@@ -16,33 +16,84 @@ const DOM = {
    palette: null,
 
    /**
+    * @property {HTMLElement} hueSlider
+    */
+   hueSlider: null,
+
+   /**
     * @property {HTMLElement} hueSliderThumb
     */
-   hueSliderThumb: null
+   hueSliderThumb: null,
+
+   /**
+    * @property {HTMLElement} hueSliderWrapper
+    */
+   hueSliderWrapper: null,
+
+   /**
+    * @property {HTMLElement} opacitySliderWrapper
+    */
+   opacitySliderWrapper: null,
+
+   /**
+    * @property {HTMLElement} opacityColor
+    */
+   opacityColor: null,
+
+   /**
+    * @property {HTMLElement} opacitySliderThumb
+    */
+   opacitySliderThumb: null,
+
+   /**
+    * @property {HTMLElement} colorPreview
+    */
+   colorPreview: null
 
 }
 
-let color;
+const COLOR_MODEL = {
+   RGB: 'rgb',
+   HSV: 'hsv',
+   HSL: 'hsl',
+   HEX: 'hex'
+};
+const hsv = {
+   h: 0,
+   s: 100,
+   v: 100,
+   a: 1
+}
+let currentColorModel = COLOR_MODEL.HEX;
+
+
+//////////////
 let colorValue;
 
 
 window.addEventListener("load", function() {
-   
    DOM.paletteWrapper = document.querySelector('.color-picker-palette-wrapper');
    DOM.palette = document.querySelector('.color-picker-palette');
    DOM.cursor = document.querySelector('.color-picker-cursor');
+   DOM.hueSliderWrapper = document.querySelector('.color-picker-hue-slider-wrapper');
    DOM.hueSliderThumb = document.querySelector('.color-picker-hue-slider-thumb');
+   DOM.hueSlider = document.querySelector('.color-picker-hue-slider');
+   DOM.opacitySliderWrapper = document.querySelector('.color-picker-opacity-slider-wrapper');
+   DOM.opacityColor = document.querySelector('.color-picker-opacity-color');
+   DOM.opacitySliderThumb = document.querySelector('.color-picker-opacity-slider-thumb');
+   DOM.colorPreview = document.querySelector('.color-picker-color-preview');
    
-   color = document.querySelector('.color');
    colorValue = document.getElementById('colorHSL');
 
    DOM.paletteWrapper.addEventListener('mousedown', cursorMouseDown);
-   DOM.hueSliderThumb.addEventListener('mousedown', hueSliderThumbMouseDown);
-   
+   DOM.hueSliderWrapper.addEventListener('mousedown', hueSliderThumbMouseDown);
+   DOM.opacitySliderWrapper.addEventListener('mousedown', opacitySliderThumbMouseDown);
+
+   applyColor();
 })
 
 /**
- * 
+ * Cursor palette color mouse down event handler
  * @param {MouseEvent} event 
  */
 function cursorMouseDown(event) {
@@ -53,16 +104,15 @@ function cursorMouseDown(event) {
 }
 
 /**
- * 
- * @param {MouseEvent} event 
+ * Cursor palette color mouse up event handler
  */
-function cursorMouseUp(event) {
+function cursorMouseUp() {
    document.removeEventListener('mousemove', cursorMouseMove);
    document.removeEventListener('mouseup', cursorMouseUp);
 }
 
 /**
- * 
+ * Cursor palette color mouse move event handler
  * @param {MouseEvent} event 
  */
 function cursorMouseMove(event) {
@@ -89,77 +139,141 @@ function cursorMouseMove(event) {
 
    DOM.cursor.style.transform = `translate(${xAxis}px, ${yAxis}px)`;
 
-   let hue = 0;
-   let saturate = calculateSaturate(xAxis);
-   let value = calculateValue(yAxis);
+   hsv.s = calculateSaturate(xAxis);
+   hsv.v = calculateValue(yAxis);
 
-   let rgb = HSVtoRGB(hue, saturate, value);
-   let colorRGB = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-   color.style.backgroundColor = colorRGB;
-   colorValue.textContent = colorRGB;
+   applyColor();
 }
 
-
-
-
-
-
-
-
-
-
 /**
- * 
+ * Hue slider thumb mouse down event handler
  * @param {MouseEvent} event 
  */
 function hueSliderThumbMouseDown(event) {
    document.addEventListener('mousemove', hueSliderThumbMouseMove);
    document.addEventListener('mouseup', hueSliderThumbMouseUp);
 
-   cursorMouseMove(event);
+   hueSliderThumbMouseMove(event);
 }
 
 /**
- * 
- * @param {MouseEvent} event 
+ * Hue slider thumb mouse up event handler
  */
-function hueSliderThumbMouseUp(event) {
+function hueSliderThumbMouseUp() {
    document.removeEventListener('mousemove', hueSliderThumbMouseMove);
    document.removeEventListener('mouseup', hueSliderThumbMouseUp);
 }
 
 /**
- * 
+ * Hue slider thumb mouse move event handler
  * @param {MouseEvent} event 
  */
 function hueSliderThumbMouseMove(event) {
+   let hueSliderRect = DOM.hueSlider.getBoundingClientRect();
+   let hueSliderThumbHalfWidth = DOM.hueSliderThumb.offsetWidth / 2;
+   let value = event.clientX - hueSliderRect.left;
+   let thumbX = value - hueSliderThumbHalfWidth;
    
+   if(thumbX >= (hueSliderThumbHalfWidth * -1) && thumbX <= (hueSliderRect.width - hueSliderThumbHalfWidth)) {
+      hsv.h = Math.round((value / hueSliderRect.width) * 360);
+      DOM.hueSliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
+      
+      applyColor();
+   }
 }
 
+/**
+ * Opacity slider thumb mouse down event handler
+ * @param {MouseEvent} event 
+ */
+function opacitySliderThumbMouseDown(event) {
+   document.addEventListener('mousemove', opacitySliderThumbMouseMove);
+   document.addEventListener('mouseup', opacitySliderThumbMouseUp);
 
+   opacitySliderThumbMouseMove(event);
+}
 
+/**
+ * Opacity slider thumb mouse up event handler
+ */
+function opacitySliderThumbMouseUp() {
+   document.removeEventListener('mousemove', opacitySliderThumbMouseMove);
+   document.removeEventListener('mouseup', opacitySliderThumbMouseUp);
+}
 
+/**
+ * Opacity slider thumb mouse move event handler
+ * @param {MouseEvent} event 
+ */
+function opacitySliderThumbMouseMove(event) {
+   let opacitySliderRect = DOM.opacitySliderWrapper.getBoundingClientRect();
+   let opacitySliderThumbHalfWidth = DOM.opacitySliderThumb.offsetWidth / 2;
+   let value = event.clientX - opacitySliderRect.left;
+   let thumbX = value - opacitySliderThumbHalfWidth;
+   
+   if(thumbX >= (opacitySliderThumbHalfWidth * -1) && thumbX <= (opacitySliderRect.width - opacitySliderThumbHalfWidth)) {
+      hsv.a = parseFloat((value / opacitySliderRect.width).toFixed(2));
+      DOM.opacitySliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
+      applyColor();
+   }
+}
 
+/**
+ * Apply color
+ */
+function applyColor() {
+   let paletteBGColor = `hsl(${hsv.h}deg 100% 50% / 1)`;
+   DOM.palette.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${paletteBGColor} 100%)`;
 
+   switch (currentColorModel) {
+      case COLOR_MODEL.RGB: {
+         let rgb = HSVtoRGB(hsv.h, hsv.s, hsv.v);
+         let previewRGBColor = `rgba(${rgb.r} ${rgb.g} ${rgb.b} / ${hsv.a})`;
+         let opacityRGBColor = `rgb(${rgb.r} ${rgb.g} ${rgb.b})`;
+         DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
+         DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
+         colorValue.textContent = previewRGBColor;
+      }
+      break;
 
+      case COLOR_MODEL.HSV: {
+         let hsl = HSVtoHSL(hsv.h, hsv.s, hsv.v);
+         let previewHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsv.a})`;
+         let opacityHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
+         let colorHSV = `hsv(${hsv.h}deg ${hsv.s}% ${hsv.v}% / ${hsv.a})`;
+         DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
+         DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
+         colorValue.textContent = colorHSV;
+      }
+      break;
 
+      case COLOR_MODEL.HSL: {
+         let hsl = HSVtoHSL(hsv.h, hsv.s, hsv.v);
+         let previewHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsv.a})`;
+         let opacityHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
+         DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
+         DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
+         colorValue.textContent = previewHSLColor;
+      }
+      break;
 
+      case COLOR_MODEL.HEX: {
+         let previewHSLColor = HSVtoHEX(hsv.h, hsv.s, hsv.v);
+         let opacityHSLColor = previewHSLColor;
 
+         if(hsv.a < 1){
+            let alpha = Math.round(hsv.a * 255).toString(16);
+            alpha = (alpha.length < 2) ? `0${alpha}` : alpha;
+            previewHSLColor += alpha;
+         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+         DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
+         DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
+         colorValue.textContent = previewHSLColor;
+      }
+      break;
+   }
+}
 
 /**
  * Calculate tha value for HSV color
@@ -207,8 +321,8 @@ function HSVtoHSL(h, s, v) {
       _saturate = ((_value - _lightness) / Math.min(_lightness, 1 - _lightness)) * 100;
    }
 
-   let l = _lightness * 100;
-   s = _saturate;
+   let l = Math.round(_lightness * 100);
+   s = Math.round(_saturate);
    
    return { h, s, l }
 }
@@ -222,9 +336,10 @@ function HSVtoHSL(h, s, v) {
  * @returns {object} RGB color 
  */
 function HSVtoRGB(h, s, v) {
-   h *= 0.01;
-   s *= 0.01;
-   v *= 0.01;
+   h /= 360;
+   s /= 100;
+   v /= 100;
+
    var r, g, b, i, f, p, q, t;
    if (arguments.length === 1) {
        s = h.s, v = h.v, h = h.h;
