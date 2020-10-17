@@ -412,9 +412,9 @@ function RGBtoHSL(r, g, b) {
 function HSVtoHEX(h, s, v) {
    let rgb = HSVtoRGB(h, s, v);
 
-   redHex = rgb.r.toString(16);
-   greenHex = rgb.g.toString(16);
-   blueHex = rgb.b.toString(16);
+   let redHex = rgb.r.toString(16);
+   let greenHex = rgb.g.toString(16);
+   let blueHex = rgb.b.toString(16);
 
    redHex = (redHex.length < 2) ? '0' + redHex : redHex;
    greenHex = (greenHex.length < 2) ? '0' + greenHex : greenHex;
