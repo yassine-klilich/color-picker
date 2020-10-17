@@ -11,25 +11,69 @@
 <body>
    
    <div class="color-picker">
-   	<div class="color-picker-wrapper">
-			<div class="color-picker-palette-wrapper">
-				<div class="color-picker-palette"></div>
-				<div class="color-picker-cursor"></div>
+   	<div class="cp-wrapper">
+			<div class="cp-palette-wrapper">
+				<div class="cp-palette"></div>
+				<div class="cp-cursor"></div>
 			</div>
-			<div class="color-picker-color-setting">
-				<div class="color-picker-color-preview-wrapper">
-					<div class="color-picker-color-preview"></div>
+			<div class="cp-color-setting">
+				<div class="cp-color-preview-wrapper">
+					<div class="cp-color-preview"></div>
 				</div>
-				<div class="color-picker-sliders">
-					<div class="color-picker-hue-slider-wrapper">
-						<div class="color-picker-hue-slider"></div>
-						<div class="color-picker-hue-slider-thumb"></div>
+				<div class="cp-sliders">
+					<div class="cp-hue-slider-wrapper">
+						<div class="cp-hue-slider"></div>
+						<div class="cp-hue-slider-thumb"></div>
 					</div>
-					<div class="color-picker-opacity-slider-wrapper">
-						<div class="color-picker-opacity-slider">
-							<div class="color-picker-opacity-color"></div>
+					<div class="cp-opacity-slider-wrapper">
+						<div class="cp-opacity-slider">
+							<div class="cp-opacity-color"></div>
 						</div>
-						<div class="color-picker-opacity-slider-thumb"></div>
+						<div class="cp-opacity-slider-thumb"></div>
+					</div>
+				</div>
+				<div class="cp-color-model-wrapper">
+					<div class="cp-color-model">
+						<div class="cp-rgb-input">
+							<input type="text" class="cp-color-input">
+							<input type="text" class="cp-color-input">
+							<input type="text" class="cp-color-input">
+							<input type="text" class="cp-color-input">
+
+							<label class="cp-color-model-label">R</label>
+							<label class="cp-color-model-label">G</label>
+							<label class="cp-color-model-label">B</label>
+							<label class="cp-color-model-label">A</label>
+						</div>
+					</div>
+					
+					<!-- <div class="cp-color-model">
+						<div class="cp-hsl-input">
+							<input type="text" class="cp-color-input">
+							<input type="text" class="cp-color-input">
+							<input type="text" class="cp-color-input">
+							<input type="text" class="cp-color-input">
+
+							<label class="cp-color-model-label">H</label>
+							<label class="cp-color-model-label">S</label>
+							<label class="cp-color-model-label">L</label>
+							<label class="cp-color-model-label">A</label>
+						</div>
+					</div> -->
+					
+					<!-- <div class="cp-color-model">
+						<div class="cp-hex-input">
+							<input type="text" class="cp-color-input">
+
+							<label class="cp-color-model-label">HEX</label>
+						</div>
+					</div> -->
+
+					<span class="cp-color-model-arrow"><svg width="12" height="12" viewBox="-285 408.9 24 24"><path d="M-285,417l4-4.1l8,8l8-8l4,4.1l-12,11.9L-285,417z"/></svg></span>
+					<div class="cp-select-color-model" style="display: none;">
+						<span class="cp-select-color-model-option" data-value="0">RGB</span>
+						<span class="cp-select-color-model-option" data-value="1">HSL</span>
+						<span class="cp-select-color-model-option" data-value="2">HEX</span>
 					</div>
 				</div>
 			</div>
@@ -39,6 +83,10 @@
 	<span id="colorHSL" style="color: red;">hhhh</span>
 
 	<script src="./script.js"></script>
+
+   <script>
+      ColorPicker.init();
+   </script>
 
 </body>
 </html>
