@@ -5,65 +5,14 @@
 
 (function(window) {
    if(!window.ColorPicker) {
-      const DOM = {
-         /**
-          * @property {HTMLElement} paletteWwrapper
-          */
-         paletteWrapper: null,
-      
-         /**
-          * @property {HTMLElement} cursor
-          */
-         cursor: null,
-         
-         /**
-          * @property {HTMLElement} palette
-          */
-         palette: null,
-      
-         /**
-          * @property {HTMLElement} hueSlider
-          */
-         hueSlider: null,
-      
-         /**
-          * @property {HTMLElement} hueSliderThumb
-          */
-         hueSliderThumb: null,
-      
-         /**
-          * @property {HTMLElement} hueSliderWrapper
-          */
-         hueSliderWrapper: null,
-      
-         /**
-          * @property {HTMLElement} opacitySliderWrapper
-          */
-         opacitySliderWrapper: null,
-      
-         /**
-          * @property {HTMLElement} opacityColor
-          */
-         opacityColor: null,
-      
-         /**
-          * @property {HTMLElement} opacitySliderThumb
-          */
-         opacitySliderThumb: null,
-      
-         /**
-          * @property {HTMLElement} colorPreview
-          */
-         colorPreview: null
-      
-      }
+      const DOM = {};
       
       const COLOR_MODEL = {
          RGB: 'rgb',
          HSV: 'hsv',
          HSL: 'hsl',
          HEX: 'hex'
-      };
+      }
       const hsv = {
          h: 0,
          s: 100,
@@ -75,16 +24,8 @@
       let colorValue;
 
       function init() {
-         DOM.paletteWrapper = document.querySelector('.cp-palette-wrapper');
-         DOM.palette = document.querySelector('.cp-palette');
-         DOM.cursor = document.querySelector('.cp-cursor');
-         DOM.hueSliderWrapper = document.querySelector('.cp-hue-slider-wrapper');
-         DOM.hueSliderThumb = document.querySelector('.cp-hue-slider-thumb');
-         DOM.hueSlider = document.querySelector('.cp-hue-slider');
-         DOM.opacitySliderWrapper = document.querySelector('.cp-opacity-slider-wrapper');
-         DOM.opacityColor = document.querySelector('.cp-opacity-color');
-         DOM.opacitySliderThumb = document.querySelector('.cp-opacity-slider-thumb');
-         DOM.colorPreview = document.querySelector('.cp-color-preview');
+
+         _initGUI();
          
          colorValue = document.getElementById('colorHSL');
 
@@ -93,6 +34,77 @@
          DOM.opacitySliderWrapper.addEventListener('mousedown', opacitySliderThumbMouseDown);
 
          applyColor();
+      }
+
+      /**
+       * Initialize the GUI
+       */
+      function _initGUI() {
+         // DOM declaration
+         let colorPicker = document.createElement("div");
+         let cp_Wrapper = document.createElement("div");
+         let cp_PaletteWrapper = document.createElement("div");
+         let cp_Palette = document.createElement("div");
+         let cp_Cursor = document.createElement("div");
+         let cp_ColorSetting = document.createElement("div");
+         let cp_ColorPreviewWrapper = document.createElement("div");
+         let cp_ColorPreview = document.createElement("div");
+         let cp_Sliders = document.createElement("div");
+         let cp_HueSliderWrapper = document.createElement("div");
+         let cp_HueSlider = document.createElement("div");
+         let cp_HueSliderThumb = document.createElement("div");
+         let cp_OpacitySliderWrapper = document.createElement("div");
+         let cp_OpacitySlider = document.createElement("div");
+         let cp_OpacityColor = document.createElement("div");
+         let cp_OpacitySliderThumb = document.createElement("div");
+
+         // Add class names
+         colorPicker.classList.add("color-picker");
+         cp_Wrapper.classList.add("cp-wrapper");
+         cp_PaletteWrapper.classList.add("cp-palette-wrapper");
+         cp_Palette.classList.add("cp-palette");
+         cp_Cursor.classList.add("cp-cursor");
+         cp_ColorSetting.classList.add("cp-color-setting");
+         cp_ColorPreviewWrapper.classList.add("cp-color-preview-wrapper");
+         cp_ColorPreview.classList.add("cp-color-preview");
+         cp_Sliders.classList.add("cp-sliders");
+         cp_HueSliderWrapper.classList.add("cp-hue-slider-wrapper");
+         cp_HueSlider.classList.add("cp-hue-slider");
+         cp_HueSliderThumb.classList.add("cp-hue-slider-thumb");
+         cp_OpacitySliderWrapper.classList.add("cp-opacity-slider-wrapper");
+         cp_OpacitySlider.classList.add("cp-opacity-slider");
+         cp_OpacityColor.classList.add("cp-opacity-color");
+         cp_OpacitySliderThumb.classList.add("cp-opacity-slider-thumb");
+
+         // Append child nodes
+         colorPicker.appendChild(cp_Wrapper);
+         cp_Wrapper.appendChild(cp_PaletteWrapper);
+         cp_Wrapper.appendChild(cp_ColorSetting);
+         cp_PaletteWrapper.appendChild(cp_Palette);
+         cp_PaletteWrapper.appendChild(cp_Cursor);
+         cp_ColorSetting.appendChild(cp_ColorPreviewWrapper);
+         cp_ColorSetting.appendChild(cp_Sliders);
+         cp_ColorPreviewWrapper.appendChild(cp_ColorPreview);
+         cp_Sliders.appendChild(cp_HueSliderWrapper);
+         cp_Sliders.appendChild(cp_OpacitySliderWrapper);
+         cp_HueSliderWrapper.appendChild(cp_HueSlider);
+         cp_HueSliderWrapper.appendChild(cp_HueSliderThumb);
+         cp_OpacitySliderWrapper.appendChild(cp_OpacitySlider);
+         cp_OpacitySliderWrapper.appendChild(cp_OpacitySliderThumb);
+         cp_OpacitySlider.appendChild(cp_OpacityColor);
+
+         DOM.paletteWrapper = cp_PaletteWrapper;
+         DOM.cursor = cp_Cursor;
+         DOM.palette = cp_Palette;
+         DOM.hueSlider = cp_HueSlider;
+         DOM.hueSliderThumb = cp_HueSliderThumb;
+         DOM.hueSliderWrapper = cp_HueSliderWrapper;
+         DOM.opacitySliderWrapper = cp_OpacitySliderWrapper;
+         DOM.opacityColor = cp_OpacityColor;
+         DOM.opacitySliderThumb = cp_OpacitySliderThumb;
+         DOM.colorPreview = cp_ColorPreview;
+
+         document.body.appendChild(colorPicker);
       }
 
       /**
@@ -119,26 +131,22 @@
        * @param {MouseEvent} event 
        */
       function cursorMouseMove(event) {
-         let xAxis = event.clientX;
-         let yAxis = event.clientY;
-
          let paletteWrapperClientRect = DOM.paletteWrapper.getBoundingClientRect();
+         let xAxis = event.clientX - paletteWrapperClientRect.left;
+         let yAxis = event.clientY - paletteWrapperClientRect.top;
 
-         if(xAxis <= paletteWrapperClientRect.left) {
-            xAxis = paletteWrapperClientRect.left;
+         if(xAxis < 0) {
+            xAxis = 0;
          }
-         if(xAxis >= paletteWrapperClientRect.right) {
-            xAxis = paletteWrapperClientRect.right;
+         if(xAxis > DOM.paletteWrapper.offsetWidth) {
+            xAxis = DOM.paletteWrapper.offsetWidth;
          }
-         if(yAxis <= paletteWrapperClientRect.top) {
-            yAxis = paletteWrapperClientRect.top;
+         if(yAxis < 0) {
+            yAxis = 0;
          }
-         if(yAxis >= paletteWrapperClientRect.bottom) {
-            yAxis = paletteWrapperClientRect.bottom;
+         if(yAxis > DOM.paletteWrapper.offsetHeight) {
+            yAxis = DOM.paletteWrapper.offsetHeight;
          }
-
-         xAxis -= 9;
-         yAxis -= 9;
 
          DOM.cursor.style.transform = `translate(${xAxis}px, ${yAxis}px)`;
 
