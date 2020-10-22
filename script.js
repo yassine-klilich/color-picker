@@ -21,17 +21,14 @@
       }
       let currentColorModel = COLOR_MODEL.RGB;
 
-      let colorValue;
-
       function init() {
 
          _initGUI();
          
-         colorValue = document.getElementById('colorHSL');
-
          DOM.paletteWrapper.addEventListener('mousedown', _cursorMouseDown);
          DOM.hueSliderWrapper.addEventListener('mousedown', _hueSliderThumbMouseDown);
          DOM.opacitySliderWrapper.addEventListener('mousedown', _opacitySliderThumbMouseDown);
+         DOM.overlayBackdrop.addEventListener('click', _closeColorPicker);
 
          _applyColor();
       }
@@ -41,9 +38,9 @@
        */
       function _initGUI() {
          // DOM declaration
-         let overlayContainer = document.createElement("div");
-         let overlayBackdrop = document.createElement("div");
-         let overlayWrapper = document.createElement("div");
+         let cp_overlayContainer = document.createElement("div");
+         let cp_overlayBackdrop = document.createElement("div");
+         let cp_overlayWrapper = document.createElement("div");
          let colorPicker = document.createElement("div");
          let cp_Wrapper = document.createElement("div");
          let cp_PaletteWrapper = document.createElement("div");
@@ -62,9 +59,9 @@
          let cp_OpacitySliderThumb = document.createElement("div");
 
          // Add class names
-         overlayContainer.classList.add("cl-overlay-container");
-         overlayBackdrop.classList.add("cl-overlay-backdrop");
-         overlayWrapper.classList.add("cl-overlay-wrapper");
+         cp_overlayContainer.classList.add("cl-overlay-container");
+         cp_overlayBackdrop.classList.add("cl-overlay-backdrop");
+         cp_overlayWrapper.classList.add("cl-overlay-wrapper");
          colorPicker.classList.add("color-picker");
          cp_Wrapper.classList.add("cp-wrapper");
          cp_PaletteWrapper.classList.add("cp-palette-wrapper");
@@ -83,9 +80,9 @@
          cp_OpacitySliderThumb.classList.add("cp-opacity-slider-thumb");
 
          // Append child nodes
-         overlayContainer.appendChild(overlayBackdrop);
-         overlayContainer.appendChild(overlayWrapper);
-         overlayWrapper.appendChild(colorPicker);
+         cp_overlayContainer.appendChild(cp_overlayBackdrop);
+         cp_overlayContainer.appendChild(cp_overlayWrapper);
+         cp_overlayWrapper.appendChild(colorPicker);
          colorPicker.appendChild(cp_Wrapper);
          cp_Wrapper.appendChild(cp_PaletteWrapper);
          cp_Wrapper.appendChild(cp_ColorSetting);
@@ -102,6 +99,8 @@
          cp_OpacitySliderWrapper.appendChild(cp_OpacitySliderThumb);
          cp_OpacitySlider.appendChild(cp_OpacityColor);
 
+         DOM.overlayContainer = cp_overlayContainer;
+         DOM.overlayBackdrop = cp_overlayBackdrop;
          DOM.paletteWrapper = cp_PaletteWrapper;
          DOM.cursor = cp_Cursor;
          DOM.palette = cp_Palette;
@@ -113,7 +112,7 @@
          DOM.opacitySliderThumb = cp_OpacitySliderThumb;
          DOM.colorPreview = cp_ColorPreview;
 
-         document.body.appendChild(overlayContainer);
+         document.body.appendChild(DOM.overlayContainer);
       }
 
       /**
@@ -239,6 +238,20 @@
       }
 
       /**
+       * Open color picker
+       */
+      function _openColorPicker() {
+         document.body.appendChild(DOM.overlayContainer);
+      }
+
+      /**
+       * Close color picker
+       */
+      function _closeColorPicker() {
+         document.body.removeChild(DOM.overlayContainer);
+      }
+
+      /**
        * Apply color
        */
       function _applyColor() {
@@ -252,7 +265,6 @@
                let opacityRGBColor = `rgb(${rgb.r} ${rgb.g} ${rgb.b})`;
                DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
                DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
-               colorValue.textContent = previewRGBColor;
             }
             break;
 
@@ -263,7 +275,6 @@
                let colorHSV = `hsv(${hsv.h}deg ${hsv.s}% ${hsv.v}% / ${hsv.a})`;
                DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
                DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
-               colorValue.textContent = colorHSV;
             }
             break;
 
@@ -273,7 +284,6 @@
                let opacityHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
                DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
                DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
-               colorValue.textContent = previewHSLColor;
             }
             break;
 
@@ -289,7 +299,6 @@
 
                DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
                DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
-               colorValue.textContent = previewHSLColor;
             }
             break;
          }
@@ -450,10 +459,12 @@
       window.ColorPicker = {
          // Properties
          COLOR_MODEL,
-
+DOM,
          // Methods
          init,
          selectedColorModel,
+         openColorPicker: _openColorPicker,
+         closeColorPicker: _closeColorPicker
       }
    }
 })(window);
