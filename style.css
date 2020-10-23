@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
-.cl-overlay-container {
+.cp-overlay-container {
+	font-family: 'Roboto', sans-serif;
 	position: fixed;
 	top: 0px;
 	left: 0px;
@@ -8,20 +9,21 @@
 	height: 100%;
 }
 
-.cl-overlay-backdrop {
+.cp-overlay-backdrop {
 	position: absolute;
 	top: 0px;
 	left: 0px;
 	width: 100%;
 	height: 100%;
+	z-index: 0;
 }
 
-.cl-overlay-wrapper {
+.cp-overlay-wrapper {
 	position: absolute;
+	z-index: 1;
 }
 
 .color-picker {
-	font-family: 'Roboto', sans-serif;
 	display: inline-block;
 }
 
@@ -159,6 +161,7 @@
 }
 
 .cp-rgb-input,
+.cp-hsv-input,
 .cp-hsl-input,
 .cp-hex-input {
 	display: grid;
@@ -169,6 +172,7 @@
 }
 
 .cp-rgb-input,
+.cp-hsv-input,
 .cp-hsl-input {
 	grid-template-columns: 1fr 1fr 1fr 1fr;
 }
@@ -178,6 +182,7 @@
 }
 
 .cp-color-input {
+	font-family: inherit;
 	height: 16px;
 	outline: none;
 	border: 1px solid #5A5A5A;
@@ -193,11 +198,12 @@
 }
 
 .cp-rgb-input .cp-color-input,
+.cp-hsv-input .cp-color-input,
 .cp-hsl-input .cp-color-input {
 	width: 36px;
 }
 .cp-hex-input .cp-color-input {
-	width: 140px;
+	width: 180px;
 }
 
 .cp-color-model-label {
@@ -205,8 +211,46 @@
 	font-size: 12px;
 }
 
-.cp-select-color-model {
+.cp-color-model-arrow {
+	cursor: pointer;
+	position: relative;
+}
+.cp-color-model-arrow::before {
+	content: "";
+	visibility: hidden;
 	position: absolute;
+	background-color: #4d4d4d;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	z-index: 0;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -56%);
+}
+.cp-color-model-arrow:hover::before {
+	visibility: visible;
+}
+.cp-color-model-arrow svg {
+	position: relative;
+	z-index: 1;
+}
+.cp-color-model-arrow svg path {
+	fill: #bcbcbc;
+}
+
+.cp-select-color-model-overlay-wrapper {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 2;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+.cp-select-color-model {
 	display: flex;
 	flex-direction: column;
 	width: 100px;
@@ -219,18 +263,10 @@
 	top: 30px;
 	right: -4px;
 }
-
 .cp-select-color-model-option {
 	padding: 4px 8px;
 	cursor: pointer;
 }
 .cp-select-color-model-option:hover {
 	background-color: #383838;
-}
-
-.cp-color-model-arrow {
-	cursor: pointer;
-}
-.cp-color-model-arrow svg path {
-	fill: #bcbcbc;
 }
