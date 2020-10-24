@@ -399,6 +399,7 @@
                let opacityRGBColor = `rgb(${rgb.r} ${rgb.g} ${rgb.b})`;
                DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
                DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
+               // _setColorValue()
             }
             break;
 
@@ -439,7 +440,7 @@
       }
 
       /**
-       * Calculate the value for HSV color
+       * Calculate the value for HSV color from the distance between the cursor Y axis and the height of palette color
        * @param {number} yAxis 
        * 
        * @returns {number} value
@@ -451,7 +452,7 @@
       }
 
       /**
-       * Calculate tha saturate for HSV color
+       * Calculate the saturate for HSV color from the distance between the cursor X axis and the width of palette color
        * @param {number} xAxis
        * 
        * @returns {number} saturate
@@ -683,13 +684,20 @@
             let hueSliderThumbHalfWidth = DOM.hueSliderThumb.offsetWidth / 2;
             let value = event.clientX - hueSliderRect.left;
             let thumbX = value - hueSliderThumbHalfWidth;
-            
-            if(thumbX >= (hueSliderThumbHalfWidth * -1) && thumbX <= (hueSliderRect.width - hueSliderThumbHalfWidth)) {
-               hsv.h = Math.round((value / hueSliderRect.width) * 360);
-               DOM.hueSliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
-               
-               _applyColor();
+            let minPosition = (hueSliderThumbHalfWidth * -1);
+            let maxPosition = (hueSliderRect.width - hueSliderThumbHalfWidth);
+
+            if(thumbX < minPosition) {
+               thumbX = minPosition;
             }
+            if(thumbX > maxPosition) {
+               thumbX = maxPosition;
+            }
+
+            hsv.h = Math.round(((thumbX + hueSliderThumbHalfWidth) / hueSliderRect.width) * 360);
+            DOM.hueSliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
+               
+            _applyColor();
          },
 
          /**
@@ -720,12 +728,20 @@
             let opacitySliderThumbHalfWidth = DOM.opacitySliderThumb.offsetWidth / 2;
             let value = event.clientX - opacitySliderRect.left;
             let thumbX = value - opacitySliderThumbHalfWidth;
+            let minPosition = (opacitySliderThumbHalfWidth * -1);
+            let maxPosition = (opacitySliderRect.width - opacitySliderThumbHalfWidth);
             
-            if(thumbX >= (opacitySliderThumbHalfWidth * -1) && thumbX <= (opacitySliderRect.width - opacitySliderThumbHalfWidth)) {
-               hsv.a = parseFloat((value / opacitySliderRect.width).toFixed(2));
-               DOM.opacitySliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
-               _applyColor();
+            if(thumbX < minPosition) {
+               thumbX = minPosition;
             }
+            if(thumbX > maxPosition) {
+               thumbX = maxPosition;
+            }
+
+            hsv.a = parseFloat(((thumbX + opacitySliderThumbHalfWidth) / opacitySliderRect.width).toFixed(2));
+            DOM.opacitySliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
+               
+            _applyColor();
          },
 
          /**
