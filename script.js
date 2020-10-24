@@ -21,341 +21,9 @@
       let currentColorModel = null;
 
       function init() {
-         _initGUI();
-         _initEvents();
+         _guiBuilder.initGUI();
+         _eventListeners.initEvents();
          _applyColor();
-      }
-
-      /**
-       * Initialize the GUI
-       */
-      function _initGUI() {
-         // DOM declaration
-         let cp_overlayContainer = document.createElement("div");
-         let cp_overlayBackdrop = document.createElement("div");
-         let cp_overlayWrapper = document.createElement("div");
-         let colorPicker = document.createElement("div");
-         let cp_Wrapper = document.createElement("div");
-         let cp_PaletteWrapper = document.createElement("div");
-         let cp_Palette = document.createElement("div");
-         let cp_Cursor = document.createElement("div");
-         let cp_ColorSetting = document.createElement("div");
-         let cp_ColorPreviewWrapper = document.createElement("div");
-         let cp_ColorPreview = document.createElement("div");
-         let cp_Sliders = document.createElement("div");
-         let cp_HueSliderWrapper = document.createElement("div");
-         let cp_HueSlider = document.createElement("div");
-         let cp_HueSliderThumb = document.createElement("div");
-         let cp_OpacitySliderWrapper = document.createElement("div");
-         let cp_OpacitySlider = document.createElement("div");
-         let cp_OpacityColor = document.createElement("div");
-         let cp_OpacitySliderThumb = document.createElement("div");
-         let cp_ColorModelWrapper = document.createElement("div");
-         let cp_ColorModel = document.createElement("div");
-         let cp_colorModelArrow = document.createElement("span");
-         cp_colorModelArrow.innerHTML = '<svg width="12" height="12" viewBox="-285 408.9 24 24"><path d="M-285,417l4-4.1l8,8l8-8l4,4.1l-12,11.9L-285,417z"/></svg>';
-         let cp_SelectColorModelOverlayWrapper = document.createElement("div");
-         let cp_SelectColorModelOverlay = document.createElement("div");
-         let cp_SelectColorModel = _buildColorModelSelectDOM();
-         let cp_rgbInputs = _buildRGBInputsDOM();
-         let cp_hsvInputs = _buildHSVInputsDOM();
-         let cp_hslInputs = _buildHSLInputsDOM();
-         let cp_hexInputs = _buildHEXInputsDOM();
-         
-         // Add class names
-         cp_overlayContainer.classList.add("cp-overlay-container");
-         cp_overlayBackdrop.classList.add("cp-overlay-backdrop");
-         cp_overlayWrapper.classList.add("cp-overlay-wrapper");
-         colorPicker.classList.add("color-picker");
-         cp_Wrapper.classList.add("cp-wrapper");
-         cp_PaletteWrapper.classList.add("cp-palette-wrapper");
-         cp_Palette.classList.add("cp-palette");
-         cp_Cursor.classList.add("cp-cursor");
-         cp_ColorSetting.classList.add("cp-color-setting");
-         cp_ColorPreviewWrapper.classList.add("cp-color-preview-wrapper");
-         cp_ColorPreview.classList.add("cp-color-preview");
-         cp_Sliders.classList.add("cp-sliders");
-         cp_HueSliderWrapper.classList.add("cp-hue-slider-wrapper");
-         cp_HueSlider.classList.add("cp-hue-slider");
-         cp_HueSliderThumb.classList.add("cp-hue-slider-thumb");
-         cp_OpacitySliderWrapper.classList.add("cp-opacity-slider-wrapper");
-         cp_OpacitySlider.classList.add("cp-opacity-slider");
-         cp_OpacityColor.classList.add("cp-opacity-color");
-         cp_OpacitySliderThumb.classList.add("cp-opacity-slider-thumb");
-         cp_ColorModelWrapper.classList.add("cp-color-model-wrapper");
-         cp_ColorModel.classList.add("cp-color-model");
-         cp_colorModelArrow.classList.add("cp-color-model-arrow");
-         cp_SelectColorModelOverlayWrapper.classList.add("cp-select-color-model-overlay-wrapper");
-         cp_SelectColorModelOverlay.classList.add("cp-select-color-model-overlay");
-         
-         // Append child nodes
-         cp_overlayContainer.appendChild(cp_overlayBackdrop);
-         cp_overlayContainer.appendChild(cp_overlayWrapper);
-         cp_overlayWrapper.appendChild(colorPicker);
-         colorPicker.appendChild(cp_Wrapper);
-         cp_Wrapper.appendChild(cp_PaletteWrapper);
-         cp_Wrapper.appendChild(cp_ColorSetting);
-         cp_PaletteWrapper.appendChild(cp_Palette);
-         cp_PaletteWrapper.appendChild(cp_Cursor);
-         cp_ColorSetting.appendChild(cp_ColorPreviewWrapper);
-         cp_ColorSetting.appendChild(cp_Sliders);
-         cp_ColorSetting.appendChild(cp_ColorModelWrapper);
-         cp_ColorPreviewWrapper.appendChild(cp_ColorPreview);
-         cp_Sliders.appendChild(cp_HueSliderWrapper);
-         cp_Sliders.appendChild(cp_OpacitySliderWrapper);
-         cp_HueSliderWrapper.appendChild(cp_HueSlider);
-         cp_HueSliderWrapper.appendChild(cp_HueSliderThumb);
-         cp_OpacitySliderWrapper.appendChild(cp_OpacitySlider);
-         cp_OpacitySliderWrapper.appendChild(cp_OpacitySliderThumb);
-         cp_OpacitySlider.appendChild(cp_OpacityColor);
-         cp_ColorModelWrapper.appendChild(cp_ColorModel);
-         cp_ColorModelWrapper.appendChild(cp_colorModelArrow);
-         cp_SelectColorModelOverlayWrapper.appendChild(cp_SelectColorModelOverlay);
-         cp_SelectColorModelOverlay.appendChild(cp_SelectColorModel);
-         
-         DOM.overlayContainer = cp_overlayContainer;
-         DOM.overlayBackdrop = cp_overlayBackdrop;
-         DOM.overlayWrapper = cp_overlayWrapper;
-         DOM.orPicker = colorPicker;
-         DOM.wrapper = cp_Wrapper;
-         DOM.paletteWrapper = cp_PaletteWrapper;
-         DOM.palette = cp_Palette;
-         DOM.cursor = cp_Cursor;
-         DOM.colorSetting = cp_ColorSetting;
-         DOM.colorPreviewWrapper = cp_ColorPreviewWrapper;
-         DOM.colorPreview = cp_ColorPreview;
-         DOM.sliders = cp_Sliders;
-         DOM.hueSliderWrapper = cp_HueSliderWrapper;
-         DOM.hueSlider = cp_HueSlider;
-         DOM.hueSliderThumb = cp_HueSliderThumb;
-         DOM.opacitySliderWrapper = cp_OpacitySliderWrapper;
-         DOM.opacitySlider = cp_OpacitySlider;
-         DOM.opacityColor = cp_OpacityColor;
-         DOM.opacitySliderThumb = cp_OpacitySliderThumb;
-         DOM.colorModelWrapper = cp_ColorModelWrapper;
-         DOM.colorModel = cp_ColorModel;
-         DOM.colorModelArrow = cp_colorModelArrow;
-         DOM.selectColorModelOverlayWrapper = cp_SelectColorModelOverlayWrapper;
-         DOM.selectColorModelOverlay = cp_SelectColorModelOverlay;
-         DOM.selectColorModel = cp_SelectColorModel;
-         DOM.rgbInputs = cp_rgbInputs;
-         DOM.hsvInputs = cp_hsvInputs;
-         DOM.hslInputs = cp_hslInputs;
-         DOM.hexInputs = cp_hexInputs;
-         
-         /**
-          * Basically is initializing a color model input
-          */
-         _setColorModel(COLOR_MODEL.RGB);
-
-         document.body.appendChild(DOM.overlayContainer);
-      }
-
-      /**
-       * Initialize event listeners for DOM elements
-       */
-      function _initEvents() {
-         DOM.paletteWrapper.addEventListener('mousedown', _eventListeners.cursorMouseDown);
-         DOM.hueSliderWrapper.addEventListener('mousedown', _eventListeners.hueSliderThumbMouseDown);
-         DOM.opacitySliderWrapper.addEventListener('mousedown', _eventListeners.opacitySliderThumbMouseDown);
-         DOM.overlayBackdrop.addEventListener('click', _eventListeners.closeColorPicker);
-         DOM.colorModelArrow.addEventListener('click', _eventListeners.openSelectColorModel);
-         DOM.selectColorModelOverlayWrapper.addEventListener('click', _eventListeners.closeSelectColorModel);
-         DOM.selectColorModel.addEventListener('click', _eventListeners.onColorModelChanged);
-      }
-
-      /**
-       * Build RGB color model input elements
-       */
-      function _buildRGBInputsDOM() {
-         let cp_RgbInput = document.createElement("div");
-         let redInput = document.createElement("input");
-         let greenInput = document.createElement("input");
-         let blueInput = document.createElement("input");
-         let alphaInput = document.createElement("input");
-         let redLabel = document.createElement("label");
-         let greenLabel = document.createElement("label");
-         let blueLabel = document.createElement("label");
-         let alphaLabel = document.createElement("label");
-
-         redInput.setAttribute("type", "text");
-         greenInput.setAttribute("type", "text");
-         blueInput.setAttribute("type", "text");
-         alphaInput.setAttribute("type", "text");
-         
-         cp_RgbInput.classList.add("cp-rgb-input");
-         redInput.classList.add("cp-color-input");
-         greenInput.classList.add("cp-color-input");
-         blueInput.classList.add("cp-color-input");
-         alphaInput.classList.add("cp-color-input");
-         redLabel.classList.add("cp-color-model-label");
-         greenLabel.classList.add("cp-color-model-label");
-         blueLabel.classList.add("cp-color-model-label");
-         alphaLabel.classList.add("cp-color-model-label");
-
-         redLabel.innerHTML = "R";
-         greenLabel.innerHTML = "G";
-         blueLabel.innerHTML = "B";
-         alphaLabel.innerHTML = "A";
-
-         cp_RgbInput.appendChild(redInput);
-         cp_RgbInput.appendChild(greenInput);
-         cp_RgbInput.appendChild(blueInput);
-         cp_RgbInput.appendChild(alphaInput);
-         cp_RgbInput.appendChild(redLabel);
-         cp_RgbInput.appendChild(greenLabel);
-         cp_RgbInput.appendChild(blueLabel);
-         cp_RgbInput.appendChild(alphaLabel);
-
-         return cp_RgbInput;
-      }
-
-      /**
-       * Build HSV color model input elements
-       */
-      function _buildHSVInputsDOM() {
-         let cp_HSVInput = document.createElement("div");
-         let hueInput = document.createElement("input");
-         let saturateInput = document.createElement("input");
-         let valueInput = document.createElement("input");
-         let alphaInput = document.createElement("input");
-         let hueLabel = document.createElement("label");
-         let saturateLabel = document.createElement("label");
-         let valueLabel = document.createElement("label");
-         let alphaLabel = document.createElement("label");
-
-         hueInput.setAttribute("type", "text");
-         saturateInput.setAttribute("type", "text");
-         valueInput.setAttribute("type", "text");
-         alphaInput.setAttribute("type", "text");
-         
-         cp_HSVInput.classList.add("cp-hsv-input");
-         hueInput.classList.add("cp-color-input");
-         saturateInput.classList.add("cp-color-input");
-         valueInput.classList.add("cp-color-input");
-         alphaInput.classList.add("cp-color-input");
-         hueLabel.classList.add("cp-color-model-label");
-         saturateLabel.classList.add("cp-color-model-label");
-         valueLabel.classList.add("cp-color-model-label");
-         alphaLabel.classList.add("cp-color-model-label");
-
-         hueLabel.innerHTML = "H";
-         saturateLabel.innerHTML = "S";
-         valueLabel.innerHTML = "V";
-         alphaLabel.innerHTML = "A";
-
-         cp_HSVInput.appendChild(hueInput);
-         cp_HSVInput.appendChild(saturateInput);
-         cp_HSVInput.appendChild(valueInput);
-         cp_HSVInput.appendChild(alphaInput);
-         cp_HSVInput.appendChild(hueLabel);
-         cp_HSVInput.appendChild(saturateLabel);
-         cp_HSVInput.appendChild(valueLabel);
-         cp_HSVInput.appendChild(alphaLabel);
-
-         return cp_HSVInput;
-      }
-
-      /**
-       * Build HSL color model input elements
-       */
-      function _buildHSLInputsDOM() {
-         let cp_HSLInput = document.createElement("div");
-         let hueInput = document.createElement("input");
-         let saturateInput = document.createElement("input");
-         let lightnessInput = document.createElement("input");
-         let alphaInput = document.createElement("input");
-         let hueLabel = document.createElement("label");
-         let saturateLabel = document.createElement("label");
-         let lightnessLabel = document.createElement("label");
-         let alphaLabel = document.createElement("label");
-
-         hueInput.setAttribute("type", "text");
-         saturateInput.setAttribute("type", "text");
-         lightnessInput.setAttribute("type", "text");
-         alphaInput.setAttribute("type", "text");
-         
-         cp_HSLInput.classList.add("cp-hsl-input");
-         hueInput.classList.add("cp-color-input");
-         saturateInput.classList.add("cp-color-input");
-         lightnessInput.classList.add("cp-color-input");
-         alphaInput.classList.add("cp-color-input");
-         hueLabel.classList.add("cp-color-model-label");
-         saturateLabel.classList.add("cp-color-model-label");
-         lightnessLabel.classList.add("cp-color-model-label");
-         alphaLabel.classList.add("cp-color-model-label");
-
-         hueLabel.innerHTML = "H";
-         saturateLabel.innerHTML = "S";
-         lightnessLabel.innerHTML = "L";
-         alphaLabel.innerHTML = "A";
-
-         cp_HSLInput.appendChild(hueInput);
-         cp_HSLInput.appendChild(saturateInput);
-         cp_HSLInput.appendChild(lightnessInput);
-         cp_HSLInput.appendChild(alphaInput);
-         cp_HSLInput.appendChild(hueLabel);
-         cp_HSLInput.appendChild(saturateLabel);
-         cp_HSLInput.appendChild(lightnessLabel);
-         cp_HSLInput.appendChild(alphaLabel);
-
-         return cp_HSLInput;
-      }
-
-      /**
-       * Build HEX color model input elements
-       */
-      function _buildHEXInputsDOM() {
-         let cp_HEXInput = document.createElement("div");
-         let hexInput = document.createElement("input");
-         let hexLabel = document.createElement("label");
-
-         hexInput.setAttribute("type", "text");
-         
-         cp_HEXInput.classList.add("cp-hex-input");
-         hexInput.classList.add("cp-color-input");
-         hexLabel.classList.add("cp-color-model-label");
-         
-         hexLabel.innerHTML = "HEX";
-         
-         cp_HEXInput.appendChild(hexInput);
-         cp_HEXInput.appendChild(hexLabel);
-         
-         return cp_HEXInput;
-      }
-
-      /**
-       * Build custom select input for selecting a color model
-       */
-      function _buildColorModelSelectDOM() {
-         let cp_SelectColorModel = document.createElement("div");
-         let cp_SelectColorModelOptionRGB = document.createElement("span");
-         let cp_SelectColorModelOptionHSV = document.createElement("span");
-         let cp_SelectColorModelOptionHSL = document.createElement("span");
-         let cp_SelectColorModelOptionHEX = document.createElement("span");
-
-         cp_SelectColorModel.classList.add("cp-select-color-model");
-         cp_SelectColorModelOptionRGB.classList.add("cp-select-color-model-option");
-         cp_SelectColorModelOptionHSV.classList.add("cp-select-color-model-option");
-         cp_SelectColorModelOptionHSL.classList.add("cp-select-color-model-option");
-         cp_SelectColorModelOptionHEX.classList.add("cp-select-color-model-option");
-
-         cp_SelectColorModelOptionRGB.setAttribute("data-value", COLOR_MODEL.RGB);
-         cp_SelectColorModelOptionHSV.setAttribute("data-value", COLOR_MODEL.HSV);
-         cp_SelectColorModelOptionHSL.setAttribute("data-value", COLOR_MODEL.HSL);
-         cp_SelectColorModelOptionHEX.setAttribute("data-value", COLOR_MODEL.HEX);
-
-         cp_SelectColorModelOptionRGB.innerHTML = "RGB";
-         cp_SelectColorModelOptionHSV.innerHTML = "HSV";
-         cp_SelectColorModelOptionHSL.innerHTML = "HSL";
-         cp_SelectColorModelOptionHEX.innerHTML = "HEX";
-
-         cp_SelectColorModel.appendChild(cp_SelectColorModelOptionRGB);
-         cp_SelectColorModel.appendChild(cp_SelectColorModelOptionHSV);
-         cp_SelectColorModel.appendChild(cp_SelectColorModelOptionHSL);
-         cp_SelectColorModel.appendChild(cp_SelectColorModelOptionHEX);
-
-         return cp_SelectColorModel;
       }
 
       /**
@@ -461,6 +129,330 @@
          let paletteWidth = DOM.palette.offsetWidth;
 
          return Math.round((xAxis / paletteWidth) * 100);
+      }
+
+      /**
+       * GUI builder
+       */
+      const _guiBuilder = {
+         /**
+          * Initialize the GUI
+          */
+         initGUI() {
+            // DOM declaration
+            let cp_overlayContainer = document.createElement("div");
+            let cp_overlayBackdrop = document.createElement("div");
+            let cp_overlayWrapper = document.createElement("div");
+            let colorPicker = document.createElement("div");
+            let cp_Wrapper = document.createElement("div");
+            let cp_PaletteWrapper = document.createElement("div");
+            let cp_Palette = document.createElement("div");
+            let cp_Cursor = document.createElement("div");
+            let cp_ColorSetting = document.createElement("div");
+            let cp_ColorPreviewWrapper = document.createElement("div");
+            let cp_ColorPreview = document.createElement("div");
+            let cp_Sliders = document.createElement("div");
+            let cp_HueSliderWrapper = document.createElement("div");
+            let cp_HueSlider = document.createElement("div");
+            let cp_HueSliderThumb = document.createElement("div");
+            let cp_OpacitySliderWrapper = document.createElement("div");
+            let cp_OpacitySlider = document.createElement("div");
+            let cp_OpacityColor = document.createElement("div");
+            let cp_OpacitySliderThumb = document.createElement("div");
+            let cp_ColorModelWrapper = document.createElement("div");
+            let cp_ColorModel = document.createElement("div");
+            let cp_colorModelArrow = document.createElement("span");
+            cp_colorModelArrow.innerHTML = '<svg width="12" height="12" viewBox="-285 408.9 24 24"><path d="M-285,417l4-4.1l8,8l8-8l4,4.1l-12,11.9L-285,417z"/></svg>';
+            let cp_SelectColorModelOverlayWrapper = document.createElement("div");
+            let cp_SelectColorModelOverlay = document.createElement("div");
+            let cp_SelectColorModel = _guiBuilder.buildColorModelSelectDOM();
+            let cp_rgbInputs = _guiBuilder.buildRGBInputsDOM();
+            let cp_hsvInputs = _guiBuilder.buildHSVInputsDOM();
+            let cp_hslInputs = _guiBuilder.buildHSLInputsDOM();
+            let cp_hexInputs = _guiBuilder.buildHEXInputsDOM();
+            
+            // Add class names
+            cp_overlayContainer.classList.add("cp-overlay-container");
+            cp_overlayBackdrop.classList.add("cp-overlay-backdrop");
+            cp_overlayWrapper.classList.add("cp-overlay-wrapper");
+            colorPicker.classList.add("color-picker");
+            cp_Wrapper.classList.add("cp-wrapper");
+            cp_PaletteWrapper.classList.add("cp-palette-wrapper");
+            cp_Palette.classList.add("cp-palette");
+            cp_Cursor.classList.add("cp-cursor");
+            cp_ColorSetting.classList.add("cp-color-setting");
+            cp_ColorPreviewWrapper.classList.add("cp-color-preview-wrapper");
+            cp_ColorPreview.classList.add("cp-color-preview");
+            cp_Sliders.classList.add("cp-sliders");
+            cp_HueSliderWrapper.classList.add("cp-hue-slider-wrapper");
+            cp_HueSlider.classList.add("cp-hue-slider");
+            cp_HueSliderThumb.classList.add("cp-hue-slider-thumb");
+            cp_OpacitySliderWrapper.classList.add("cp-opacity-slider-wrapper");
+            cp_OpacitySlider.classList.add("cp-opacity-slider");
+            cp_OpacityColor.classList.add("cp-opacity-color");
+            cp_OpacitySliderThumb.classList.add("cp-opacity-slider-thumb");
+            cp_ColorModelWrapper.classList.add("cp-color-model-wrapper");
+            cp_ColorModel.classList.add("cp-color-model");
+            cp_colorModelArrow.classList.add("cp-color-model-arrow");
+            cp_SelectColorModelOverlayWrapper.classList.add("cp-select-color-model-overlay-wrapper");
+            cp_SelectColorModelOverlay.classList.add("cp-select-color-model-overlay");
+            
+            // Append child nodes
+            cp_overlayContainer.appendChild(cp_overlayBackdrop);
+            cp_overlayContainer.appendChild(cp_overlayWrapper);
+            cp_overlayWrapper.appendChild(colorPicker);
+            colorPicker.appendChild(cp_Wrapper);
+            cp_Wrapper.appendChild(cp_PaletteWrapper);
+            cp_Wrapper.appendChild(cp_ColorSetting);
+            cp_PaletteWrapper.appendChild(cp_Palette);
+            cp_PaletteWrapper.appendChild(cp_Cursor);
+            cp_ColorSetting.appendChild(cp_ColorPreviewWrapper);
+            cp_ColorSetting.appendChild(cp_Sliders);
+            cp_ColorSetting.appendChild(cp_ColorModelWrapper);
+            cp_ColorPreviewWrapper.appendChild(cp_ColorPreview);
+            cp_Sliders.appendChild(cp_HueSliderWrapper);
+            cp_Sliders.appendChild(cp_OpacitySliderWrapper);
+            cp_HueSliderWrapper.appendChild(cp_HueSlider);
+            cp_HueSliderWrapper.appendChild(cp_HueSliderThumb);
+            cp_OpacitySliderWrapper.appendChild(cp_OpacitySlider);
+            cp_OpacitySliderWrapper.appendChild(cp_OpacitySliderThumb);
+            cp_OpacitySlider.appendChild(cp_OpacityColor);
+            cp_ColorModelWrapper.appendChild(cp_ColorModel);
+            cp_ColorModelWrapper.appendChild(cp_colorModelArrow);
+            cp_SelectColorModelOverlayWrapper.appendChild(cp_SelectColorModelOverlay);
+            cp_SelectColorModelOverlay.appendChild(cp_SelectColorModel);
+            
+            DOM.overlayContainer = cp_overlayContainer;
+            DOM.overlayBackdrop = cp_overlayBackdrop;
+            DOM.overlayWrapper = cp_overlayWrapper;
+            DOM.orPicker = colorPicker;
+            DOM.wrapper = cp_Wrapper;
+            DOM.paletteWrapper = cp_PaletteWrapper;
+            DOM.palette = cp_Palette;
+            DOM.cursor = cp_Cursor;
+            DOM.colorSetting = cp_ColorSetting;
+            DOM.colorPreviewWrapper = cp_ColorPreviewWrapper;
+            DOM.colorPreview = cp_ColorPreview;
+            DOM.sliders = cp_Sliders;
+            DOM.hueSliderWrapper = cp_HueSliderWrapper;
+            DOM.hueSlider = cp_HueSlider;
+            DOM.hueSliderThumb = cp_HueSliderThumb;
+            DOM.opacitySliderWrapper = cp_OpacitySliderWrapper;
+            DOM.opacitySlider = cp_OpacitySlider;
+            DOM.opacityColor = cp_OpacityColor;
+            DOM.opacitySliderThumb = cp_OpacitySliderThumb;
+            DOM.colorModelWrapper = cp_ColorModelWrapper;
+            DOM.colorModel = cp_ColorModel;
+            DOM.colorModelArrow = cp_colorModelArrow;
+            DOM.selectColorModelOverlayWrapper = cp_SelectColorModelOverlayWrapper;
+            DOM.selectColorModelOverlay = cp_SelectColorModelOverlay;
+            DOM.selectColorModel = cp_SelectColorModel;
+            DOM.rgbInputs = cp_rgbInputs;
+            DOM.hsvInputs = cp_hsvInputs;
+            DOM.hslInputs = cp_hslInputs;
+            DOM.hexInputs = cp_hexInputs;
+            
+            /**
+             * Basically is initializing a color model input
+             */
+            _setColorModel(COLOR_MODEL.RGB);
+
+            document.body.appendChild(DOM.overlayContainer);
+         },
+
+         /**
+          * Build RGB color model input elements
+          */
+         buildRGBInputsDOM() {
+            let cp_RgbInput = document.createElement("div");
+            let redInput = document.createElement("input");
+            let greenInput = document.createElement("input");
+            let blueInput = document.createElement("input");
+            let alphaInput = document.createElement("input");
+            let redLabel = document.createElement("label");
+            let greenLabel = document.createElement("label");
+            let blueLabel = document.createElement("label");
+            let alphaLabel = document.createElement("label");
+
+            redInput.setAttribute("type", "text");
+            greenInput.setAttribute("type", "text");
+            blueInput.setAttribute("type", "text");
+            alphaInput.setAttribute("type", "text");
+            
+            cp_RgbInput.classList.add("cp-rgb-input");
+            redInput.classList.add("cp-color-input");
+            greenInput.classList.add("cp-color-input");
+            blueInput.classList.add("cp-color-input");
+            alphaInput.classList.add("cp-color-input");
+            redLabel.classList.add("cp-color-model-label");
+            greenLabel.classList.add("cp-color-model-label");
+            blueLabel.classList.add("cp-color-model-label");
+            alphaLabel.classList.add("cp-color-model-label");
+
+            redLabel.innerHTML = "R";
+            greenLabel.innerHTML = "G";
+            blueLabel.innerHTML = "B";
+            alphaLabel.innerHTML = "A";
+
+            cp_RgbInput.appendChild(redInput);
+            cp_RgbInput.appendChild(greenInput);
+            cp_RgbInput.appendChild(blueInput);
+            cp_RgbInput.appendChild(alphaInput);
+            cp_RgbInput.appendChild(redLabel);
+            cp_RgbInput.appendChild(greenLabel);
+            cp_RgbInput.appendChild(blueLabel);
+            cp_RgbInput.appendChild(alphaLabel);
+
+            return cp_RgbInput;
+         },
+
+         /**
+          * Build HSV color model input elements
+          */
+         buildHSVInputsDOM() {
+            let cp_HSVInput = document.createElement("div");
+            let hueInput = document.createElement("input");
+            let saturateInput = document.createElement("input");
+            let valueInput = document.createElement("input");
+            let alphaInput = document.createElement("input");
+            let hueLabel = document.createElement("label");
+            let saturateLabel = document.createElement("label");
+            let valueLabel = document.createElement("label");
+            let alphaLabel = document.createElement("label");
+
+            hueInput.setAttribute("type", "text");
+            saturateInput.setAttribute("type", "text");
+            valueInput.setAttribute("type", "text");
+            alphaInput.setAttribute("type", "text");
+            
+            cp_HSVInput.classList.add("cp-hsv-input");
+            hueInput.classList.add("cp-color-input");
+            saturateInput.classList.add("cp-color-input");
+            valueInput.classList.add("cp-color-input");
+            alphaInput.classList.add("cp-color-input");
+            hueLabel.classList.add("cp-color-model-label");
+            saturateLabel.classList.add("cp-color-model-label");
+            valueLabel.classList.add("cp-color-model-label");
+            alphaLabel.classList.add("cp-color-model-label");
+
+            hueLabel.innerHTML = "H";
+            saturateLabel.innerHTML = "S";
+            valueLabel.innerHTML = "V";
+            alphaLabel.innerHTML = "A";
+
+            cp_HSVInput.appendChild(hueInput);
+            cp_HSVInput.appendChild(saturateInput);
+            cp_HSVInput.appendChild(valueInput);
+            cp_HSVInput.appendChild(alphaInput);
+            cp_HSVInput.appendChild(hueLabel);
+            cp_HSVInput.appendChild(saturateLabel);
+            cp_HSVInput.appendChild(valueLabel);
+            cp_HSVInput.appendChild(alphaLabel);
+
+            return cp_HSVInput;
+         },
+
+         /**
+          * Build HSL color model input elements
+          */
+         buildHSLInputsDOM() {
+            let cp_HSLInput = document.createElement("div");
+            let hueInput = document.createElement("input");
+            let saturateInput = document.createElement("input");
+            let lightnessInput = document.createElement("input");
+            let alphaInput = document.createElement("input");
+            let hueLabel = document.createElement("label");
+            let saturateLabel = document.createElement("label");
+            let lightnessLabel = document.createElement("label");
+            let alphaLabel = document.createElement("label");
+
+            hueInput.setAttribute("type", "text");
+            saturateInput.setAttribute("type", "text");
+            lightnessInput.setAttribute("type", "text");
+            alphaInput.setAttribute("type", "text");
+            
+            cp_HSLInput.classList.add("cp-hsl-input");
+            hueInput.classList.add("cp-color-input");
+            saturateInput.classList.add("cp-color-input");
+            lightnessInput.classList.add("cp-color-input");
+            alphaInput.classList.add("cp-color-input");
+            hueLabel.classList.add("cp-color-model-label");
+            saturateLabel.classList.add("cp-color-model-label");
+            lightnessLabel.classList.add("cp-color-model-label");
+            alphaLabel.classList.add("cp-color-model-label");
+
+            hueLabel.innerHTML = "H";
+            saturateLabel.innerHTML = "S";
+            lightnessLabel.innerHTML = "L";
+            alphaLabel.innerHTML = "A";
+
+            cp_HSLInput.appendChild(hueInput);
+            cp_HSLInput.appendChild(saturateInput);
+            cp_HSLInput.appendChild(lightnessInput);
+            cp_HSLInput.appendChild(alphaInput);
+            cp_HSLInput.appendChild(hueLabel);
+            cp_HSLInput.appendChild(saturateLabel);
+            cp_HSLInput.appendChild(lightnessLabel);
+            cp_HSLInput.appendChild(alphaLabel);
+
+            return cp_HSLInput;
+         },
+
+         /**
+          * Build HEX color model input elements
+          */
+         buildHEXInputsDOM() {
+            let cp_HEXInput = document.createElement("div");
+            let hexInput = document.createElement("input");
+            let hexLabel = document.createElement("label");
+
+            hexInput.setAttribute("type", "text");
+            
+            cp_HEXInput.classList.add("cp-hex-input");
+            hexInput.classList.add("cp-color-input");
+            hexLabel.classList.add("cp-color-model-label");
+            
+            hexLabel.innerHTML = "HEX";
+            
+            cp_HEXInput.appendChild(hexInput);
+            cp_HEXInput.appendChild(hexLabel);
+            
+            return cp_HEXInput;
+         },
+
+         /**
+          * Build custom select input for selecting a color model
+          */
+         buildColorModelSelectDOM() {
+            let cp_SelectColorModel = document.createElement("div");
+            let cp_SelectColorModelOptionRGB = document.createElement("span");
+            let cp_SelectColorModelOptionHSV = document.createElement("span");
+            let cp_SelectColorModelOptionHSL = document.createElement("span");
+            let cp_SelectColorModelOptionHEX = document.createElement("span");
+
+            cp_SelectColorModel.classList.add("cp-select-color-model");
+            cp_SelectColorModelOptionRGB.classList.add("cp-select-color-model-option");
+            cp_SelectColorModelOptionHSV.classList.add("cp-select-color-model-option");
+            cp_SelectColorModelOptionHSL.classList.add("cp-select-color-model-option");
+            cp_SelectColorModelOptionHEX.classList.add("cp-select-color-model-option");
+
+            cp_SelectColorModelOptionRGB.setAttribute("data-value", COLOR_MODEL.RGB);
+            cp_SelectColorModelOptionHSV.setAttribute("data-value", COLOR_MODEL.HSV);
+            cp_SelectColorModelOptionHSL.setAttribute("data-value", COLOR_MODEL.HSL);
+            cp_SelectColorModelOptionHEX.setAttribute("data-value", COLOR_MODEL.HEX);
+
+            cp_SelectColorModelOptionRGB.innerHTML = "RGB";
+            cp_SelectColorModelOptionHSV.innerHTML = "HSV";
+            cp_SelectColorModelOptionHSL.innerHTML = "HSL";
+            cp_SelectColorModelOptionHEX.innerHTML = "HEX";
+
+            cp_SelectColorModel.appendChild(cp_SelectColorModelOptionRGB);
+            cp_SelectColorModel.appendChild(cp_SelectColorModelOptionHSV);
+            cp_SelectColorModel.appendChild(cp_SelectColorModelOptionHSL);
+            cp_SelectColorModel.appendChild(cp_SelectColorModelOptionHEX);
+
+            return cp_SelectColorModel;
+         }
       }
 
       /**
@@ -595,6 +587,18 @@
        * Event listeners
        */
       const _eventListeners = {
+         /**
+          * Initialize event listeners for DOM elements
+          */
+         initEvents() {
+            DOM.paletteWrapper.addEventListener('mousedown', _eventListeners.cursorMouseDown);
+            DOM.hueSliderWrapper.addEventListener('mousedown', _eventListeners.hueSliderThumbMouseDown);
+            DOM.opacitySliderWrapper.addEventListener('mousedown', _eventListeners.opacitySliderThumbMouseDown);
+            DOM.overlayBackdrop.addEventListener('click', _eventListeners.closeColorPicker);
+            DOM.colorModelArrow.addEventListener('click', _eventListeners.openSelectColorModel);
+            DOM.selectColorModelOverlayWrapper.addEventListener('click', _eventListeners.closeSelectColorModel);
+            DOM.selectColorModel.addEventListener('click', _eventListeners.onColorModelChanged);
+         },
 
          /**
           * Click event handler when a color model is changed
