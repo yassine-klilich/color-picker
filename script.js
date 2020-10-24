@@ -20,117 +20,136 @@
       }
       let currentColorModel = null;
 
+      /**
+       * Initialize the color picker library
+       */
       function init() {
          _guiBuilder.initGUI();
          _eventListeners.initEvents();
-         _applyColor();
+         _helper.applyColor();
       }
 
       /**
-       * Set a color model
-       * @param {COLOR_MODEL} colorModel 
+       * Get the current selected color model
        */
-      function _setColorModel(colorModel) {
-         currentColorModel = colorModel;
-         DOM.colorModel.innerHTML = "";
-         
-         switch (currentColorModel) {
-            case COLOR_MODEL.RGB:
-               DOM.colorModel.appendChild(DOM.rgbInputs);
-            break;
+      function selectedColorModel() {
+         return currentColorModel;
+      }
+
+      const _helper = {
+         /**
+          * Set a color model
+          * @param {COLOR_MODEL} colorModel 
+          */
+         setColorModel(colorModel) {
+            currentColorModel = colorModel;
+            DOM.colorModel.innerHTML = "";
             
-            case COLOR_MODEL.HSV:
-               DOM.colorModel.appendChild(DOM.hsvInputs);
-            break;
+            switch (currentColorModel) {
+               case COLOR_MODEL.RGB:
+                  let rgb = _colorConverter.HSVtoRGB(hsv.h, hsv.s, hsv.v);
+                  DOM.colorModel.appendChild(DOM.rgbInputs);
+                  DOM.rgbInputs.cp_setValue(rgb.r, rgb.g, rgb.b, hsv.a);
+               break;
+               
+               case COLOR_MODEL.HSV:
+                  DOM.colorModel.appendChild(DOM.hsvInputs);
+                  DOM.hsvInputs.cp_setValue(hsv.h, hsv.s, hsv.v, hsv.a);
+               break;
 
-            case COLOR_MODEL.HSL:
-               DOM.colorModel.appendChild(DOM.hslInputs);
-            break;
+               case COLOR_MODEL.HSL:
+                  let hsl = _colorConverter.HSVtoHSL(hsv.h, hsv.s, hsv.v);
+                  DOM.colorModel.appendChild(DOM.hslInputs);
+                  DOM.hslInputs.cp_setValue(hsl.h, hsl.s, hsl.l, hsv.a);
+               break;
 
-            case COLOR_MODEL.HEX:
-               DOM.colorModel.appendChild(DOM.hexInputs);
-            break;
-         }
-      }
-
-      /**
-       * Apply color
-       */
-      function _applyColor() {
-         let paletteBGColor = `hsl(${hsv.h}deg 100% 50% / 1)`;
-         DOM.palette.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${paletteBGColor} 100%)`;
-
-         switch (currentColorModel) {
-            case COLOR_MODEL.RGB: {
-               let rgb = _colorConverter.HSVtoRGB(hsv.h, hsv.s, hsv.v);
-               let previewRGBColor = `rgba(${rgb.r} ${rgb.g} ${rgb.b} / ${hsv.a})`;
-               let opacityRGBColor = `rgb(${rgb.r} ${rgb.g} ${rgb.b})`;
-               DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
-               DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
-               DOM.rgbInputs.cp_setValue(rgb.r, rgb.g, rgb.b, hsv.a);
+               case COLOR_MODEL.HEX:
+                  let hex = _colorConverter.HSVtoHEX(hsv.h, hsv.s, hsv.v);
+                  DOM.colorModel.appendChild(DOM.hexInputs);
+                  DOM.hexInputs.cp_setValue(hex);
+               break;
             }
-            break;
+         },
 
-            case COLOR_MODEL.HSV: {
-               let hsl = _colorConverter.HSVtoHSL(hsv.h, hsv.s, hsv.v);
-               let previewHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsv.a})`;
-               let opacityHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
-               DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
-               DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
-               DOM.hsvInputs.cp_setValue(hsl.h, hsl.s, hsl.l, hsv.a);
-            }
-            break;
+         /**
+          * Apply color
+          */
+         applyColor() {
+            let paletteBGColor = `hsl(${hsv.h}deg 100% 50% / 1)`;
+            DOM.palette.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${paletteBGColor} 100%)`;
 
-            case COLOR_MODEL.HSL: {
-               let hsl = _colorConverter.HSVtoHSL(hsv.h, hsv.s, hsv.v);
-               let previewHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsv.a})`;
-               let opacityHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
-               DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
-               DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
-               DOM.hslInputs.cp_setValue(hsl.h, hsl.s, hsl.l, hsv.a);
-            }
-            break;
-
-            case COLOR_MODEL.HEX: {
-               let previewHEXColor = _colorConverter.HSVtoHEX(hsv.h, hsv.s, hsv.v);
-               let opacityHEXColor = previewHEXColor;
-
-               if(hsv.a < 1){
-                  let alpha = Math.round(hsv.a * 255).toString(16);
-                  alpha = (alpha.length < 2) ? `0${alpha}` : alpha;
-                  previewHEXColor += alpha;
+            switch (currentColorModel) {
+               case COLOR_MODEL.RGB: {
+                  let rgb = _colorConverter.HSVtoRGB(hsv.h, hsv.s, hsv.v);
+                  let previewRGBColor = `rgba(${rgb.r} ${rgb.g} ${rgb.b} / ${hsv.a})`;
+                  let opacityRGBColor = `rgb(${rgb.r} ${rgb.g} ${rgb.b})`;
+                  DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
+                  DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
+                  DOM.rgbInputs.cp_setValue(rgb.r, rgb.g, rgb.b, hsv.a);
                }
+               break;
 
-               DOM.colorPreview.style.setProperty('background-color', previewHEXColor);
-               DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHEXColor})`);
-               DOM.hexInputs.cp_setValue(previewHEXColor);
+               case COLOR_MODEL.HSV: {
+                  let hsl = _colorConverter.HSVtoHSL(hsv.h, hsv.s, hsv.v);
+                  let previewHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsv.a})`;
+                  let opacityHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
+                  DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
+                  DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
+                  DOM.hsvInputs.cp_setValue(hsl.h, hsl.s, hsl.l, hsv.a);
+               }
+               break;
+
+               case COLOR_MODEL.HSL: {
+                  let hsl = _colorConverter.HSVtoHSL(hsv.h, hsv.s, hsv.v);
+                  let previewHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsv.a})`;
+                  let opacityHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
+                  DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
+                  DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
+                  DOM.hslInputs.cp_setValue(hsl.h, hsl.s, hsl.l, hsv.a);
+               }
+               break;
+
+               case COLOR_MODEL.HEX: {
+                  let previewHEXColor = _colorConverter.HSVtoHEX(hsv.h, hsv.s, hsv.v);
+                  let opacityHEXColor = previewHEXColor;
+
+                  if(hsv.a < 1){
+                     let alpha = Math.round(hsv.a * 255).toString(16);
+                     alpha = (alpha.length < 2) ? `0${alpha}` : alpha;
+                     previewHEXColor += alpha;
+                  }
+
+                  DOM.colorPreview.style.setProperty('background-color', previewHEXColor);
+                  DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHEXColor})`);
+                  DOM.hexInputs.cp_setValue(previewHEXColor);
+               }
+               break;
             }
-            break;
+         },
+
+         /**
+          * Calculate the value for HSV color from the distance between the cursor Y axis and the height of palette color
+          * @param {number} yAxis 
+          * 
+          * @returns {number} value
+          */
+         calculateValue(yAxis) {
+            let paletteHeight = DOM.palette.offsetHeight;
+
+            return Math.round(((paletteHeight - yAxis) / paletteHeight) * 100);
+         },
+
+         /**
+          * Calculate the saturate for HSV color from the distance between the cursor X axis and the width of palette color
+          * @param {number} xAxis
+          * 
+          * @returns {number} saturate
+          */
+         calculateSaturate(xAxis) {
+            let paletteWidth = DOM.palette.offsetWidth;
+
+            return Math.round((xAxis / paletteWidth) * 100);
          }
-      }
-
-      /**
-       * Calculate the value for HSV color from the distance between the cursor Y axis and the height of palette color
-       * @param {number} yAxis 
-       * 
-       * @returns {number} value
-       */
-      function _calculateValue(yAxis) {
-         let paletteHeight = DOM.palette.offsetHeight;
-
-         return Math.round(((paletteHeight - yAxis) / paletteHeight) * 100);
-      }
-
-      /**
-       * Calculate the saturate for HSV color from the distance between the cursor X axis and the width of palette color
-       * @param {number} xAxis
-       * 
-       * @returns {number} saturate
-       */
-      function _calculateSaturate(xAxis) {
-         let paletteWidth = DOM.palette.offsetWidth;
-
-         return Math.round((xAxis / paletteWidth) * 100);
       }
 
       /**
@@ -257,7 +276,7 @@
             /**
              * Basically is initializing a color model input
              */
-            _setColorModel(COLOR_MODEL.RGB);
+            _helper.setColorModel(COLOR_MODEL.RGB);
 
             document.body.appendChild(DOM.overlayContainer);
          },
@@ -305,6 +324,13 @@
             cp_RgbInput.appendChild(blueLabel);
             cp_RgbInput.appendChild(alphaLabel);
 
+            /**
+             * Set RGB color inputs values
+             * @param {number} r 
+             * @param {number} g 
+             * @param {number} b 
+             * @param {number} a 
+             */
             cp_RgbInput.cp_setValue = function(r, g, b, a) {
                redInput.value = r;
                greenInput.value = g;
@@ -358,6 +384,13 @@
             cp_HSVInput.appendChild(valueLabel);
             cp_HSVInput.appendChild(alphaLabel);
 
+            /**
+             * Set HSV color inputs values
+             * @param {number} h 
+             * @param {number} s 
+             * @param {number} v 
+             * @param {number} a 
+             */
             cp_HSVInput.cp_setValue = function(h, s, v, a) {
                hueInput.value = `${h}°`;
                saturateInput.value = `${s}%`;
@@ -411,6 +444,13 @@
             cp_HSLInput.appendChild(lightnessLabel);
             cp_HSLInput.appendChild(alphaLabel);
 
+            /**
+             * Set HSL color inputs values
+             * @param {number} h 
+             * @param {number} s 
+             * @param {number} l 
+             * @param {number} a 
+             */
             cp_HSLInput.cp_setValue = function(h, s, l, a) {
                hueInput.value = `${h}°`;
                saturateInput.value = `${s}%`;
@@ -440,6 +480,10 @@
             cp_HEXInput.appendChild(hexInput);
             cp_HEXInput.appendChild(hexLabel);
 
+            /**
+             * Set HEX color inputs values
+             * @param {string} hex 
+             */
             cp_HEXInput.cp_setValue = function(hex) {
                hexInput.value = hex;
             };
@@ -634,7 +678,7 @@
          onColorModelChanged(event) {
             let selectedColorModel = event.target.dataset.value;
             if(currentColorModel != selectedColorModel) {
-               _setColorModel(selectedColorModel);
+               _helper.setColorModel(selectedColorModel);
             }
          },
 
@@ -681,10 +725,10 @@
 
             DOM.cursor.style.transform = `translate(${xAxis}px, ${yAxis}px)`;
 
-            hsv.s = _calculateSaturate(xAxis);
-            hsv.v = _calculateValue(yAxis);
+            hsv.s = _helper.calculateSaturate(xAxis);
+            hsv.v = _helper.calculateValue(yAxis);
 
-            _applyColor();
+            _helper.applyColor();
          },
 
          /**
@@ -728,7 +772,7 @@
             hsv.h = Math.round(((thumbX + hueSliderThumbHalfWidth) / hueSliderRect.width) * 360);
             DOM.hueSliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
                
-            _applyColor();
+            _helper.applyColor();
          },
 
          /**
@@ -772,7 +816,7 @@
             hsv.a = parseFloat(((thumbX + opacitySliderThumbHalfWidth) / opacitySliderRect.width).toFixed(2));
             DOM.opacitySliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
                
-            _applyColor();
+            _helper.applyColor();
          },
 
          /**
@@ -802,13 +846,6 @@
          closeSelectColorModel() {
             DOM.overlayContainer.removeChild(DOM.selectColorModelOverlayWrapper);
          }
-      }
-
-      /**
-       * Get the current selected color model
-       */
-      function selectedColorModel() {
-         return currentColorModel;
       }
 
       window.ColorPicker = {
