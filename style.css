@@ -168,7 +168,6 @@
 	width: 100%;
 	justify-items: center;
 	row-gap: 4px;
-	column-gap: 8px;
 }
 
 .cp-rgb-input,
@@ -200,7 +199,7 @@
 .cp-rgb-input .cp-color-input,
 .cp-hsv-input .cp-color-input,
 .cp-hsl-input .cp-color-input {
-	width: 36px;
+	width: 38px;
 }
 .cp-hex-input .cp-color-input {
 	width: 180px;

@@ -67,7 +67,7 @@
                let opacityRGBColor = `rgb(${rgb.r} ${rgb.g} ${rgb.b})`;
                DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
                DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
-               // _setColorValue()
+               DOM.rgbInputs.cp_setValue(rgb.r, rgb.g, rgb.b, hsv.a);
             }
             break;
 
@@ -75,9 +75,9 @@
                let hsl = _colorConverter.HSVtoHSL(hsv.h, hsv.s, hsv.v);
                let previewHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsv.a})`;
                let opacityHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
-               let colorHSV = `hsv(${hsv.h}deg ${hsv.s}% ${hsv.v}% / ${hsv.a})`;
                DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
                DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
+               DOM.hsvInputs.cp_setValue(hsl.h, hsl.s, hsl.l, hsv.a);
             }
             break;
 
@@ -87,21 +87,23 @@
                let opacityHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
                DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
                DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
+               DOM.hslInputs.cp_setValue(hsl.h, hsl.s, hsl.l, hsv.a);
             }
             break;
 
             case COLOR_MODEL.HEX: {
-               let previewHSLColor = _colorConverter.HSVtoHEX(hsv.h, hsv.s, hsv.v);
-               let opacityHSLColor = previewHSLColor;
+               let previewHEXColor = _colorConverter.HSVtoHEX(hsv.h, hsv.s, hsv.v);
+               let opacityHEXColor = previewHEXColor;
 
                if(hsv.a < 1){
                   let alpha = Math.round(hsv.a * 255).toString(16);
                   alpha = (alpha.length < 2) ? `0${alpha}` : alpha;
-                  previewHSLColor += alpha;
+                  previewHEXColor += alpha;
                }
 
-               DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
-               DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
+               DOM.colorPreview.style.setProperty('background-color', previewHEXColor);
+               DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHEXColor})`);
+               DOM.hexInputs.cp_setValue(previewHEXColor);
             }
             break;
          }
@@ -303,6 +305,13 @@
             cp_RgbInput.appendChild(blueLabel);
             cp_RgbInput.appendChild(alphaLabel);
 
+            cp_RgbInput.cp_setValue = function(r, g, b, a) {
+               redInput.value = r;
+               greenInput.value = g;
+               blueInput.value = b;
+               alphaInput.value = a;
+            };
+
             return cp_RgbInput;
          },
 
@@ -348,6 +357,13 @@
             cp_HSVInput.appendChild(saturateLabel);
             cp_HSVInput.appendChild(valueLabel);
             cp_HSVInput.appendChild(alphaLabel);
+
+            cp_HSVInput.cp_setValue = function(h, s, v, a) {
+               hueInput.value = `${h}°`;
+               saturateInput.value = `${s}%`;
+               valueInput.value = `${v}%`;
+               alphaInput.value = a;
+            };
 
             return cp_HSVInput;
          },
@@ -395,6 +411,13 @@
             cp_HSLInput.appendChild(lightnessLabel);
             cp_HSLInput.appendChild(alphaLabel);
 
+            cp_HSLInput.cp_setValue = function(h, s, l, a) {
+               hueInput.value = `${h}°`;
+               saturateInput.value = `${s}%`;
+               lightnessInput.value = `${l}%`;
+               alphaInput.value = a;
+            };
+
             return cp_HSLInput;
          },
 
@@ -416,6 +439,10 @@
             
             cp_HEXInput.appendChild(hexInput);
             cp_HEXInput.appendChild(hexLabel);
+
+            cp_HEXInput.cp_setValue = function(hex) {
+               hexInput.value = hex;
+            };
             
             return cp_HEXInput;
          },
