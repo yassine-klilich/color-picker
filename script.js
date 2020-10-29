@@ -18,6 +18,12 @@
          v: 100,
          a: 1
       }
+      const rgba = {
+         red: 255,
+         green: 0,
+         blue: 0,
+         alpha: 1
+      }
       let currentColorModel = null;
 
       /**
@@ -47,9 +53,8 @@
             
             switch (currentColorModel) {
                case COLOR_MODEL.RGB:
-                  let rgb = _colorConverter.HSVtoRGB(hsva.h, hsva.s, hsva.v);
                   DOM.colorModel.appendChild(DOM.rgbInputs);
-                  DOM.rgbInputs.cp_setValue(rgb.r, rgb.g, rgb.b, hsva.a);
+                  DOM.rgbInputs.cp_setValue(rgba.red, rgba.green, rgba.blue, rgba.alpha);
                break;
                
                case COLOR_MODEL.HSV:
@@ -75,52 +80,48 @@
           * Apply color
           */
          applyColor() {
+            this.updateView();
+            this.updateColorModelInput();
+         },
+
+         updateView() {
             let paletteBGColor = `hsl(${hsva.h}deg 100% 50% / 1)`;
             DOM.palette.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${paletteBGColor} 100%)`;
 
+            let previewRGBColor = `rgba(${rgba.red} ${rgba.green} ${rgba.blue} / ${rgba.alpha})`;
+            let opacityRGBColor = `rgb(${rgba.red} ${rgba.green} ${rgba.blue})`;
+            DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
+            DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
+
+            // let
+            // DOM.hueSliderThumb.style.setProperty("transform", `translate(157px, -50%)`)
+         },
+
+         updateColorModelInput() {
             switch (currentColorModel) {
                case COLOR_MODEL.RGB: {
-                  let rgb = _colorConverter.HSVtoRGB(hsva.h, hsva.s, hsva.v);
-                  let previewRGBColor = `rgba(${rgb.r} ${rgb.g} ${rgb.b} / ${hsva.a})`;
-                  let opacityRGBColor = `rgb(${rgb.r} ${rgb.g} ${rgb.b})`;
-                  DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
-                  DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
-                  DOM.rgbInputs.cp_setValue(rgb.r, rgb.g, rgb.b, hsva.a);
+                  DOM.rgbInputs.cp_setValue(rgba.red, rgba.green, rgba.blue, rgba.alpha);
                }
                break;
 
                case COLOR_MODEL.HSV: {
-                  let hsl = _colorConverter.HSVtoHSL(hsva.h, hsva.s, hsva.v);
-                  let previewHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsva.a})`;
-                  let opacityHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
-                  DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
-                  DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
                   DOM.hsvInputs.cp_setValue(hsva.h, hsva.s, hsva.v, hsva.a);
                }
                break;
 
                case COLOR_MODEL.HSL: {
                   let hsl = _colorConverter.HSVtoHSL(hsva.h, hsva.s, hsva.v);
-                  let previewHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsva.a})`;
-                  let opacityHSLColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
-                  DOM.colorPreview.style.setProperty('background-color', previewHSLColor);
-                  DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHSLColor})`);
                   DOM.hslInputs.cp_setValue(hsl.h, hsl.s, hsl.l, hsva.a);
                }
                break;
 
                case COLOR_MODEL.HEX: {
                   let previewHEXColor = _colorConverter.HSVtoHEX(hsva.h, hsva.s, hsva.v);
-                  let opacityHEXColor = previewHEXColor;
-
                   if(hsva.a < 1){
                      let alpha = Math.round(hsva.a * 255).toString(16);
                      alpha = (alpha.length < 2) ? `0${alpha}` : alpha;
                      previewHEXColor += alpha;
                   }
-
-                  DOM.colorPreview.style.setProperty('background-color', previewHEXColor);
-                  DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityHEXColor})`);
                   DOM.hexInputs.cp_setValue(previewHEXColor);
                }
                break;
@@ -338,8 +339,21 @@
                alphaInput.value = a;
             };
             
-            // redInput.addEventListener("keydown", _eventListeners.rgbRedInputKeyDown);
-            // redInput.addEventListener("change", _eventListeners.rgbRedInputChange);
+            redInput.addEventListener("keydown", (event) => _eventListeners.rgbaInputKeyDown(event, "red"));
+            redInput.addEventListener("keyup", (event) => _eventListeners.rgbaInputKeyUp(event, "red"));
+            redInput.addEventListener("change", (event) => _eventListeners.rgbaInputChanged(event, "red"));
+
+            greenInput.addEventListener("keydown", (event) => _eventListeners.rgbaInputKeyDown(event, "green"));
+            greenInput.addEventListener("keyup", (event) => _eventListeners.rgbaInputKeyUp(event, "green"));
+            greenInput.addEventListener("change", (event) => _eventListeners.rgbaInputChanged(event, "green"));
+
+            blueInput.addEventListener("keydown", (event) => _eventListeners.rgbaInputKeyDown(event, "blue"));
+            blueInput.addEventListener("keyup", (event) => _eventListeners.rgbaInputKeyUp(event, "blue"));
+            blueInput.addEventListener("change", (event) => _eventListeners.rgbaInputChanged(event, "blue"));
+
+            alphaInput.addEventListener("keydown", (event) => _eventListeners.alphaInputKeyDown(event));
+            alphaInput.addEventListener("keyup", (event) => _eventListeners.alphaInputKeyUp(event));
+            alphaInput.addEventListener("change", (event) => _eventListeners.alphaInputChanged(event));
 
             return cp_RgbInput;
          },
@@ -772,6 +786,11 @@
             hsva.s = _helper.calculateSaturate(xAxis);
             hsva.v = _helper.calculateValue(yAxis);
 
+            let rgb = _colorConverter.HSVtoRGB(hsva.h, hsva.s, hsva.v);
+            rgba.red = rgb.r;
+            rgba.green = rgb.g;
+            rgba.blue = rgb.b;
+
             _helper.applyColor();
          },
 
@@ -816,6 +835,11 @@
             hsva.h = Math.round(((thumbX + hueSliderThumbHalfWidth) / hueSliderRect.width) * 360);
             DOM.hueSliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
                
+            let rgb = _colorConverter.HSVtoRGB(hsva.h, hsva.s, hsva.v);
+            rgba.red = rgb.r;
+            rgba.green = rgb.g;
+            rgba.blue = rgb.b;
+
             _helper.applyColor();
          },
 
@@ -857,7 +881,7 @@
                thumbX = maxPosition;
             }
 
-            hsva.a = parseFloat(((thumbX + opacitySliderThumbHalfWidth) / opacitySliderRect.width).toFixed(2));
+            rgba.alpha = hsva.a = parseFloat(((thumbX + opacitySliderThumbHalfWidth) / opacitySliderRect.width).toFixed(2));
             DOM.opacitySliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
                
             _helper.applyColor();
@@ -889,7 +913,123 @@
           */
          closeSelectColorModel() {
             DOM.overlayContainer.removeChild(DOM.selectColorModelOverlayWrapper);
-         }
+         },
+
+         rgbaInputKeyDown(event, color) {
+            let target = event.target;
+            let pressedKey = event.key;
+
+            if(/[0-9]|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Control)/.test(pressedKey)) {
+               switch (pressedKey) {
+                  case "ArrowUp":
+                     if(rgba[color] < 255) {
+                        target.value = ++rgba[color];
+                        let hsv = _colorConverter.RGBtoHSV(rgba.red, rgba.green, rgba.blue);
+                        hsva.h = hsv.h;
+                        hsva.s = hsv.s;
+                        hsva.v = hsv.v;
+                        _helper.updateView();
+                     }
+                  break;
+                  
+                  case "ArrowDown":
+                     if(rgba[color] > 0) {
+                        target.value = --rgba[color];
+                        let hsv = _colorConverter.RGBtoHSV(rgba.red, rgba.green, rgba.blue);
+                        hsva.h = hsv.h;
+                        hsva.s = hsv.s;
+                        hsva.v = hsv.v;
+                        _helper.updateView();
+                     }
+                  break;
+               }
+            }
+            else {
+               event.preventDefault();
+            }
+         },
+
+         rgbaInputKeyUp(event, color) {
+            let target = event.target;
+            if(/[0-9]|(Backspace)|(Delete)/.test(event.key) && target.value !== null && target.value !== undefined && target.value !== "") {
+               let value = parseInt(target.value);
+               if(isNaN(value) || value < 0 || value > 255) {
+                  target.value = rgba[color];
+               }
+               else {
+                  rgba[color] = value;
+                  let hsv = _colorConverter.RGBtoHSV(rgba.red, rgba.green, rgba.blue);
+                  hsva.h = hsv.h;
+                  hsva.s = hsv.s;
+                  hsva.v = hsv.v;
+                  _helper.updateView();
+               }
+            }
+         },
+
+         rgbaInputChanged(event, color) {
+            let target = event.target;
+            target.value = rgba[color];
+         },
+
+         alphaInputKeyDown(event) {
+            let target = event.target;
+            let pressedKey = event.key;
+
+            if(/[0-9]|(\.)|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Control)/.test(pressedKey)) {
+               switch (pressedKey) {
+                  case "ArrowUp":
+                     if(rgba.alpha < 1) {
+                        let alphaValue = parseFloat((rgba.alpha + 0.01).toFixed(2));
+                        if(alphaValue > 1){
+                           alphaValue = 1;
+                        }
+                        target.value = hsva.a = rgba.alpha = alphaValue;
+                        _helper.updateView();
+                     }
+                  break;
+                  
+                  case "ArrowDown":
+                     if(rgba.alpha > 0) {
+                        let alphaValue = parseFloat((rgba.alpha - 0.01).toFixed(2));
+                        if(alphaValue < 0){
+                           alphaValue = 0;
+                        }
+                        target.value = hsva.a = rgba.alpha = alphaValue;
+                        _helper.updateView();
+                     }
+                  break;
+                  
+                  case ".":
+                     if(/(\.)/.test(target.value)) {
+                        event.preventDefault();
+                     }
+                  break;
+               }
+            }
+            else {
+               event.preventDefault();
+            }
+         },
+
+         alphaInputKeyUp(event) {
+            let target = event.target;
+            if(/[0-9]|(\.)|(Backspace)|(Delete)/.test(event.key) && target.value !== null && target.value !== undefined && target.value !== "") {
+               let value = parseFloat(target.value);
+               if(isNaN(value) || value < 0 || value > 1) {
+                  target.value = rgba.alpha;
+               }
+               else {
+                  hsva.a = rgba.alpha = value;
+                  _helper.updateView();
+               }
+            }
+         },
+
+         alphaInputChanged(event) {
+            let target = event.target;
+            target.value = rgba.alpha;
+         },
       }
 
       window.ColorPicker = {
