@@ -80,11 +80,12 @@
           * Apply color
           */
          applyColor() {
-            this.updateView();
+            this.updateViewColors();
+            this.updateViewControls();
             this.updateColorModelInput();
          },
 
-         updateView() {
+         updateViewColors() {
             let paletteBGColor = `hsl(${hsva.h}deg 100% 50% / 1)`;
             DOM.palette.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${paletteBGColor} 100%)`;
 
@@ -92,9 +93,33 @@
             let opacityRGBColor = `rgb(${rgba.red} ${rgba.green} ${rgba.blue})`;
             DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
             DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
+         },
 
-            // let
-            // DOM.hueSliderThumb.style.setProperty("transform", `translate(157px, -50%)`)
+         updateViewControls() {
+            this.updateHueThumbControl();
+            this.updateOpacityThumbControl();
+            this.updateCursorPalette();
+         },
+
+         updateHueThumbControl() {
+            let hueThumbHalfWidth = DOM.hueSliderThumb.offsetWidth / 2;
+            let positionHueThumb = ((hsva.h / 360) * DOM.hueSliderWrapper.offsetWidth) - hueThumbHalfWidth;
+
+            DOM.hueSliderThumb.style.setProperty("transform", `translate(${positionHueThumb}px, -50%)`);
+         },
+
+         updateOpacityThumbControl() {
+            let opacityThumbHalfWidth = DOM.opacitySliderThumb.offsetWidth / 2;
+            let positionOpacityThumb = (hsva.a * DOM.opacitySliderWrapper.offsetWidth) - opacityThumbHalfWidth;
+
+            DOM.opacitySliderThumb.style.setProperty("transform", `translate(${positionOpacityThumb}px, -50%)`);
+         },
+
+         updateCursorPalette() {
+            let xPosition = ((hsva.s / 100) * DOM.paletteWrapper.offsetWidth);
+            let yPosition = DOM.paletteWrapper.offsetHeight - ((hsva.v / 100) * DOM.paletteWrapper.offsetHeight);
+
+            DOM.cursor.style.setProperty("transform", `translate(${xPosition}px, ${yPosition}px)`);
          },
 
          updateColorModelInput() {
@@ -791,7 +816,8 @@
             rgba.green = rgb.g;
             rgba.blue = rgb.b;
 
-            _helper.applyColor();
+            _helper.updateViewColors();
+            _helper.updateColorModelInput();
          },
 
          /**
@@ -840,7 +866,8 @@
             rgba.green = rgb.g;
             rgba.blue = rgb.b;
 
-            _helper.applyColor();
+            _helper.updateViewColors();
+            _helper.updateColorModelInput();
          },
 
          /**
@@ -884,7 +911,8 @@
             rgba.alpha = hsva.a = parseFloat(((thumbX + opacitySliderThumbHalfWidth) / opacitySliderRect.width).toFixed(2));
             DOM.opacitySliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
                
-            _helper.applyColor();
+            _helper.updateViewColors();
+            _helper.updateColorModelInput();
          },
 
          /**
@@ -928,7 +956,8 @@
                         hsva.h = hsv.h;
                         hsva.s = hsv.s;
                         hsva.v = hsv.v;
-                        _helper.updateView();
+                        _helper.updateViewColors();
+                        _helper.updateViewControls();
                      }
                   break;
                   
@@ -939,7 +968,8 @@
                         hsva.h = hsv.h;
                         hsva.s = hsv.s;
                         hsva.v = hsv.v;
-                        _helper.updateView();
+                        _helper.updateViewColors();
+                        _helper.updateViewControls();
                      }
                   break;
                }
@@ -962,7 +992,8 @@
                   hsva.h = hsv.h;
                   hsva.s = hsv.s;
                   hsva.v = hsv.v;
-                  _helper.updateView();
+                  _helper.updateViewColors();
+                  _helper.updateViewControls();
                }
             }
          },
@@ -985,7 +1016,8 @@
                            alphaValue = 1;
                         }
                         target.value = hsva.a = rgba.alpha = alphaValue;
-                        _helper.updateView();
+                        _helper.updateViewColors();
+                        _helper.updateOpacityThumbControl();
                      }
                   break;
                   
@@ -996,7 +1028,8 @@
                            alphaValue = 0;
                         }
                         target.value = hsva.a = rgba.alpha = alphaValue;
-                        _helper.updateView();
+                        _helper.updateViewColors();
+                        _helper.updateOpacityThumbControl();
                      }
                   break;
                   
@@ -1021,7 +1054,8 @@
                }
                else {
                   hsva.a = rgba.alpha = value;
-                  _helper.updateView();
+                  _helper.updateViewColors();
+                  _helper.updateOpacityThumbControl();
                }
             }
          },
