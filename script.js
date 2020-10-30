@@ -24,6 +24,12 @@
          blue: 0,
          alpha: 1
       }
+      const hsla = {
+         hue: 0,
+         saturate: 100,
+         lightness: 100,
+         alpha: 1
+      }
       let currentColorModel = null;
 
       /**
@@ -306,7 +312,7 @@
             /**
              * Basically is initializing a color model input
              */
-            _helper.setColorModel(COLOR_MODEL.HSV);
+            _helper.setColorModel(COLOR_MODEL.HSL);
 
             document.body.appendChild(DOM.overlayContainer);
          },
@@ -518,20 +524,24 @@
                saturateInput.value = `${s}%`;
                lightnessInput.value = `${l}%`;
                alphaInput.value = a;
+               hsla.hue = h;
+               hsla.saturate = s;
+               hsla.lightness = l;
+               hsla.alpha = a;
             };
 
 
-            hueInput.addEventListener("keydown", (event) => _eventListeners.hsvaInputKeyDown(event, "hue", 360, "°"));
-            hueInput.addEventListener("keyup", (event) => _eventListeners.hsvaInputKeyUp(event, "hue", 360, "°"));
-            hueInput.addEventListener("change", (event) => _eventListeners.hsvaInputChanged(event, "hue", "°"));
+            hueInput.addEventListener("keydown", (event) => _eventListeners.hslaInputKeyDown(event, "hue", 360, "°"));
+            hueInput.addEventListener("keyup", (event) => _eventListeners.hslaInputKeyUp(event, "hue", 360, "°"));
+            hueInput.addEventListener("change", (event) => _eventListeners.hslaInputChanged(event, "hue", "°"));
             
             saturateInput.addEventListener("keydown", (event) => _eventListeners.hslaInputKeyDown(event, "saturate", 100, "%"));
-            // saturateInput.addEventListener("keyup", (event) => _eventListeners.hslaInputKeyUp(event, "saturate", 100, "%"));
-            // saturateInput.addEventListener("change", (event) => _eventListeners.hslaInputChanged(event, "saturate", "%"));
+            saturateInput.addEventListener("keyup", (event) => _eventListeners.hslaInputKeyUp(event, "saturate", 100, "%"));
+            saturateInput.addEventListener("change", (event) => _eventListeners.hslaInputChanged(event, "saturate", "%"));
 
-            // valueInput.addEventListener("keydown", (event) => _eventListeners.hsvaInputKeyDown(event, "value", 100, "%"));
-            // valueInput.addEventListener("keyup", (event) => _eventListeners.hsvaInputKeyUp(event, "value", 100, "%"));
-            // valueInput.addEventListener("change", (event) => _eventListeners.hsvaInputChanged(event, "value", "%"));
+            lightnessInput.addEventListener("keydown", (event) => _eventListeners.hslaInputKeyDown(event, "lightness", 100, "%"));
+            lightnessInput.addEventListener("keyup", (event) => _eventListeners.hslaInputKeyUp(event, "lightness", 100, "%"));
+            lightnessInput.addEventListener("change", (event) => _eventListeners.hslaInputChanged(event, "lightness", "%"));
 
             alphaInput.addEventListener("keydown", (event) => _eventListeners.alphaInputKeyDown(event));
             alphaInput.addEventListener("keyup", (event) => _eventListeners.alphaInputKeyUp(event));
@@ -738,7 +748,7 @@
           * @param {number} g Green 
           * @param {number} b Blue 
           * 
-          * @returns {object} HEX color 
+          * @returns {object} HSV color 
           */ 
          RGBtoHSV(r, g, b) {
             r /= 255, g /= 255, b /= 255;
@@ -769,6 +779,23 @@
                h,
                s,
                v
+            };
+         },
+
+         /**
+          * Convert HSL to HSV
+          * @param {number} h Hue
+          * @param {number} s Saturate
+          * @param {number} l Lightness 
+          * 
+          * @returns {object} HSV color 
+          */ 
+         HSLtoHSV(h, s, l) {
+            const hsv1 = s * (l < 50 ? l : 100 - l) / 100;
+
+            return { h,
+               s: hsv1 === 0 ? 0 : 2 * hsv1 / (l + hsv1) * 100,
+               v: l + hsv1
             };
          }
       }
@@ -1142,39 +1169,64 @@
          },
          
          hslaInputKeyDown(event, color, maxValue, suffix) {
-            // let target = event.target;
-            // let pressedKey = event.key;
+            let target = event.target;
+            let pressedKey = event.key;
 
-            // if(/[0-9]|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Control)/.test(pressedKey)) {
-            //    switch (pressedKey) {
-            //       case "ArrowUp":
-            //          if(hsva[color] < maxValue) {
-            //             target.value = `${++hsva[color]}${suffix}`;
-            //             _helper.updateViewColors();
-            //             _helper.updateViewControls();
-            //          }
-            //       break;
+            if(/[0-9]|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Control)/.test(pressedKey)) {
+               switch (pressedKey) {
+                  case "ArrowUp":
+                     if(hsla[color] < maxValue) {
+                        target.value = `${++hsla[color]}${suffix}`;
+                        let hsv = _colorConverter.HSLtoHSV(hsla.hue, hsla.saturate, hsla.lightness);
+                        hsva.hue = hsv.h;
+                        hsva.saturate = hsv.s;
+                        hsva.value = hsv.v;
+                        _helper.updateViewColors();
+                        _helper.updateViewControls();
+                     }
+                  break;
                   
-            //       case "ArrowDown":
-            //          if(hsva[color] > 0) {
-            //             target.value = `${--hsva[color]}${suffix}`;
-            //             _helper.updateViewColors();
-            //             _helper.updateViewControls();
-            //          }
-            //       break;
-            //    }
-            // }
-            // else {
-            //    event.preventDefault();
-            // }
+                  case "ArrowDown":
+                     if(hsla[color] > 0) {
+                        target.value = `${--hsla[color]}${suffix}`;
+                        let hsv = _colorConverter.HSLtoHSV(hsla.hue, hsla.saturate, hsla.lightness);
+                        hsva.hue = hsv.h;
+                        hsva.saturate = hsv.s;
+                        hsva.value = hsv.v;
+                        _helper.updateViewColors();
+                        _helper.updateViewControls();
+                     }
+                  break;
+               }
+            }
+            else {
+               event.preventDefault();
+            }
          },
 
-         hslaInputKeyUp() {
-
+         hslaInputKeyUp(event, color, maxValue, suffix) {
+            let target = event.target;
+            if(/[0-9]|(Backspace)|(Delete)/.test(event.key) && target.value !== null && target.value !== undefined && target.value !== "" && target.value !== suffix) {
+               let value = parseInt(target.value);
+               let pattern = new RegExp(`^[0-9]{0,3}${suffix}$`);
+               if(isNaN(value) || !pattern.test(target.value) || value < 0 || value > maxValue) {
+                  target.value = `${hsla[color]}${suffix}`;
+               }
+               else {
+                  hsla[color] = value;
+                  let hsv = _colorConverter.HSLtoHSV(hsla.hue, hsla.saturate, hsla.lightness);
+                  hsva.hue = hsv.h;
+                  hsva.saturate = hsv.s;
+                  hsva.value = hsv.v;
+                  _helper.updateViewColors();
+                  _helper.updateViewControls();
+               }
+            }
          },
 
-         hslaInputChanged() {
-
+         hslaInputChanged(event, color, suffix) {
+            let target = event.target;
+            target.value = `${hsla[color]}${suffix}`;
          },
 
       }
