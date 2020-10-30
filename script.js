@@ -18,17 +18,15 @@
          value: 50,
          alpha: 1
       }
-      const rgba = {
+      const _rgba_ = {
          red: 255,
          green: 0,
-         blue: 0,
-         alpha: 1
+         blue: 0
       }
-      const hsla = {
+      const _hsla_ = {
          hue: 0,
          saturate: 100,
-         lightness: 100,
-         alpha: 1
+         lightness: 100
       }
       let currentColorModel = null;
 
@@ -365,10 +363,10 @@
              * @param {number} a 
              */
             cp_RgbInput.cp_setValue = function(r, g, b, a) {
-               rgba.red = redInput.value = r;
-               rgba.green = greenInput.value = g;
-               rgba.blue = blueInput.value = b;
-               rgba.alpha = alphaInput.value = a;
+               _rgba_.red = redInput.value = r;
+               _rgba_.green = greenInput.value = g;
+               _rgba_.blue = blueInput.value = b;
+               alphaInput.value = a;
             };
             
             redInput.addEventListener("keydown", (event) => _eventListeners.rgbaInputKeyDown(event, "red"));
@@ -521,10 +519,9 @@
                saturateInput.value = `${s}%`;
                lightnessInput.value = `${l}%`;
                alphaInput.value = a;
-               hsla.hue = h;
-               hsla.saturate = s;
-               hsla.lightness = l;
-               hsla.alpha = a;
+               _hsla_.hue = h;
+               _hsla_.saturate = s;
+               _hsla_.lightness = l;
             };
 
 
@@ -1013,9 +1010,9 @@
             if(/[0-9]|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Control)/.test(pressedKey)) {
                switch (pressedKey) {
                   case "ArrowUp":
-                     if(rgba[color] < 255) {
-                        target.value = ++rgba[color];
-                        let hsv = _colorConverter.RGBtoHSV(rgba.red, rgba.green, rgba.blue);
+                     if(_rgba_[color] < 255) {
+                        target.value = ++_rgba_[color];
+                        let hsv = _colorConverter.RGBtoHSV(_rgba_.red, _rgba_.green, _rgba_.blue);
                         hsva.hue = hsv.h;
                         hsva.saturate = hsv.s;
                         hsva.value = hsv.v;
@@ -1025,9 +1022,9 @@
                   break;
                   
                   case "ArrowDown":
-                     if(rgba[color] > 0) {
-                        target.value = --rgba[color];
-                        let hsv = _colorConverter.RGBtoHSV(rgba.red, rgba.green, rgba.blue);
+                     if(_rgba_[color] > 0) {
+                        target.value = --_rgba_[color];
+                        let hsv = _colorConverter.RGBtoHSV(_rgba_.red, _rgba_.green, _rgba_.blue);
                         hsva.hue = hsv.h;
                         hsva.saturate = hsv.s;
                         hsva.value = hsv.v;
@@ -1047,11 +1044,11 @@
             if(/[0-9]|(Backspace)|(Delete)/.test(event.key) && target.value !== null && target.value !== undefined && target.value !== "") {
                let value = parseInt(target.value);
                if(isNaN(value) || value < 0 || value > 255) {
-                  target.value = rgba[color];
+                  target.value = _rgba_[color];
                }
                else {
-                  rgba[color] = value;
-                  let hsv = _colorConverter.RGBtoHSV(rgba.red, rgba.green, rgba.blue);
+                  _rgba_[color] = value;
+                  let hsv = _colorConverter.RGBtoHSV(_rgba_.red, _rgba_.green, _rgba_.blue);
                   hsva.hue = hsv.h;
                   hsva.saturate = hsv.s;
                   hsva.value = hsv.v;
@@ -1063,7 +1060,7 @@
 
          rgbaInputChanged(event, color) {
             let target = event.target;
-            target.value = rgba[color];
+            target.value = _rgba_[color];
          },
 
          alphaInputKeyDown(event) {
@@ -1184,9 +1181,9 @@
             if(/[0-9]|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Control)/.test(pressedKey)) {
                switch (pressedKey) {
                   case "ArrowUp":
-                     if(hsla[color] < maxValue) {
-                        target.value = `${++hsla[color]}${suffix}`;
-                        let hsv = _colorConverter.HSLtoHSV(hsla.hue, hsla.saturate, hsla.lightness);
+                     if(_hsla_[color] < maxValue) {
+                        target.value = `${++_hsla_[color]}${suffix}`;
+                        let hsv = _colorConverter.HSLtoHSV(_hsla_.hue, _hsla_.saturate, _hsla_.lightness);
                         hsva.hue = hsv.h;
                         hsva.saturate = hsv.s;
                         hsva.value = hsv.v;
@@ -1196,9 +1193,9 @@
                   break;
                   
                   case "ArrowDown":
-                     if(hsla[color] > 0) {
-                        target.value = `${--hsla[color]}${suffix}`;
-                        let hsv = _colorConverter.HSLtoHSV(hsla.hue, hsla.saturate, hsla.lightness);
+                     if(_hsla_[color] > 0) {
+                        target.value = `${--_hsla_[color]}${suffix}`;
+                        let hsv = _colorConverter.HSLtoHSV(_hsla_.hue, _hsla_.saturate, _hsla_.lightness);
                         hsva.hue = hsv.h;
                         hsva.saturate = hsv.s;
                         hsva.value = hsv.v;
@@ -1219,11 +1216,11 @@
                let value = parseInt(target.value);
                let pattern = new RegExp(`^[0-9]{0,3}${suffix}$`);
                if(isNaN(value) || !pattern.test(target.value) || value < 0 || value > maxValue) {
-                  target.value = `${hsla[color]}${suffix}`;
+                  target.value = `${_hsla_[color]}${suffix}`;
                }
                else {
-                  hsla[color] = value;
-                  let hsv = _colorConverter.HSLtoHSV(hsla.hue, hsla.saturate, hsla.lightness);
+                  _hsla_[color] = value;
+                  let hsv = _colorConverter.HSLtoHSV(_hsla_.hue, _hsla_.saturate, _hsla_.lightness);
                   hsva.hue = hsv.h;
                   hsva.saturate = hsv.s;
                   hsva.value = hsv.v;
@@ -1235,7 +1232,7 @@
 
          hslaInputChanged(event, color, suffix) {
             let target = event.target;
-            target.value = `${hsla[color]}${suffix}`;
+            target.value = `${_hsla_[color]}${suffix}`;
          },
 
       }
