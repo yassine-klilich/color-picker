@@ -14,8 +14,8 @@
       }
       const hsva = {
          hue: 0,
-         saturate: 100,
-         value: 100,
+         saturate: 70,
+         value: 50,
          alpha: 1
       }
       const rgba = {
@@ -38,7 +38,6 @@
       function init() {
          _guiBuilder.initGUI();
          _eventListeners.initEvents();
-         _helper.applyColor();
       }
 
       /**
@@ -77,6 +76,11 @@
 
                case COLOR_MODEL.HEX:
                   let hex = _colorConverter.HSVtoHEX(hsva.hue, hsva.saturate, hsva.value);
+                  if(hsva.alpha < 1){
+                     let alpha = Math.round(hsva.alpha * 255).toString(16);
+                     alpha = (alpha.length < 2) ? `0${alpha}` : alpha;
+                     hex += alpha;
+                  }
                   DOM.colorModel.appendChild(DOM.hexInputs);
                   DOM.hexInputs.cp_setValue(hex);
                break;
@@ -308,13 +312,6 @@
             DOM.hsvInputs = cp_hsvInputs;
             DOM.hslInputs = cp_hslInputs;
             DOM.hexInputs = cp_hexInputs;
-            
-            /**
-             * Basically is initializing a color model input
-             */
-            _helper.setColorModel(COLOR_MODEL.HSL);
-
-            document.body.appendChild(DOM.overlayContainer);
          },
 
          /**
@@ -685,6 +682,28 @@
          },
    
          /**
+          * Convert HSV to HEX
+          * @param {number} h Hue 
+          * @param {number} s Saturation 
+          * @param {number} v Value 
+          * 
+          * @returns {object} HEX color 
+          */
+         HSVtoHEX(h, s, v) {
+            let rgb = this.HSVtoRGB(h, s, v);
+   
+            let redHex = rgb.r.toString(16);
+            let greenHex = rgb.g.toString(16);
+            let blueHex = rgb.b.toString(16);
+   
+            redHex = (redHex.length < 2) ? '0' + redHex : redHex;
+            greenHex = (greenHex.length < 2) ? '0' + greenHex : greenHex;
+            blueHex = (blueHex.length < 2) ? '0' + blueHex : blueHex;
+   
+            return `#${redHex}${greenHex}${blueHex}`;
+         },
+   
+         /**
           * Convert RGB to HSL
           * @param {number} r Red
           * @param {number} g Green 
@@ -718,28 +737,6 @@
             l = Math.round(l * 100);
    
             return { h, s, l };
-         },
-   
-         /**
-          * Convert HSV to HEX
-          * @param {number} h Hue 
-          * @param {number} s Saturation 
-          * @param {number} v Value 
-          * 
-          * @returns {object} HEX color 
-          */
-         HSVtoHEX(h, s, v) {
-            let rgb = this.HSVtoRGB(h, s, v);
-   
-            let redHex = rgb.r.toString(16);
-            let greenHex = rgb.g.toString(16);
-            let blueHex = rgb.b.toString(16);
-   
-            redHex = (redHex.length < 2) ? '0' + redHex : redHex;
-            greenHex = (greenHex.length < 2) ? '0' + greenHex : greenHex;
-            blueHex = (blueHex.length < 2) ? '0' + blueHex : blueHex;
-   
-            return `#${redHex}${greenHex}${blueHex}`;
          },
 
          /**
@@ -793,9 +790,10 @@
          HSLtoHSV(h, s, l) {
             const hsv1 = s * (l < 50 ? l : 100 - l) / 100;
 
-            return { h,
-               s: hsv1 === 0 ? 0 : 2 * hsv1 / (l + hsv1) * 100,
-               v: l + hsv1
+            return {
+               h,
+               s: Math.round(hsv1 === 0 ? 0 : 2 * hsv1 / (l + hsv1) * 100),
+               v: Math.round(l + hsv1)
             };
          }
       }
@@ -973,7 +971,9 @@
           * Open color picker
           */
          openColorPicker() {
+            _helper.setColorModel(COLOR_MODEL.HSL);
             document.body.appendChild(DOM.overlayContainer);
+            _helper.applyColor();
          },
 
          /**
@@ -981,6 +981,15 @@
           */
          closeColorPicker() {
             document.body.removeChild(DOM.overlayContainer);
+
+            let result = {
+               hue: hsva.hue,
+               saturate: hsva.saturate,
+               value: hsva.value,
+               alpha: hsva.alpha
+            };
+            
+            return result;
          },
 
          /**
