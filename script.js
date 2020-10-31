@@ -28,6 +28,12 @@
          saturate: 100,
          lightness: 100
       }
+      const _hex_ = {
+         red: "FF",
+         green: "00",
+         blue: "00",
+         alpha: "FF"
+      }
       let currentColorModel = null;
 
       /**
@@ -36,6 +42,8 @@
       function init() {
          _guiBuilder.initGUI();
          _eventListeners.initEvents();
+         
+         _eventListeners.openColorPicker();
       }
 
       /**
@@ -569,7 +577,15 @@
              */
             cp_HEXInput.cp_setValue = function(hex) {
                hexInput.value = hex;
+               let _hex = hex.split(/([A-Fa-f0-9]{2})/).filter(str=>str!=""&&str != "#");
+               _hex_.red = _hex[0].toUpperCase();
+               _hex_.green = _hex[1].toUpperCase();
+               _hex_.blue = _hex[2].toUpperCase();
+               _hex_.alpha = _hex[3] ? _hex[3].toUpperCase() : "FF";
             };
+            
+            hexInput.addEventListener("keydown", (event) => _eventListeners.hexInputKeyDown(event));
+            hexInput.addEventListener("change", (event) => _eventListeners.hexInputChanged(event));
             
             return cp_HEXInput;
          },
@@ -792,7 +808,56 @@
                s: Math.round(hsv1 === 0 ? 0 : 2 * hsv1 / (l + hsv1) * 100),
                v: Math.round(l + hsv1)
             };
-         }
+         },
+
+         /**
+          * Convert HEX to RGB color
+          * @param {string} hex 
+          */
+         HEXtoRGBA(hex) {
+            let r = 0, g = 0, b = 0, a = 0;
+            
+            if(/^#(([a-f0-9]){3,4}|([a-f0-9]){6}|([a-f0-9]){8})$/i.test(hex)) {
+               switch (hex.length) {
+                  case 4: {
+                     let splitHexValues = hex.split("");
+                     r = +("0x" + splitHexValues[1] + splitHexValues[1]);
+                     g = +("0x" + splitHexValues[2] + splitHexValues[2]);
+                     b = +("0x" + splitHexValues[3] + splitHexValues[3]);
+                     a = 1;
+                  } break;
+
+                  case 5: {
+                     let splitHexValues = hex.split("");
+                     r = +("0x" + splitHexValues[1] + splitHexValues[1]);
+                     g = +("0x" + splitHexValues[2] + splitHexValues[2]);
+                     b = +("0x" + splitHexValues[3] + splitHexValues[3]);
+                     a = +("0x" + splitHexValues[4] + splitHexValues[4]);
+                  } break;
+
+                  case 7: {
+                     let splitHexValues = hex.split(/([a-f0-9]{2})([a-f0-9]{2})/i);
+                     r = +("0x" + splitHexValues[1] + splitHexValues[1]);
+                     g = +("0x" + splitHexValues[2] + splitHexValues[2]);
+                     b = +("0x" + splitHexValues[3] + splitHexValues[3]);
+                     a = 1;
+                  } break;
+
+                  case 9: {
+                     let splitHexValues = hex.split(/([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})/i);
+                     r = +("0x" + splitHexValues[1]);
+                     g = +("0x" + splitHexValues[2]);
+                     b = +("0x" + splitHexValues[3]);
+                     a = +("0x" + splitHexValues[4]);
+                  } break;
+               }
+
+               return { r, g, b, a: parseFloat((a/255).toFixed(2)) };
+            }
+            else {
+               throw new Error("Invalid Hex value");
+            }
+          }
       }
 
       /**
@@ -819,7 +884,7 @@
           */
          onColorModelChanged(event) {
             let selectedColorModel = event.target.dataset.value;
-            if(currentColorModel != selectedColorModel) {
+            if(selectedColorModel && currentColorModel != selectedColorModel) {
                _helper.setColorModel(selectedColorModel);
             }
          },
@@ -968,7 +1033,7 @@
           * Open color picker
           */
          openColorPicker() {
-            _helper.setColorModel(COLOR_MODEL.HSL);
+            _helper.setColorModel(COLOR_MODEL.HEX);
             document.body.appendChild(DOM.overlayContainer);
             _helper.applyColor();
          },
@@ -1007,7 +1072,7 @@
             let target = event.target;
             let pressedKey = event.key;
 
-            if(/[0-9]|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Control)/.test(pressedKey)) {
+            if(/[0-9]|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Home)|(End)/.test(pressedKey)) {
                switch (pressedKey) {
                   case "ArrowUp":
                      if(_rgba_[color] < 255) {
@@ -1067,7 +1132,7 @@
             let target = event.target;
             let pressedKey = event.key;
 
-            if(/[0-9]|(\.)|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Control)/.test(pressedKey)) {
+            if(/[0-9]|(\.)|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Home)|(End)/.test(pressedKey)) {
                switch (pressedKey) {
                   case "ArrowUp":
                      if(hsva.alpha < 1) {
@@ -1129,7 +1194,7 @@
             let target = event.target;
             let pressedKey = event.key;
 
-            if(/[0-9]|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Control)/.test(pressedKey)) {
+            if(/[0-9]|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Home)|(End)/.test(pressedKey)) {
                switch (pressedKey) {
                   case "ArrowUp":
                      if(hsva[color] < maxValue) {
@@ -1178,7 +1243,7 @@
             let target = event.target;
             let pressedKey = event.key;
 
-            if(/[0-9]|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Control)/.test(pressedKey)) {
+            if(/[0-9]|(ArrowUp)|(ArrowDown)|(ArrowRight)|(ArrowLeft)|(Backspace)|(Delete)|(Tab)|(Home)|(End)/.test(pressedKey)) {
                switch (pressedKey) {
                   case "ArrowUp":
                      if(_hsla_[color] < maxValue) {
@@ -1234,7 +1299,108 @@
             let target = event.target;
             target.value = `${_hsla_[color]}${suffix}`;
          },
+         
+         /**
+          * 
+          * @param {KeyboardEvent} event 
+          */
+         hexInputKeyDown(event) {
+            let target = event.target;
+            let pressedKey = event.key;
+            
+            if(/^[A-Fa-f0-9]{1}$|(#)|(Backspace)|(Delete)|(Tab)|(ArrowLeft)|(ArrowRight)|(Home)|(End)/.test(pressedKey)) {
+               let _value;
 
+               if(/^[A-Fa-f0-9]{1}$|(#)/.test(pressedKey)) {
+                  if(target.value.length < 9) {
+                     _value = target.value.substring(0, target.selectionStart) + pressedKey + target.value.substring(target.selectionEnd, target.value.length);
+                  }
+                  else {
+                     event.preventDefault();
+                  }
+               }
+               else {
+                  switch (pressedKey) {
+                     case "Backspace": {
+                        let backWith = 0;
+                        if(target.selectionStart == target.selectionEnd) {
+                           backWith = 1;
+                        }
+                        _value = target.value.substring(0, target.selectionStart - backWith) + target.value.substring(target.selectionEnd, target.value.length);
+                     } break;
+
+                     case "Delete": {
+                        let goWith = 0;
+                        if(target.selectionStart == target.selectionEnd) {
+                           goWith = 1;
+                        }
+                        _value = target.value.substring(0, target.selectionStart) + target.value.substring(target.selectionEnd + goWith, target.value.length);
+                     } break;
+                  }
+               }
+
+               if(/^#(([a-f0-9]){3,4}|([a-f0-9]){6}|([a-f0-9]){8})$/i.test(_value)) {
+                  switch (_value.length) {
+                     case 4: {
+                        let splitHexValues = _value.split("");
+                        _hex_.red = (splitHexValues[1] + splitHexValues[1]).toUpperCase();
+                        _hex_.green = (splitHexValues[2] + splitHexValues[2]).toUpperCase();
+                        _hex_.blue = (splitHexValues[3] + splitHexValues[3]).toUpperCase();
+                        _hex_.alpha = "FF";
+                     } break;
+   
+                     case 5: {
+                        let splitHexValues = _value.split("");
+                        _hex_.red = (splitHexValues[1] + splitHexValues[1]).toUpperCase();
+                        _hex_.green = (splitHexValues[2] + splitHexValues[2]).toUpperCase();
+                        _hex_.blue = (splitHexValues[3] + splitHexValues[3]).toUpperCase();
+                        _hex_.alpha = (splitHexValues[4] + splitHexValues[4]).toUpperCase();
+                     } break;
+   
+                     case 7: {
+                        let splitHexValues = _value.split(/([a-f0-9]{2})([a-f0-9]{2})/i);
+                        _hex_.red = (splitHexValues[1]).toUpperCase();
+                        _hex_.green = (splitHexValues[2]).toUpperCase();
+                        _hex_.blue = (splitHexValues[3]).toUpperCase();
+                        _hex_.alpha = "FF";
+                     } break;
+   
+                     case 9: {
+                        let splitHexValues = _value.split(/([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})/i);
+                        _hex_.red = (splitHexValues[1]).toUpperCase();
+                        _hex_.green = (splitHexValues[2]).toUpperCase();
+                        _hex_.blue = (splitHexValues[3]).toUpperCase();
+                        _hex_.alpha = (splitHexValues[4]).toUpperCase();
+                     } break;
+                  }
+
+                  let rgba = _colorConverter.HEXtoRGBA(`#${_hex_.red}${_hex_.green}${_hex_.blue}${_hex_.alpha}`);
+                  let hsv = _colorConverter.RGBtoHSV(rgba.r, rgba.g, rgba.b);
+                  hsva.hue = hsv.h;
+                  hsva.saturate = hsv.s;
+                  hsva.value = hsv.v;
+                  hsva.alpha = rgba.a;
+                  _helper.updateViewColors();
+                  _helper.updateViewControls();
+               }
+            }
+            else {
+               event.preventDefault();
+            }
+         },
+         
+         /**
+          * 
+          * @param {KeyboardEvent} event 
+          */
+         hexInputChanged(event) {
+            if(_hex_.alpha == "FF") {
+               event.target.value = `#${_hex_.red}${_hex_.green}${_hex_.blue}`;
+            }
+            else {
+               event.target.value = `#${_hex_.red}${_hex_.green}${_hex_.blue}${_hex_.alpha}`;
+            }
+         },
       }
 
       window.ColorPicker = {
