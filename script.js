@@ -97,19 +97,40 @@
           * Apply color
           */
          applyColor() {
+            this.updateColorModelInput();
             this.updateViewColors();
             this.updateViewControls();
-            this.updateColorModelInput();
          },
 
          updateViewColors() {
-            let hsl = _colorConverter.HSVtoHSL(hsva.hue, hsva.saturate, hsva.value);
-
-            let paletteBGColor = `hsl(${hsl.h}deg 100% 50% / 1)`;
+            let paletteBGColor = `hsl(${hsva.hue}deg 100% 50% / 1)`;
             DOM.palette.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${paletteBGColor} 100%)`;
-            
-            let previewRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsva.alpha})`;
-            let opacityRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
+            let previewRGBColor = "";
+            let opacityRGBColor = "";
+
+            switch (currentColorModel) {
+               case COLOR_MODEL.RGB:
+                  previewRGBColor = `rgba(${_rgba_.red}, ${_rgba_.green}, ${_rgba_.blue}, ${hsva.alpha})`;
+                  opacityRGBColor = `rgb(${_rgba_.red}, ${_rgba_.green}, ${_rgba_.blue})`;
+               break;
+               
+               case COLOR_MODEL.HSV:
+                  let hsl = _colorConverter.HSVtoHSL(hsva.hue, hsva.saturate, hsva.value);
+                  previewRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsva.alpha})`;
+                  opacityRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
+               break;
+
+               case COLOR_MODEL.HSL:
+                  previewRGBColor = `hsl(${_hsla_.hue}deg ${_hsla_.saturate}% ${_hsla_.lightness}% / ${hsva.alpha})`;
+                  opacityRGBColor = `hsl(${_hsla_.hue}deg ${_hsla_.saturate}% ${_hsla_.lightness}%)`;
+               break;
+
+               case COLOR_MODEL.HEX:
+                  previewRGBColor = `#${_hex_.red}${_hex_.green}${_hex_.blue}${_hex_.alpha}`;
+                  opacityRGBColor = `#${_hex_.red}${_hex_.green}${_hex_.blue}${_hex_.alpha}`;
+               break;
+            }
+
             DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
             DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
          },
@@ -705,15 +726,7 @@
          HSVtoHEX(h, s, v) {
             let rgb = this.HSVtoRGB(h, s, v);
    
-            let redHex = rgb.r.toString(16);
-            let greenHex = rgb.g.toString(16);
-            let blueHex = rgb.b.toString(16);
-   
-            redHex = (redHex.length < 2) ? '0' + redHex : redHex;
-            greenHex = (greenHex.length < 2) ? '0' + greenHex : greenHex;
-            blueHex = (blueHex.length < 2) ? '0' + blueHex : blueHex;
-   
-            return `#${redHex}${greenHex}${blueHex}`;
+            return this.RGBToHex(rgb.r, rgb.g, rgb.b);
          },
    
          /**
@@ -793,6 +806,29 @@
          },
 
          /**
+          * Convert RGB to HEX
+          * @param {number} r Red 
+          * @param {number} g Green 
+          * @param {number} b Blue 
+          * 
+          * @returns {object} HEX color 
+          */
+         RGBToHex(r, g, b) {
+            r = r.toString(16);
+            g = g.toString(16);
+            b = b.toString(16);
+          
+            if (r.length == 1)
+              r = "0" + r;
+            if (g.length == 1)
+              g = "0" + g;
+            if (b.length == 1)
+              b = "0" + b;
+          
+            return "#" + r + g + b;
+         },
+
+         /**
           * Convert HSL to HSV
           * @param {number} h Hue
           * @param {number} s Saturate
@@ -857,7 +893,7 @@
             else {
                throw new Error("Invalid Hex value");
             }
-          }
+         }
       }
 
       /**
@@ -935,8 +971,8 @@
             hsva.saturate = _helper.calculateSaturate(xAxis);
             hsva.value = _helper.calculateValue(yAxis);
 
-            _helper.updateViewColors();
             _helper.updateColorModelInput();
+            _helper.updateViewColors();
          },
 
          /**
@@ -980,8 +1016,8 @@
             hsva.hue = Math.round(((thumbX + hueSliderThumbHalfWidth) / hueSliderRect.width) * 360);
             DOM.hueSliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
 
-            _helper.updateViewColors();
             _helper.updateColorModelInput();
+            _helper.updateViewColors();
          },
 
          /**
@@ -1025,15 +1061,15 @@
             hsva.alpha = parseFloat(((thumbX + opacitySliderThumbHalfWidth) / opacitySliderRect.width).toFixed(2));
             DOM.opacitySliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
                
-            _helper.updateViewColors();
             _helper.updateColorModelInput();
+            _helper.updateViewColors();
          },
 
          /**
           * Open color picker
           */
          openColorPicker() {
-            _helper.setColorModel(COLOR_MODEL.HEX);
+            _helper.setColorModel(COLOR_MODEL.HSL);
             document.body.appendChild(DOM.overlayContainer);
             _helper.applyColor();
          },
