@@ -860,7 +860,7 @@
                      r = +("0x" + splitHexValues[1] + splitHexValues[1]);
                      g = +("0x" + splitHexValues[2] + splitHexValues[2]);
                      b = +("0x" + splitHexValues[3] + splitHexValues[3]);
-                     a = 1;
+                     a = 255;
                   } break;
 
                   case 5: {
@@ -873,10 +873,10 @@
 
                   case 7: {
                      let splitHexValues = hex.split(/([a-f0-9]{2})([a-f0-9]{2})/i);
-                     r = +("0x" + splitHexValues[1] + splitHexValues[1]);
-                     g = +("0x" + splitHexValues[2] + splitHexValues[2]);
-                     b = +("0x" + splitHexValues[3] + splitHexValues[3]);
-                     a = 1;
+                     r = +("0x" + splitHexValues[1]);
+                     g = +("0x" + splitHexValues[2]);
+                     b = +("0x" + splitHexValues[3]);
+                     a = 255;
                   } break;
 
                   case 9: {
@@ -888,7 +888,7 @@
                   } break;
                }
 
-               return { r, g, b, a: parseFloat((a/255).toFixed(2)) };
+               return { r, g, b, a };
             }
             else {
                throw new Error("Invalid Hex value");
@@ -1415,7 +1415,7 @@
                   hsva.hue = hsv.h;
                   hsva.saturate = hsv.s;
                   hsva.value = hsv.v;
-                  hsva.alpha = rgba.a;
+                  hsva.alpha = parseFloat((rgba.a/255).toFixed(2));
                   _helper.updateViewColors();
                   _helper.updateViewControls();
                }
@@ -1448,8 +1448,9 @@
          selectedColorModel,
          openColorPicker: _eventListeners.openColorPicker,
          closeColorPicker: _eventListeners.closeColorPicker,
-
-         hsva
+         
+         // Color converter object contains some converting functions
+         colorConverter: _colorConverter
       }
    }
 })(window);
