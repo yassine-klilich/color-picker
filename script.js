@@ -203,7 +203,7 @@
          calculateValue(yAxis) {
             let paletteHeight = DOM.palette.offsetHeight;
 
-            return Math.round(((paletteHeight - yAxis) / paletteHeight) * 100);
+            return ((paletteHeight - yAxis) / paletteHeight) * 100;
          },
 
          /**
@@ -215,7 +215,7 @@
          calculateSaturate(xAxis) {
             let paletteWidth = DOM.palette.offsetWidth;
 
-            return Math.round((xAxis / paletteWidth) * 100);
+            return (xAxis / paletteWidth) * 100;
          }
       }
 
@@ -392,9 +392,9 @@
              * @param {number} a 
              */
             cp_RgbInput.cp_setValue = function(r, g, b, a) {
-               _rgba_.red = redInput.value = r;
-               _rgba_.green = greenInput.value = g;
-               _rgba_.blue = blueInput.value = b;
+               _rgba_.red = redInput.value = Math.round(r);
+               _rgba_.green = greenInput.value = Math.round(g);
+               _rgba_.blue = blueInput.value = Math.round(b);
                alphaInput.value = a;
             };
             
@@ -468,9 +468,9 @@
              * @param {number} a 
              */
             cp_HSVInput.cp_setValue = function(h, s, v, a) {
-               hueInput.value = `${h}°`;
-               saturateInput.value = `${s}%`;
-               valueInput.value = `${v}%`;
+               hueInput.value = `${Math.round(h)}°`;
+               saturateInput.value = `${Math.round(s)}%`;
+               valueInput.value = `${Math.round(v)}%`;
                alphaInput.value = a;
             };
 
@@ -544,9 +544,9 @@
              * @param {number} a 
              */
             cp_HSLInput.cp_setValue = function(h, s, l, a) {
-               hueInput.value = `${h}°`;
-               saturateInput.value = `${s}%`;
-               lightnessInput.value = `${l}%`;
+               hueInput.value = `${Math.round(h)}°`;
+               saturateInput.value = `${Math.round(s)}%`;
+               lightnessInput.value = `${Math.round(l)}%`;
                alphaInput.value = a;
                _hsla_.hue = h;
                _hsla_.saturate = s;
@@ -672,8 +672,8 @@
                _saturate = ((_value - _lightness) / Math.min(_lightness, 1 - _lightness)) * 100;
             }
    
-            let l = Math.round(_lightness * 100);
-            s = Math.round(_saturate);
+            let l = (_lightness * 100);
+            s = (_saturate);
             
             return { h, s, l }
          },
@@ -709,9 +709,9 @@
                case 5: r = v, g = p, b = q; break;
             }
             return {
-               r: Math.round(r * 255),
-               g: Math.round(g * 255),
-               b: Math.round(b * 255)
+               r: (r * 255),
+               g: (g * 255),
+               b: (b * 255)
             };
          },
    
@@ -726,7 +726,7 @@
          HSVtoHEX(h, s, v) {
             let rgb = this.HSVtoRGB(h, s, v);
    
-            return this.RGBToHex(rgb.r, rgb.g, rgb.b);
+            return this.RGBToHex(Math.round(rgb.r), Math.round(rgb.g), Math.round(rgb.b));
          },
    
          /**
@@ -758,9 +758,9 @@
             h /= 6;
             }
          
-            h = Math.round(h * 100);
-            s = Math.round(s * 100);
-            l = Math.round(l * 100);
+            h = (h * 100);
+            s = (s * 100);
+            l = (l * 100);
    
             return { h, s, l };
          },
@@ -794,9 +794,9 @@
               h /= 6;
             }
           
-            h = Math.round(h * 360);
-            s = Math.round(s * 100);
-            v = Math.round(v * 100);
+            h = (h * 360);
+            s = (s * 100);
+            v = (v * 100);
 
             return {
                h,
@@ -841,8 +841,8 @@
 
             return {
                h,
-               s: Math.round(hsv1 === 0 ? 0 : 2 * hsv1 / (l + hsv1) * 100),
-               v: Math.round(l + hsv1)
+               s: (hsv1 === 0 ? 0 : 2 * hsv1 / (l + hsv1) * 100),
+               v: (l + hsv1)
             };
          },
 
@@ -1013,7 +1013,7 @@
                thumbX = maxPosition;
             }
 
-            hsva.hue = Math.round(((thumbX + hueSliderThumbHalfWidth) / hueSliderRect.width) * 360);
+            hsva.hue = (((thumbX + hueSliderThumbHalfWidth) / hueSliderRect.width) * 360);
             DOM.hueSliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
 
             _helper.updateColorModelInput();
@@ -1447,7 +1447,9 @@
          init,
          selectedColorModel,
          openColorPicker: _eventListeners.openColorPicker,
-         closeColorPicker: _eventListeners.closeColorPicker
+         closeColorPicker: _eventListeners.closeColorPicker,
+
+         hsva
       }
    }
 })(window);
