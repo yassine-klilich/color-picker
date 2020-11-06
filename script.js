@@ -1381,7 +1381,56 @@
          closeColorPicker: _eventListeners.closeColorPicker,
          
          // Color converter object contains some converting functions
-         colorConverter: _colorConverter
+         colorConverter: {
+            HSVtoHSL: (h, s, v) => { 
+               let result = _colorConverter.HSVtoHSL(h, s, v) ;
+               return {
+                  h: result.h,
+                  s: Math.round(result.s),
+                  l: Math.round(result.l)
+               }
+            },
+            HSVtoRGB: (h, s, v) => { 
+               let result = _colorConverter.HSVtoRGB(h, s, v) ;
+               return {
+                  r: Math.round(result.r),
+                  g: Math.round(result.g),
+                  b: Math.round(result.b)
+               }
+            },
+            HSVtoHEX: (h, s, v) => { 
+               let result = _colorConverter.HSVtoHEX(h, s, v) ;
+               return {
+
+               }
+            },
+            HSLtoHSV: (h, s, l) => { 
+               let result = _colorConverter.HSLtoHSV(h, s, l) ;
+               return {
+                  h: result.h,
+                  s: Math.round(result.s),
+                  v: Math.round(result.v)
+               }
+            },
+            RGBtoHSL: (r, g, b) => { 
+               let result = _colorConverter.RGBtoHSL(r, g, b) ;
+               return {
+                  h: Math.round(result.h),
+                  s: Math.round(result.s),
+                  l: Math.round(result.l)
+               }
+            },
+            RGBtoHSV: (r, g, b) => { 
+               let result = _colorConverter.RGBtoHSV(r, g, b) ;
+               return {
+                  h: Math.round(result.h),
+                  s: Math.round(result.s),
+                  v: Math.round(result.v)
+               }
+            },
+            RGBToHex: _colorConverter.RGBToHex,
+            HEXtoRGBA: _colorConverter.HEXtoRGBA
+         }
       }
    }
 })(window);
