@@ -49,7 +49,7 @@
       /**
        * Get the current selected color model
        */
-      function selectedColorModel() {
+      function getSelectedColorModel() {
          return currentColorModel;
       }
 
@@ -58,7 +58,7 @@
           * Set a color model
           * @param {COLOR_MODEL} colorModel 
           */
-         setColorModel(colorModel) {
+         setColorModelInput(colorModel) {
             currentColorModel = colorModel;
             DOM.colorModel.innerHTML = "";
             
@@ -107,30 +107,11 @@
             DOM.palette.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${paletteBGColor} 100%)`;
             let previewRGBColor = "";
             let opacityRGBColor = "";
-
-            switch (currentColorModel) {
-               case COLOR_MODEL.RGB:
-                  previewRGBColor = `rgba(${_rgba_.red}, ${_rgba_.green}, ${_rgba_.blue}, ${hsva.alpha})`;
-                  opacityRGBColor = `rgb(${_rgba_.red}, ${_rgba_.green}, ${_rgba_.blue})`;
-               break;
-               
-               case COLOR_MODEL.HSV:
-                  let hsl = _colorConverter.HSVtoHSL(hsva.hue, hsva.saturate, hsva.value);
-                  previewRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsva.alpha})`;
-                  opacityRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
-               break;
-
-               case COLOR_MODEL.HSL:
-                  previewRGBColor = `hsl(${_hsla_.hue}deg ${_hsla_.saturate}% ${_hsla_.lightness}% / ${hsva.alpha})`;
-                  opacityRGBColor = `hsl(${_hsla_.hue}deg ${_hsla_.saturate}% ${_hsla_.lightness}%)`;
-               break;
-
-               case COLOR_MODEL.HEX:
-                  previewRGBColor = `#${_hex_.red}${_hex_.green}${_hex_.blue}${_hex_.alpha}`;
-                  opacityRGBColor = `#${_hex_.red}${_hex_.green}${_hex_.blue}${_hex_.alpha}`;
-               break;
-            }
-
+            
+            let hsl = _colorConverter.HSVtoHSL(hsva.hue, hsva.saturate, hsva.value);
+            previewRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsva.alpha})`;
+            opacityRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
+            
             DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
             DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
          },
@@ -921,7 +902,7 @@
          onColorModelChanged(event) {
             let selectedColorModel = event.target.dataset.value;
             if(selectedColorModel && currentColorModel != selectedColorModel) {
-               _helper.setColorModel(selectedColorModel);
+               _helper.setColorModelInput(selectedColorModel);
             }
          },
 
@@ -1069,7 +1050,7 @@
           * Open color picker
           */
          openColorPicker() {
-            _helper.setColorModel(COLOR_MODEL.HSL);
+            _helper.setColorModelInput(COLOR_MODEL.HSL);
             document.body.appendChild(DOM.overlayContainer);
             _helper.applyColor();
          },
@@ -1445,7 +1426,7 @@
          
          // Methods
          init,
-         selectedColorModel,
+         getSelectedColorModel,
          openColorPicker: _eventListeners.openColorPicker,
          closeColorPicker: _eventListeners.closeColorPicker,
          
