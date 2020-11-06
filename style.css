@@ -237,35 +237,3 @@
 .cp-color-model-arrow svg path {
 	fill: #bcbcbc;
 }
-
-.cp-select-color-model-overlay-wrapper {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	width: 100%;
-	height: 100%;
-	z-index: 2;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	user-select: none;
-}
-.cp-select-color-model {
-	display: flex;
-	flex-direction: column;
-	width: 100px;
-	border: 1px solid #5A5A5A;
-	background-color: #242424;
-	border-radius: 4px;
-	color: #bcbcbc;
-	font-size: 14px;
-	overflow: hidden;
-	top: 30px;
-	right: -4px;
-}
-.cp-select-color-model-option {
-	padding: 4px 8px;
-	cursor: pointer;
-}
-.cp-select-color-model-option:hover {
-	background-color: #383838;
-}

@@ -105,13 +105,9 @@
          updateViewColors() {
             let paletteBGColor = `hsl(${hsva.hue}deg 100% 50% / 1)`;
             DOM.palette.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${paletteBGColor} 100%)`;
-            let previewRGBColor = "";
-            let opacityRGBColor = "";
-            
             let hsl = _colorConverter.HSVtoHSL(hsva.hue, hsva.saturate, hsva.value);
-            previewRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsva.alpha})`;
-            opacityRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
-            
+            let previewRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsva.alpha})`;
+            let opacityRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
             DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
             DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
          },
@@ -231,10 +227,8 @@
             let cp_ColorModelWrapper = document.createElement("div");
             let cp_ColorModel = document.createElement("div");
             let cp_colorModelArrow = document.createElement("span");
-            cp_colorModelArrow.innerHTML = '<svg width="12" height="12" viewBox="-285 408.9 24 24"><path d="M-285,417l4-4.1l8,8l8-8l4,4.1l-12,11.9L-285,417z"/></svg>';
-            let cp_SelectColorModelOverlayWrapper = document.createElement("div");
-            let cp_SelectColorModelOverlay = document.createElement("div");
-            let cp_SelectColorModel = _guiBuilder.buildColorModelSelectDOM();
+            cp_colorModelArrow.innerHTML = '<svg width="16" height="16" viewBox="-203 292.3 12 12"><path d="M-200.5,300.9l1.2-1.2l2.3,2.3l2.3-2.3l1.2,1.2l-3.5,3.4L-200.5,300.9z"/><path d="M-197,292.3l3.5,3.4l-1.2,1.2l-2.3-2.3l-2.3,2.3l-1.2-1.2L-197,292.3z"/></svg>';
+            
             let cp_rgbInputs = _guiBuilder.buildRGBInputsDOM();
             let cp_hsvInputs = _guiBuilder.buildHSVInputsDOM();
             let cp_hslInputs = _guiBuilder.buildHSLInputsDOM();
@@ -263,8 +257,6 @@
             cp_ColorModelWrapper.classList.add("cp-color-model-wrapper");
             cp_ColorModel.classList.add("cp-color-model");
             cp_colorModelArrow.classList.add("cp-color-model-arrow");
-            cp_SelectColorModelOverlayWrapper.classList.add("cp-select-color-model-overlay-wrapper");
-            cp_SelectColorModelOverlay.classList.add("cp-select-color-model-overlay");
             
             // Append child nodes
             cp_overlayContainer.appendChild(cp_overlayBackdrop);
@@ -288,8 +280,6 @@
             cp_OpacitySlider.appendChild(cp_OpacityColor);
             cp_ColorModelWrapper.appendChild(cp_ColorModel);
             cp_ColorModelWrapper.appendChild(cp_colorModelArrow);
-            cp_SelectColorModelOverlayWrapper.appendChild(cp_SelectColorModelOverlay);
-            cp_SelectColorModelOverlay.appendChild(cp_SelectColorModel);
             
             DOM.overlayContainer = cp_overlayContainer;
             DOM.overlayBackdrop = cp_overlayBackdrop;
@@ -313,9 +303,6 @@
             DOM.colorModelWrapper = cp_ColorModelWrapper;
             DOM.colorModel = cp_ColorModel;
             DOM.colorModelArrow = cp_colorModelArrow;
-            DOM.selectColorModelOverlayWrapper = cp_SelectColorModelOverlayWrapper;
-            DOM.selectColorModelOverlay = cp_SelectColorModelOverlay;
-            DOM.selectColorModel = cp_SelectColorModel;
             DOM.rgbInputs = cp_rgbInputs;
             DOM.hsvInputs = cp_hsvInputs;
             DOM.hslInputs = cp_hslInputs;
@@ -592,39 +579,6 @@
             return cp_HEXInput;
          },
 
-         /**
-          * Build custom select input for selecting a color model
-          */
-         buildColorModelSelectDOM() {
-            let cp_SelectColorModel = document.createElement("div");
-            let cp_SelectColorModelOptionRGB = document.createElement("span");
-            let cp_SelectColorModelOptionHSV = document.createElement("span");
-            let cp_SelectColorModelOptionHSL = document.createElement("span");
-            let cp_SelectColorModelOptionHEX = document.createElement("span");
-
-            cp_SelectColorModel.classList.add("cp-select-color-model");
-            cp_SelectColorModelOptionRGB.classList.add("cp-select-color-model-option");
-            cp_SelectColorModelOptionHSV.classList.add("cp-select-color-model-option");
-            cp_SelectColorModelOptionHSL.classList.add("cp-select-color-model-option");
-            cp_SelectColorModelOptionHEX.classList.add("cp-select-color-model-option");
-
-            cp_SelectColorModelOptionRGB.setAttribute("data-value", COLOR_MODEL.RGB);
-            cp_SelectColorModelOptionHSV.setAttribute("data-value", COLOR_MODEL.HSV);
-            cp_SelectColorModelOptionHSL.setAttribute("data-value", COLOR_MODEL.HSL);
-            cp_SelectColorModelOptionHEX.setAttribute("data-value", COLOR_MODEL.HEX);
-
-            cp_SelectColorModelOptionRGB.innerHTML = "RGB";
-            cp_SelectColorModelOptionHSV.innerHTML = "HSV";
-            cp_SelectColorModelOptionHSL.innerHTML = "HSL";
-            cp_SelectColorModelOptionHEX.innerHTML = "HEX";
-
-            cp_SelectColorModel.appendChild(cp_SelectColorModelOptionRGB);
-            cp_SelectColorModel.appendChild(cp_SelectColorModelOptionHSV);
-            cp_SelectColorModel.appendChild(cp_SelectColorModelOptionHSL);
-            cp_SelectColorModel.appendChild(cp_SelectColorModelOptionHEX);
-
-            return cp_SelectColorModel;
-         }
       }
 
       /**
@@ -890,20 +844,7 @@
             DOM.hueSliderWrapper.addEventListener('mousedown', _eventListeners.hueSliderThumbMouseDown);
             DOM.opacitySliderWrapper.addEventListener('mousedown', _eventListeners.opacitySliderThumbMouseDown);
             DOM.overlayBackdrop.addEventListener('click', _eventListeners.closeColorPicker);
-            DOM.colorModelArrow.addEventListener('click', _eventListeners.openSelectColorModel);
-            DOM.selectColorModelOverlayWrapper.addEventListener('click', _eventListeners.closeSelectColorModel);
-            DOM.selectColorModel.addEventListener('click', _eventListeners.onColorModelChanged);
-         },
-
-         /**
-          * Click event handler when a color model is changed
-          * @param {MouseEvent} event 
-          */
-         onColorModelChanged(event) {
-            let selectedColorModel = event.target.dataset.value;
-            if(selectedColorModel && currentColorModel != selectedColorModel) {
-               _helper.setColorModelInput(selectedColorModel);
-            }
+            DOM.colorModelArrow.addEventListener('click', _eventListeners.changeColorModel);
          },
 
          /**
@@ -1072,17 +1013,26 @@
          },
 
          /**
-          * Open the select color model input
+          * Change color model
           */
-         openSelectColorModel() {
-            DOM.overlayContainer.appendChild(DOM.selectColorModelOverlayWrapper);
-         },
+         changeColorModel() {
+            switch (getSelectedColorModel()) {
+               case COLOR_MODEL.RGB: {
+                  _helper.setColorModelInput(COLOR_MODEL.HSV);
+               } break;
+               
+               case COLOR_MODEL.HSV: {
+                  _helper.setColorModelInput(COLOR_MODEL.HSL);
+               } break;
+               
+               case COLOR_MODEL.HSL: {
+                  _helper.setColorModelInput(COLOR_MODEL.HEX);
+               } break;
 
-         /**
-          * Close the select color model input
-          */
-         closeSelectColorModel() {
-            DOM.overlayContainer.removeChild(DOM.selectColorModelOverlayWrapper);
+               case COLOR_MODEL.HEX: {
+                  _helper.setColorModelInput(COLOR_MODEL.RGB);
+               } break;
+            }
          },
 
          rgbaInputKeyDown(event, color) {
