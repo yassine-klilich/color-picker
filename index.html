@@ -34,12 +34,17 @@
 	
 	<div class="btn-wrapper">
 		<button onclick="ColorPicker.openColorPicker()">Open color picker</button>
+		<input type="color">
 	</div>
 
 	<script src="./script.js"></script>
 
    <script>
-      ColorPicker.init();
+      ColorPicker.init({
+			onClosed: (color)=>{
+				console.log(color);
+			}
+		});
    </script>
 
 </body>

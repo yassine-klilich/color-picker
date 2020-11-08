@@ -30,11 +30,17 @@
          alpha: "FF"
       }
       let currentColorModel = null;
+      let _user_options_ = null;
 
       /**
        * Initialize the color picker library
        */
-      function init() {
+      function init({
+         onOpened, onClosed
+      } = _options.defaultOptions) {
+         _user_options_ = {
+            onOpened, onClosed
+         }
          _guiBuilder.initGUI();
          _eventListeners.initEvents();
          
@@ -48,6 +54,36 @@
          return currentColorModel;
       }
 
+      /**
+       * Default Options
+       */
+      const _options = {
+         defaultOptions: {
+            onOpened: function() {},
+            onClosed: function(color) { return color; },
+         },
+
+         /**
+          * Get option
+          * @param {string} optionName 
+          */
+         getOption(optionName) {
+            let option = null;
+
+            if(_user_options_ == null || (_user_options_ != null && _user_options_[optionName] == undefined)) {
+               option = this.defaultOptions[optionName];
+            }
+            else {
+               option = _user_options_[optionName];
+            }
+
+            return option;
+         }
+      }
+
+      /**
+       * Some helper functions
+       */
       const _helper = {
          /**
           * Set a color model
@@ -1157,6 +1193,8 @@
             _helper.setColorModelInput(COLOR_MODEL.HSL);
             document.body.appendChild(DOM.overlayContainer);
             _helper.applyColor();
+
+            _options.getOption("onOpened")();
          },
 
          /**
@@ -1175,7 +1213,7 @@
                      alpha: hsva.alpha
                   };
                   
-                  return result;
+                  _options.getOption("onClosed")(result);
                }
             }
          },
