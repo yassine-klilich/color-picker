@@ -361,7 +361,7 @@
             let colorModelWrapper = document.createElement("div");
             let colorModel = document.createElement("div");
             let colorModelArrow = document.createElement("span");
-            colorModelArrow.innerHTML = '<svg width="16" height="16" viewBox="-203 292.3 12 12"><path d="M-200.5,300.9l1.2-1.2l2.3,2.3l2.3-2.3l1.2,1.2l-3.5,3.4L-200.5,300.9z"/><path d="M-197,292.3l3.5,3.4l-1.2,1.2l-2.3-2.3l-2.3,2.3l-1.2-1.2L-197,292.3z"/></svg>';
+            colorModelArrow.style.setProperty("background-image", `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-203 292.3 12 12'%3E%3Cpath fill='%23bcbcbc' d='M-200.5,300.9l1.2-1.2l2.3,2.3l2.3-2.3l1.2,1.2l-3.5,3.4L-200.5,300.9z'%3E%3C/path%3E%3Cpath fill='%23bcbcbc' d='M-197,292.3l3.5,3.4l-1.2,1.2l-2.3-2.3l-2.3,2.3l-1.2-1.2L-197,292.3z'%3E%3C/path%3E%3C/svg%3E")`);
             let hiddenClipboardInput = this.buildHiddenClipboardInput();
 
             let rgbInputs = _guiBuilder.buildRGBInputsDOM();
@@ -401,9 +401,13 @@
          buildClipboardColor() {
             let clipboardColor = document.createElement("span");
             clipboardColor.classList.add("cp-clipboard-color");
-            clipboardColor.innerHTML = '<svg viewBox="-201 290.3 16 16" width="16" height="16"><path d="M-199.1,301.3v-6.7c0-2,1.6-3.7,3.7-3.7h4.3c0.8,0,1.5,0.5,1.7,1.2l-5.4,0l-0.2,0c-1.6,0.1-2.9,1.4-2.9,3.1 l0,7.9C-198.6,302.8-199.1,302.1-199.1,301.3z M-194.8,305.6c-1,0-1.8-0.8-1.8-1.8v-8.6c0-1,0.8-1.8,1.8-1.8h6.1 c1,0,1.8,0.8,1.8,1.8v8.6c0,1-0.8,1.8-1.8,1.8H-194.8z M-188.1,303.8v-8.6c0-0.3-0.3-0.6-0.6-0.6h-6.1c-0.3,0-0.6,0.3-0.6,0.6v8.6 c0,0.3,0.3,0.6,0.6,0.6h6.1C-188.4,304.4-188.1,304.1-188.1,303.8z" fill="white"></path></svg>';
+            let copyClipboardIcon = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-201 290.3 16 16' width='16' height='16'%3E%3Cpath d='M-199.1,301.3v-6.7c0-2,1.6-3.7,3.7-3.7h4.3c0.8,0,1.5,0.5,1.7,1.2l-5.4,0l-0.2,0c-1.6,0.1-2.9,1.4-2.9,3.1 l0,7.9C-198.6,302.8-199.1,302.1-199.1,301.3z M-194.8,305.6c-1,0-1.8-0.8-1.8-1.8v-8.6c0-1,0.8-1.8,1.8-1.8h6.1 c1,0,1.8,0.8,1.8,1.8v8.6c0,1-0.8,1.8-1.8,1.8H-194.8z M-188.1,303.8v-8.6c0-0.3-0.3-0.6-0.6-0.6h-6.1c-0.3,0-0.6,0.3-0.6,0.6v8.6 c0,0.3,0.3,0.6,0.6,0.6h6.1C-188.4,304.4-188.1,304.1-188.1,303.8z' fill='%23bcbcbc'%3E%3C/path%3E%3C/svg%3E")`;
+            let copiedClipboardIcon = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='14' height='14'%3E%3Cpath fill='%23bcbcbc' d='M15.2,4.7c0.3-0.3,0.2-0.7-0.1-1l-0.8-0.8c-0.3-0.3-0.7-0.2-1,0.1l-6.7,7.5L2.5,6.7c-0.3-0.3-0.7-0.2-1,0.1 L0.7,7.6c-0.3,0.3-0.2,0.7,0.1,1l5.5,5c0.3,0.3,0.7,0.2,1-0.1L15.2,4.7z'/%3E%3C/svg%3E")`;
+            clipboardColor.style.setProperty("background-image", copyClipboardIcon);
 
             DOM.clipboardColor = clipboardColor;
+            DOM.copyClipboardIcon = copyClipboardIcon;
+            DOM.copiedClipboardIcon = copiedClipboardIcon;
 
             return clipboardColor;
          },
@@ -611,9 +615,12 @@
              * @param {number} a 
              */
             cp_HSLInput.cp_setValue = function(h, s, l, a) {
-               hueInput.value = `${Math.round(h)}°`;
-               saturateInput.value = `${Math.round(s)}%`;
-               lightnessInput.value = `${Math.round(l)}%`;
+               h = Math.round(h);
+               s = Math.round(s);
+               l = Math.round(l);
+               hueInput.value = `${h}°`;
+               saturateInput.value = `${s}%`;
+               lightnessInput.value = `${l}%`;
                alphaInput.value = a;
                _hsla_.hue = h;
                _hsla_.saturate = s;
@@ -692,10 +699,12 @@
           * Build color preview in SVG
           */
          buildSVGColorPreview() {
+            let colorPreviewWrapper = document.createElement("span");
+            colorPreviewWrapper.classList.add("cp-color-preview-wrapper");
+
             let svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             svgElement.setAttribute("width", 38);
             svgElement.setAttribute("height", 38);
-            svgElement.style.setProperty("margin", "0px 16px 0px 12px");
 
             let circleColorPreview = document.createElementNS("http://www.w3.org/2000/svg", "circle");
             circleColorPreview.setAttribute("cx", 19);
@@ -708,9 +717,28 @@
 
             svgElement.innerHTML = '<defs><pattern id="transparent-grid" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="3" height="3" fill="#DBDBDB"/><rect x="3" y="0" width="3" height="3" fill="white"/><rect x="3" y="3" width="3" height="3" fill="#DBDBDB"/><rect x="0" y="3" width="3" height="3" fill="white"/></pattern></defs><circle cx="19" cy="19" r="18" fill="url(#transparent-grid)" />';
             svgElement.appendChild(circleColorPreview);
+            colorPreviewWrapper.appendChild(svgElement);
 
             DOM.circleColorPreview = circleColorPreview;
-            return svgElement;
+            return colorPreviewWrapper;
+         },
+
+         /**
+          * Set copy clipboard icon
+          */
+         setCopyClipboardIcon() {
+            DOM.clipboardColor.style.setProperty("background-image", DOM.copyClipboardIcon);
+         },
+
+         /**
+          * Set check mark when color is copied
+          */
+         setCopiedClipboardIcon() {
+            DOM.clipboardColor.style.setProperty("background-image", DOM.copiedClipboardIcon);
+
+            setTimeout(()=>{
+               _guiBuilder.setCopyClipboardIcon();
+            }, 1000);
          }
       }
 
@@ -1299,7 +1327,9 @@
                switch (pressedKey) {
                   case "ArrowUp":
                      if(hsva[color] < maxValue) {
-                        target.value = `${++hsva[color]}${suffix}`;
+                        let result = (hsva[color] + 1);
+                        hsva[color] = (result > maxValue) ? maxValue : result;
+                        target.value = `${Math.round(hsva[color])}${suffix}`;
                         _helper.updateViewColors();
                         _helper.updateViewControls();
                      }
@@ -1307,7 +1337,9 @@
                   
                   case "ArrowDown":
                      if(hsva[color] > 0) {
-                        target.value = `${--hsva[color]}${suffix}`;
+                        let result = (hsva[color] - 1);
+                        hsva[color] = (result < 0) ? 0 : result;
+                        target.value = `${Math.round(hsva[color])}${suffix}`;
                         _helper.updateViewColors();
                         _helper.updateViewControls();
                      }
@@ -1325,7 +1357,7 @@
                let value = parseInt(target.value);
                let pattern = new RegExp(`^[0-9]{0,3}${suffix}$`);
                if(isNaN(value) || !pattern.test(target.value) || value < 0 || value > maxValue) {
-                  target.value = `${hsva[color]}${suffix}`;
+                  target.value = `${Math.round(hsva[color])}${suffix}`;
                }
                else {
                   hsva[color] = value;
@@ -1337,7 +1369,7 @@
 
          hsvaInputChanged(event, color, suffix) {
             let target = event.target;
-            target.value = `${hsva[color]}${suffix}`;
+            target.value = `${Math.round(hsva[color])}${suffix}`;
          },
          
          hslaInputKeyDown(event, color, maxValue, suffix) {
@@ -1398,7 +1430,7 @@
 
          hslaInputChanged(event, color, suffix) {
             let target = event.target;
-            target.value = `${_hsla_[color]}${suffix}`;
+            target.value = `${Math.round(_hsla_[color])}${suffix}`;
          },
          
          /**
@@ -1503,6 +1535,9 @@
             }
          },
 
+         /**
+          * Clipboard color click event listener
+          */
          clipboardColor() {
             switch (getSelectedColorModel()) {
                case COLOR_MODEL.RGB:
@@ -1514,7 +1549,7 @@
                break;
 
                case COLOR_MODEL.HSL:
-                  DOM.hiddenClipboardInput.value = `hsl(${Math.round(_hsla_.hue)}, ${Math.round(_hsla_.saturate)}%, ${Math.round(_hsla_.lightness)}%, ${hsva.alpha})`;
+                  DOM.hiddenClipboardInput.value = `hsl(${_hsla_.hue}, ${_hsla_.saturate}%, ${_hsla_.lightness}%, ${hsva.alpha})`;
                break;
 
                case COLOR_MODEL.HEX:
@@ -1529,8 +1564,7 @@
 
             DOM.hiddenClipboardInput.select();
             document.execCommand('copy');
-
-            console.log(DOM.hiddenClipboardInput.value);
+            _guiBuilder.setCopiedClipboardIcon();
          }
       }
 
