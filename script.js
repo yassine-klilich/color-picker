@@ -1001,6 +1001,7 @@
           * There are some event listeners are initialized in the _guiBuilder object.
           */
          initEvents() {
+            document.addEventListener('keyup', _eventListeners.closeColorPicker);
             DOM.paletteWrapper.addEventListener('mousedown', _eventListeners.cursorMouseDown);
             DOM.hueSliderWrapper.addEventListener('mousedown', _eventListeners.hueSliderThumbMouseDown);
             DOM.opacitySliderWrapper.addEventListener('mousedown', _eventListeners.opacitySliderThumbMouseDown);
@@ -1160,18 +1161,23 @@
 
          /**
           * Close color picker
+          * @param {MouseEvent | KeyboardEvent} event 
           */
-         closeColorPicker() {
-            document.body.removeChild(DOM.overlayContainer);
-
-            let result = {
-               hue: hsva.hue,
-               saturate: hsva.saturate,
-               value: hsva.value,
-               alpha: hsva.alpha
-            };
-            
-            return result;
+         closeColorPicker(event) {
+            if(DOM.overlayContainer.parentElement) {
+               if(event instanceof MouseEvent || (event instanceof KeyboardEvent && event.key == "Escape")){
+                  document.body.removeChild(DOM.overlayContainer);
+      
+                  let result = {
+                     hue: hsva.hue,
+                     saturate: hsva.saturate,
+                     value: hsva.value,
+                     alpha: hsva.alpha
+                  };
+                  
+                  return result;
+               }
+            }
          },
 
          /**
