@@ -27,7 +27,16 @@
          red: "FF",
          green: "00",
          blue: "00",
-         alpha: "FF"
+         alpha: "FF",
+
+         toString() {
+            if(this.alpha.toUpperCase() == "FF"){
+               return `#${this.red}${this.green}${this.blue}`;
+            }
+            else {
+               return `#${this.red}${this.green}${this.blue}${this.alpha}`;
+            }
+         }
       }
       let currentColorModel = null;
       let _user_options_ = null;
@@ -1205,13 +1214,37 @@
             if(DOM.overlayContainer.parentElement) {
                if(event instanceof MouseEvent || (event instanceof KeyboardEvent && event.key == "Escape")){
                   document.body.removeChild(DOM.overlayContainer);
-      
-                  let result = {
-                     hue: hsva.hue,
-                     saturate: hsva.saturate,
-                     value: hsva.value,
-                     alpha: hsva.alpha
-                  };
+                  let result = null;
+
+                  switch (getSelectedColorModel()) {
+                     case COLOR_MODEL.RGB: {
+                        result = {
+                           red: _rgba_.red,
+                           green: _rgba_.green,
+                           blue: _rgba_.blue,
+                           alpha: hsva.alpha
+                        }
+                     } break;
+                     case COLOR_MODEL.HSV: {
+                        result = {
+                           hue: Math.round(hsva.hue),
+                           saturate: Math.round(hsva.saturate),
+                           value: Math.round(hsva.value),
+                           alpha: hsva.alpha
+                        }
+                     } break;
+                     case COLOR_MODEL.HSL: {
+                        result = {
+                           hue: _hsla_.hue,
+                           saturate: _hsla_.saturate,
+                           lightness: _hsla_.lightness,
+                           alpha: hsva.alpha
+                        }
+                     } break;
+                     case COLOR_MODEL.HEX: {
+                        result = _hex_.toString();
+                     } break;
+                  }
                   
                   _options.getOption("onClosed")(result);
                }
@@ -1551,7 +1584,7 @@
                      } break;
                   }
 
-                  let rgba = _colorConverter.HEXtoRGBA(`#${_hex_.red}${_hex_.green}${_hex_.blue}${_hex_.alpha}`);
+                  let rgba = _colorConverter.HEXtoRGBA(_hex_.toString());
                   let hsv = _colorConverter.RGBtoHSV(rgba.r, rgba.g, rgba.b);
                   hsva.hue = hsv.h;
                   hsva.saturate = hsv.s;
@@ -1571,12 +1604,7 @@
           * @param {KeyboardEvent} event 
           */
          hexInputChanged(event) {
-            if(_hex_.alpha == "FF") {
-               event.target.value = `#${_hex_.red}${_hex_.green}${_hex_.blue}`;
-            }
-            else {
-               event.target.value = `#${_hex_.red}${_hex_.green}${_hex_.blue}${_hex_.alpha}`;
-            }
+            event.target.value = _hex_.toString();
          },
 
          /**
@@ -1597,12 +1625,7 @@
                break;
 
                case COLOR_MODEL.HEX:
-                  if(_hex_.alpha == "FF") {
-                     DOM.hiddenClipboardInput.value = `#${_hex_.red}${_hex_.green}${_hex_.blue}`;
-                  }
-                  else {
-                     DOM.hiddenClipboardInput.value = `#${_hex_.red}${_hex_.green}${_hex_.blue}${_hex_.alpha}`;
-                  }
+                  DOM.hiddenClipboardInput.value = _hex_.toString();
                break;
             }
 
