@@ -100,11 +100,12 @@
          updateViewColors() {
             let paletteBGColor = `hsl(${hsva.hue}deg 100% 50% / 1)`;
             DOM.palette.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${paletteBGColor} 100%)`;
+            
             let hsl = _colorConverter.HSVtoHSL(hsva.hue, hsva.saturate, hsva.value);
-            let previewRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}% / ${hsva.alpha})`;
-            let opacityRGBColor = `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
-            DOM.colorPreview.style.setProperty('background-color', previewRGBColor);
-            DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${opacityRGBColor})`);
+            let previewColor = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+            DOM.opacityColor.style.setProperty('background-image', `linear-gradient(90deg, transparent, ${previewColor})`);
+            DOM.circleColorPreview.setAttribute("fill", previewColor);
+            DOM.circleColorPreview.setAttribute("fill-opacity", hsva.alpha);
          },
 
          updateViewControls() {
@@ -199,111 +200,181 @@
           * Initialize the GUI
           */
          initGUI() {
+
+
             // DOM declaration
             let cp_overlayContainer = document.createElement("div");
             let cp_overlayBackdrop = document.createElement("div");
             let cp_overlayWrapper = document.createElement("div");
             let colorPicker = document.createElement("div");
             let cp_Wrapper = document.createElement("div");
-            let cp_PaletteWrapper = document.createElement("div");
-            let cp_Palette = document.createElement("div");
-            let cp_Cursor = document.createElement("div");
-            let cp_ColorSetting = document.createElement("div");
-            let cp_ColorPreviewWrapper = document.createElement("div");
-            let cp_ColorPreview = document.createElement("div");
-            let cp_Sliders = document.createElement("div");
-            let cp_HueSliderWrapper = document.createElement("div");
-            let cp_HueSlider = document.createElement("div");
-            let cp_HueSliderThumb = document.createElement("div");
-            let cp_OpacitySliderWrapper = document.createElement("div");
-            let cp_OpacitySlider = document.createElement("div");
-            let cp_OpacityColor = document.createElement("div");
-            let cp_OpacitySliderThumb = document.createElement("div");
-            let cp_ColorModelWrapper = document.createElement("div");
-            let cp_ColorModel = document.createElement("div");
-            let cp_colorModelArrow = document.createElement("span");
-            cp_colorModelArrow.innerHTML = '<svg width="16" height="16" viewBox="-203 292.3 12 12"><path d="M-200.5,300.9l1.2-1.2l2.3,2.3l2.3-2.3l1.2,1.2l-3.5,3.4L-200.5,300.9z"/><path d="M-197,292.3l3.5,3.4l-1.2,1.2l-2.3-2.3l-2.3,2.3l-1.2-1.2L-197,292.3z"/></svg>';
-            let styleElement = this.buildStyleElement();
-            
-            let cp_rgbInputs = _guiBuilder.buildRGBInputsDOM();
-            let cp_hsvInputs = _guiBuilder.buildHSVInputsDOM();
-            let cp_hslInputs = _guiBuilder.buildHSLInputsDOM();
-            let cp_hexInputs = _guiBuilder.buildHEXInputsDOM();
-            
+
             // Add class names
             cp_overlayContainer.classList.add("cp-overlay-container");
             cp_overlayBackdrop.classList.add("cp-overlay-backdrop");
             cp_overlayWrapper.classList.add("cp-overlay-wrapper");
             colorPicker.classList.add("color-picker");
             cp_Wrapper.classList.add("cp-wrapper");
-            cp_PaletteWrapper.classList.add("cp-palette-wrapper");
-            cp_Palette.classList.add("cp-palette");
-            cp_Cursor.classList.add("cp-cursor");
-            cp_ColorSetting.classList.add("cp-color-setting");
-            cp_ColorPreviewWrapper.classList.add("cp-color-preview-wrapper");
-            cp_ColorPreview.classList.add("cp-color-preview");
-            cp_Sliders.classList.add("cp-sliders");
-            cp_HueSliderWrapper.classList.add("cp-hue-slider-wrapper");
-            cp_HueSlider.classList.add("cp-hue-slider");
-            cp_HueSliderThumb.classList.add("cp-hue-slider-thumb");
-            cp_OpacitySliderWrapper.classList.add("cp-opacity-slider-wrapper");
-            cp_OpacitySlider.classList.add("cp-opacity-slider");
-            cp_OpacityColor.classList.add("cp-opacity-color");
-            cp_OpacitySliderThumb.classList.add("cp-opacity-slider-thumb");
-            cp_ColorModelWrapper.classList.add("cp-color-model-wrapper");
-            cp_ColorModel.classList.add("cp-color-model");
-            cp_colorModelArrow.classList.add("cp-color-model-arrow");
-            
+
+            // build palette
+            let paletteSection = this.buildPaletteColor();
+            // build color settings
+            let colorSettings = this.buildColorSettings();
+            // build style element
+            let styleElement = this.buildStyleElement();
+
             // Append child nodes
             cp_overlayContainer.appendChild(cp_overlayBackdrop);
             cp_overlayContainer.appendChild(cp_overlayWrapper);
+            cp_overlayContainer.appendChild(styleElement);
             cp_overlayWrapper.appendChild(colorPicker);
             colorPicker.appendChild(cp_Wrapper);
-            cp_Wrapper.appendChild(cp_PaletteWrapper);
-            cp_Wrapper.appendChild(cp_ColorSetting);
-            cp_PaletteWrapper.appendChild(cp_Palette);
-            cp_PaletteWrapper.appendChild(cp_Cursor);
-            cp_ColorSetting.appendChild(cp_ColorPreviewWrapper);
-            cp_ColorSetting.appendChild(cp_Sliders);
-            cp_ColorSetting.appendChild(cp_ColorModelWrapper);
-            cp_ColorPreviewWrapper.appendChild(cp_ColorPreview);
-            cp_Sliders.appendChild(cp_HueSliderWrapper);
-            cp_Sliders.appendChild(cp_OpacitySliderWrapper);
-            cp_HueSliderWrapper.appendChild(cp_HueSlider);
-            cp_HueSliderWrapper.appendChild(cp_HueSliderThumb);
-            cp_OpacitySliderWrapper.appendChild(cp_OpacitySlider);
-            cp_OpacitySliderWrapper.appendChild(cp_OpacitySliderThumb);
-            cp_OpacitySlider.appendChild(cp_OpacityColor);
-            cp_ColorModelWrapper.appendChild(cp_ColorModel);
-            cp_ColorModelWrapper.appendChild(cp_colorModelArrow);
-            cp_overlayContainer.appendChild(styleElement);
+            cp_Wrapper.appendChild(paletteSection);
+            cp_Wrapper.appendChild(colorSettings);
             
             DOM.overlayContainer = cp_overlayContainer;
             DOM.overlayBackdrop = cp_overlayBackdrop;
             DOM.overlayWrapper = cp_overlayWrapper;
-            DOM.orPicker = colorPicker;
             DOM.wrapper = cp_Wrapper;
-            DOM.paletteWrapper = cp_PaletteWrapper;
-            DOM.palette = cp_Palette;
-            DOM.cursor = cp_Cursor;
-            DOM.colorSetting = cp_ColorSetting;
-            DOM.colorPreviewWrapper = cp_ColorPreviewWrapper;
-            DOM.colorPreview = cp_ColorPreview;
-            DOM.sliders = cp_Sliders;
-            DOM.hueSliderWrapper = cp_HueSliderWrapper;
-            DOM.hueSlider = cp_HueSlider;
-            DOM.hueSliderThumb = cp_HueSliderThumb;
-            DOM.opacitySliderWrapper = cp_OpacitySliderWrapper;
-            DOM.opacitySlider = cp_OpacitySlider;
-            DOM.opacityColor = cp_OpacityColor;
-            DOM.opacitySliderThumb = cp_OpacitySliderThumb;
-            DOM.colorModelWrapper = cp_ColorModelWrapper;
-            DOM.colorModel = cp_ColorModel;
-            DOM.colorModelArrow = cp_colorModelArrow;
-            DOM.rgbInputs = cp_rgbInputs;
-            DOM.hsvInputs = cp_hsvInputs;
-            DOM.hslInputs = cp_hslInputs;
-            DOM.hexInputs = cp_hexInputs;
+            
+         },
+
+         buildPaletteColor() {
+            let paletteWrapper = document.createElement("div");
+            let palette = document.createElement("div");
+            let cursor = document.createElement("div");
+            
+            paletteWrapper.classList.add("cp-palette-wrapper");
+            palette.classList.add("cp-palette");
+            cursor.classList.add("cp-cursor");
+            
+            paletteWrapper.appendChild(palette);
+            paletteWrapper.appendChild(cursor);
+
+            DOM.paletteWrapper = paletteWrapper;
+            DOM.palette = palette;
+            DOM.cursor = cursor;
+
+            return DOM.paletteWrapper;
+         },
+
+         buildColorSettings() {
+            let colorSettings = document.createElement("div");
+            colorSettings.classList.add("cp-color-settings");
+            
+            let ddd = document.createElement("span");
+            ddd.innerHTML = '<svg viewBox="-201 290.3 16 16" ><path d="M-199.1,301.3v-6.7c0-2,1.6-3.7,3.7-3.7h4.3c0.8,0,1.5,0.5,1.7,1.2l-5.4,0l-0.2,0c-1.6,0.1-2.9,1.4-2.9,3.1 l0,7.9C-198.6,302.8-199.1,302.1-199.1,301.3z M-194.8,305.6c-1,0-1.8-0.8-1.8-1.8v-8.6c0-1,0.8-1.8,1.8-1.8h6.1 c1,0,1.8,0.8,1.8,1.8v8.6c0,1-0.8,1.8-1.8,1.8H-194.8z M-188.1,303.8v-8.6c0-0.3-0.3-0.6-0.6-0.6h-6.1c-0.3,0-0.6,0.3-0.6,0.6v8.6 c0,0.3,0.3,0.6,0.6,0.6h6.1C-188.4,304.4-188.1,304.1-188.1,303.8z"/></svg>';
+
+            // Build clipboard color
+            let clipboardColor = this.buildClipboardColor();
+            // Build SVG color preview
+            let svgColorPreview = this.buildSVGColorPreview();
+            // Build sliders
+            let sliders = this.buildColorSliders();
+            // Build color model inputs
+            let colorModelInputs = this.buildColorModelInputs();
+            
+            colorSettings.appendChild(clipboardColor);
+            colorSettings.appendChild(svgColorPreview);
+            colorSettings.appendChild(sliders);
+            colorSettings.appendChild(colorModelInputs);
+            
+            return colorSettings;
+         },
+
+         buildColorSliders() {
+            let sliders = document.createElement("div");
+
+            sliders.classList.add("cp-sliders");
+            
+            // Build hue slider
+            let hueSliderWrapper = this.buildHueSlider();
+            // Build hue slider
+            let opacitySliderWrapper = this.buildOpacitySlider();
+
+            sliders.appendChild(hueSliderWrapper);
+            sliders.appendChild(opacitySliderWrapper);
+
+            return sliders;
+         },
+
+         buildHueSlider() {
+            let hueSliderWrapper = document.createElement("div");
+            let hueSlider = document.createElement("div");
+            let hueSliderThumb = document.createElement("div");
+
+            hueSliderWrapper.classList.add("cp-hue-slider-wrapper");
+            hueSlider.classList.add("cp-hue-slider");
+            hueSliderThumb.classList.add("cp-hue-slider-thumb");
+
+            hueSliderWrapper.appendChild(hueSlider);
+            hueSliderWrapper.appendChild(hueSliderThumb);
+
+            DOM.hueSliderWrapper = hueSliderWrapper;
+            DOM.hueSlider = hueSlider;
+            DOM.hueSliderThumb = hueSliderThumb;
+
+            return hueSliderWrapper;
+         },
+
+         buildOpacitySlider() {
+            let opacitySliderWrapper = document.createElement("div");
+            let opacitySlider = document.createElement("div");
+            let opacityColor = document.createElement("div");
+            let opacitySliderThumb = document.createElement("div");
+
+            opacitySliderWrapper.classList.add("cp-opacity-slider-wrapper");
+            opacitySlider.classList.add("cp-opacity-slider");
+            opacityColor.classList.add("cp-opacity-color");
+            opacitySliderThumb.classList.add("cp-opacity-slider-thumb");
+
+            opacitySliderWrapper.appendChild(opacitySlider);
+            opacitySliderWrapper.appendChild(opacitySliderThumb);
+            opacitySlider.appendChild(opacityColor);
+
+            DOM.opacitySliderWrapper = opacitySliderWrapper;
+            DOM.opacityColor = opacityColor;
+            DOM.opacitySliderThumb = opacitySliderThumb;
+
+            return opacitySliderWrapper;
+         },
+
+         buildColorModelInputs() {
+            let colorModelWrapper = document.createElement("div");
+            let colorModel = document.createElement("div");
+            let colorModelArrow = document.createElement("span");
+            colorModelArrow.innerHTML = '<svg width="16" height="16" viewBox="-203 292.3 12 12"><path d="M-200.5,300.9l1.2-1.2l2.3,2.3l2.3-2.3l1.2,1.2l-3.5,3.4L-200.5,300.9z"/><path d="M-197,292.3l3.5,3.4l-1.2,1.2l-2.3-2.3l-2.3,2.3l-1.2-1.2L-197,292.3z"/></svg>';
+
+            let rgbInputs = _guiBuilder.buildRGBInputsDOM();
+            let hsvInputs = _guiBuilder.buildHSVInputsDOM();
+            let hslInputs = _guiBuilder.buildHSLInputsDOM();
+            let hexInputs = _guiBuilder.buildHEXInputsDOM();
+
+            colorModelWrapper.classList.add("cp-color-model-wrapper");
+            colorModel.classList.add("cp-color-model");
+            colorModelArrow.classList.add("cp-color-model-arrow");
+            
+            colorModelWrapper.appendChild(colorModel);
+            colorModelWrapper.appendChild(colorModelArrow);
+
+            DOM.colorModel = colorModel;
+            DOM.colorModelArrow = colorModelArrow;
+            DOM.rgbInputs = rgbInputs;
+            DOM.hsvInputs = hsvInputs;
+            DOM.hslInputs = hslInputs;
+            DOM.hexInputs = hexInputs;
+
+            return colorModelWrapper;
+         },
+
+         buildClipboardColor() {
+            let clipboardColor = document.createElement("span");
+            clipboardColor.classList.add("cp-clipboard-color");
+            clipboardColor.innerHTML = '<svg viewBox="-201 290.3 16 16" width="16" height="16"><path d="M-199.1,301.3v-6.7c0-2,1.6-3.7,3.7-3.7h4.3c0.8,0,1.5,0.5,1.7,1.2l-5.4,0l-0.2,0c-1.6,0.1-2.9,1.4-2.9,3.1 l0,7.9C-198.6,302.8-199.1,302.1-199.1,301.3z M-194.8,305.6c-1,0-1.8-0.8-1.8-1.8v-8.6c0-1,0.8-1.8,1.8-1.8h6.1 c1,0,1.8,0.8,1.8,1.8v8.6c0,1-0.8,1.8-1.8,1.8H-194.8z M-188.1,303.8v-8.6c0-0.3-0.3-0.6-0.6-0.6h-6.1c-0.3,0-0.6,0.3-0.6,0.6v8.6 c0,0.3,0.3,0.6,0.6,0.6h6.1C-188.4,304.4-188.1,304.1-188.1,303.8z" fill="white"></path></svg>';
+
+            DOM.clipboardColor = clipboardColor;
+
+            return clipboardColor;
          },
 
          /**
@@ -577,10 +648,32 @@
          },
 
          buildStyleElement() {
-            let style = document.createElement("style");
-            style.innerHTML = '.cp-overlay-container{font-family:Roboto,sans-serif;position:fixed;top:0;left:0;width:100%;height:100%}.cp-overlay-backdrop{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}.cp-overlay-wrapper{position:absolute;z-index:1}.color-picker{display:inline-block}.cp-wrapper{box-shadow:0 0 4px #494949;border:1px solid #494949;background-color:#242424;display:inline-block;width:250px;border-radius:4px}.cp-palette-wrapper{position:relative;-moz-user-select:none;-webkit-user-select:none;user-select:none;overflow:hidden;border-top-left-radius:4px;border-top-right-radius:4px}.cp-palette{height:150px;background-image:linear-gradient(180deg,transparent 0,#000 100%),linear-gradient(90deg,#fff 0,red 100%)}.cp-cursor{position:absolute;top:-6px;left:-6px;width:10px;height:10px;border-radius:50%;border:1px solid #fff;box-shadow:0 0 0 1px #000}.cp-color-setting{display:flex;align-items:center;padding:12px 15px;flex-wrap:wrap;column-gap:18px;row-gap:15px}.cp-sliders{flex-grow:1;display:flex;row-gap:12px;flex-direction:column}.cp-hue-slider-wrapper,.cp-opacity-slider-wrapper{position:relative;-moz-user-select:none;-webkit-user-select:none;user-select:none;flex-grow:1}.cp-hue-slider,.cp-opacity-slider{width:100%;height:10px;border-radius:2px}.cp-hue-slider{background-image:linear-gradient(90deg,red,#ff0,#0f0,#0ff,#00f,#f0f,red)}.cp-opacity-slider{position:relative;background-image:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyIDIiPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMSwwSDJWMUgxVjBaTTAsMUgxVjJIMFYxWiIvPjxwYXRoIGZpbGw9IiNEQkRCREIiIGQ9Ik0wLDBIMVYxSDBWMFpNMSwxSDJWMkgxVjFaIi8+PC9zdmc+);background-size:8px;overflow:hidden}.cp-opacity-color{background-image:linear-gradient(90deg,transparent,red);position:absolute;width:100%;height:100%}.cp-hue-slider-thumb,.cp-opacity-slider-thumb{position:absolute;width:16px;height:16px;border-radius:50px;background-color:#272727;box-shadow:0 0 6px #777;top:50%;transform:translate(-8px,-50%)}.cp-color-preview-wrapper{width:35px;height:35px;border:1px solid gray;border-radius:50%;position:relative;overflow:hidden}.cp-color-preview-wrapper::before{content:"";position:absolute;width:100%;height:100%;background-image:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyIDIiPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMSwwSDJWMUgxVjBaTTAsMUgxVjJIMFYxWiIvPjxwYXRoIGZpbGw9IiNEQkRCREIiIGQ9Ik0wLDBIMVYxSDBWMFpNMSwxSDJWMkgxVjFaIi8+PC9zdmc+);background-size:8px}.cp-color-preview{position:absolute;width:100%;height:100%}.cp-color-model-wrapper{display:flex;flex-basis:100%;position:relative;align-items:center;column-gap:12px}.cp-color-model{display:flex;flex-direction:column;align-items:center;row-gap:6px;flex-grow:1}.cp-hex-input,.cp-hsl-input,.cp-hsv-input,.cp-rgb-input{display:grid;width:100%;justify-items:center;row-gap:4px}.cp-hsl-input,.cp-hsv-input,.cp-rgb-input{grid-template-columns:1fr 1fr 1fr 1fr}.cp-hex-input{grid-template-columns:1fr}.cp-color-input{font-family:inherit;height:18px;outline:0;border:1px solid #5a5a5a;background-color:#242424;padding:2px;color:#bcbcbc;font-size:12px;text-align:center;padding:2px}.cp-color-input:focus{border-color:#0e639c}.cp-hsl-input .cp-color-input,.cp-hsv-input .cp-color-input,.cp-rgb-input .cp-color-input{width:38px}.cp-hex-input .cp-color-input{width:180px}.cp-color-model-label{color:#bcbcbc;font-size:12px}.cp-color-model-arrow{cursor:pointer;position:relative}.cp-color-model-arrow::before{content:"";visibility:hidden;position:absolute;background-color:#4d4d4d;width:26px;height:26px;border-radius:50%;z-index:0;top:50%;left:50%;transform:translate(-50%,-56%)}.cp-color-model-arrow:hover::before{visibility:visible}.cp-color-model-arrow svg{position:relative;z-index:1}.cp-color-model-arrow svg path{fill:#bcbcbc}';
+            let styleElement = document.createElement("style");
+            // styleElement.innerHTML = '.cp-overlay-container{font-family:Roboto,sans-serif;position:fixed;top:0;left:0;width:100%;height:100%}.cp-overlay-backdrop{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}.cp-overlay-wrapper{position:absolute;z-index:1}.color-picker{display:inline-block}.cp-wrapper{box-shadow:0 0 4px #494949;border:1px solid #494949;background-color:#242424;display:inline-block;width:280px;border-radius:4px}.cp-palette-wrapper{position:relative;-moz-user-select:none;-webkit-user-select:none;user-select:none;overflow:hidden;border-top-left-radius:4px;border-top-right-radius:4px}.cp-palette{height:150px;background-image:linear-gradient(180deg,transparent 0,#000 100%),linear-gradient(90deg,#fff 0,red 100%)}.cp-cursor{position:absolute;top:-6px;left:-6px;width:10px;height:10px;border-radius:50%;border:1px solid #fff;box-shadow:0 0 0 1px #000}.cp-color-settings{display:flex;align-items:center;padding:12px 15px;flex-wrap:wrap;column-gap:18px;row-gap:15px}.cp-sliders{flex-grow:1;display:flex;row-gap:12px;flex-direction:column}.cp-hue-slider-wrapper,.cp-opacity-slider-wrapper{position:relative;-moz-user-select:none;-webkit-user-select:none;user-select:none;flex-grow:1}.cp-hue-slider,.cp-opacity-slider{width:100%;height:10px;border-radius:2px}.cp-hue-slider{background-image:linear-gradient(90deg,red,#ff0,#0f0,#0ff,#00f,#f0f,red)}.cp-opacity-slider{position:relative;background-image:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyIDIiPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMSwwSDJWMUgxVjBaTTAsMUgxVjJIMFYxWiIvPjxwYXRoIGZpbGw9IiNEQkRCREIiIGQ9Ik0wLDBIMVYxSDBWMFpNMSwxSDJWMkgxVjFaIi8+PC9zdmc+);background-size:8px;overflow:hidden}.cp-opacity-color{background-image:linear-gradient(90deg,transparent,red);position:absolute;width:100%;height:100%}.cp-hue-slider-thumb,.cp-opacity-slider-thumb{position:absolute;width:16px;height:16px;border-radius:50px;background-color:#272727;box-shadow:0 0 6px #777;top:50%;transform:translate(-8px,-50%)}.cp-color-preview-wrapper{width:34px;height:34px;border:1px solid gray;border-radius:50%;position:relative;overflow:hidden}.cp-color-preview-wrapper::before{content:"";position:absolute;width:100%;height:100%;background-image:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyIDIiPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMSwwSDJWMUgxVjBaTTAsMUgxVjJIMFYxWiIvPjxwYXRoIGZpbGw9IiNEQkRCREIiIGQ9Ik0wLDBIMVYxSDBWMFpNMSwxSDJWMkgxVjFaIi8+PC9zdmc+);background-size:8px}.cp-color-preview{position:absolute;width:100%;height:100%}.cp-color-model-wrapper{display:flex;flex-basis:100%;position:relative;align-items:center;column-gap:12px}.cp-color-model{display:flex;flex-direction:column;align-items:center;row-gap:6px;flex-grow:1}.cp-hex-input,.cp-hsl-input,.cp-hsv-input,.cp-rgb-input{display:grid;width:100%;justify-items:center;row-gap:4px}.cp-hsl-input,.cp-hsv-input,.cp-rgb-input{grid-template-columns:1fr 1fr 1fr 1fr}.cp-hex-input{grid-template-columns:1fr}.cp-color-input{font-family:inherit;height:18px;outline:0;border:1px solid #5a5a5a;background-color:#242424;padding:2px;color:#bcbcbc;font-size:12px;text-align:center;padding:2px}.cp-color-input:focus{border-color:#0e639c}.cp-hsl-input .cp-color-input,.cp-hsv-input .cp-color-input,.cp-rgb-input .cp-color-input{width:38px}.cp-hex-input .cp-color-input{width:180px}.cp-color-model-label{color:#bcbcbc;font-size:12px}.cp-color-model-arrow{cursor:pointer;position:relative}.cp-color-model-arrow::before{content:"";visibility:hidden;position:absolute;background-color:#4d4d4d;width:26px;height:26px;border-radius:50%;z-index:0;top:50%;left:50%;transform:translate(-50%,-56%)}.cp-color-model-arrow:hover::before{visibility:visible}.cp-color-model-arrow svg{position:relative;z-index:1}.cp-color-model-arrow svg path{fill:#bcbcbc}';
 
-            return style;
+            return styleElement;
+         },
+
+         buildSVGColorPreview() {
+            let svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svgElement.setAttribute("width", 38);
+            svgElement.setAttribute("height", 38);
+            svgElement.style.setProperty("margin", "0px 16px 0px 12px");
+
+            let circleColorPreview = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circleColorPreview.setAttribute("cx", 19);
+            circleColorPreview.setAttribute("cy", 19);
+            circleColorPreview.setAttribute("r", 18);
+            circleColorPreview.setAttribute("stroke", "gray");
+            circleColorPreview.setAttribute("stroke-width", 1);
+            circleColorPreview.setAttribute("fill", "red");
+            circleColorPreview.setAttribute("fill-opacity", "0.1");
+
+            svgElement.innerHTML = '<defs><pattern id="transparent-grid" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="3" height="3" fill="#DBDBDB"/><rect x="3" y="0" width="3" height="3" fill="white"/><rect x="3" y="3" width="3" height="3" fill="#DBDBDB"/><rect x="0" y="3" width="3" height="3" fill="white"/></pattern></defs><circle cx="19" cy="19" r="18" fill="url(#transparent-grid)" />';
+            svgElement.appendChild(circleColorPreview);
+
+            DOM.circleColorPreview = circleColorPreview;
+            return svgElement;
          }
       }
 

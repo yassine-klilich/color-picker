@@ -28,12 +28,13 @@
 }
 
 .cp-wrapper {
-   box-shadow: 0 0 4px #494949;
-	border: 1px solid #494949;
+   box-shadow: 0 2px 6px #494949;
 	background-color: #242424;
    display: inline-block;
-   width: 250px;
-   border-radius: 4px;
+   width: 280px;
+	border-radius: 6px;
+	overflow: hidden;
+	font-family: sans-serif;
 }
 
 .cp-palette-wrapper {
@@ -42,8 +43,6 @@
 	-webkit-user-select: none;
 	user-select: none;
 	overflow: hidden;
-	border-top-left-radius: 4px;
-	border-top-right-radius: 4px;
 }
 
 .cp-palette {
@@ -58,16 +57,16 @@
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
-	border: 1px solid white;
+	border: thin solid white;
 	box-shadow: 0 0 0 1px black;
 }
 
-.cp-color-setting {
+.cp-color-settings {
 	display: flex;
 	align-items: center;
-	padding: 12px 15px;
+	padding: 12px;
+	padding-right: 14px;
 	flex-wrap: wrap;
-	column-gap: 18px;
 	row-gap: 15px;
 }
 
@@ -123,8 +122,8 @@
 }
 
 .cp-color-preview-wrapper {
-	width: 35px;
-	height: 35px;
+	width: 34px;
+	height: 34px;
 	border: 1px solid gray;
 	border-radius: 50%;
 	position: relative;
@@ -182,27 +181,20 @@
 
 .cp-color-input {
 	font-family: inherit;
-	height: 18px;
+	height: 20px;
 	outline: none;
 	border: 1px solid #5A5A5A;
 	background-color: #242424;
-	padding: 2px;
 	color: #bcbcbc;
 	font-size: 12px;
 	text-align: center;
-	padding: 2px;
-}
-.cp-color-input:focus {
-	border-color: #0E639C;
-}
-
-.cp-rgb-input .cp-color-input,
-.cp-hsv-input .cp-color-input,
-.cp-hsl-input .cp-color-input {
 	width: 38px;
 }
 .cp-hex-input .cp-color-input {
 	width: 180px;
+}
+.cp-color-input:focus {
+	border-color: #0E639C;
 }
 
 .cp-color-model-label {
@@ -210,10 +202,12 @@
 	font-size: 12px;
 }
 
+.cp-clipboard-color,
 .cp-color-model-arrow {
 	cursor: pointer;
 	position: relative;
 }
+.cp-clipboard-color::before,
 .cp-color-model-arrow::before {
 	content: "";
 	visibility: hidden;
@@ -227,13 +221,16 @@
 	left: 50%;
 	transform: translate(-50%, -56%);
 }
+.cp-clipboard-color:hover::before,
 .cp-color-model-arrow:hover::before {
 	visibility: visible;
 }
+.cp-clipboard-color svg,
 .cp-color-model-arrow svg {
 	position: relative;
 	z-index: 1;
 }
+.cp-clipboard-color svg path,
 .cp-color-model-arrow svg path {
 	fill: #bcbcbc;
 }
