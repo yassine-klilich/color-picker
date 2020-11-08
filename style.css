@@ -35,13 +35,13 @@
 	border-radius: 6px;
 	overflow: hidden;
 	font-family: sans-serif;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 .cp-palette-wrapper {
 	position: relative;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	user-select: none;
 	overflow: hidden;
 }
 
@@ -148,7 +148,7 @@
 	flex-basis: 100%;
 	position: relative;
 	align-items: center;
-	column-gap: 12px;
+	column-gap: 6px;
 }
 
 .cp-color-model {
@@ -206,24 +206,15 @@
 .cp-color-model-arrow {
 	cursor: pointer;
 	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 4px;
+	padding: 6px 4px;
 }
-.cp-clipboard-color::before,
-.cp-color-model-arrow::before {
-	content: "";
-	visibility: hidden;
-	position: absolute;
-	background-color: #4d4d4d;
-	width: 26px;
-	height: 26px;
-	border-radius: 50%;
-	z-index: 0;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -56%);
-}
-.cp-clipboard-color:hover::before,
-.cp-color-model-arrow:hover::before {
-	visibility: visible;
+.cp-clipboard-color:hover,
+.cp-color-model-arrow:hover {
+	background-color: #373737;
 }
 .cp-clipboard-color svg,
 .cp-color-model-arrow svg {
@@ -233,4 +224,9 @@
 .cp-clipboard-color svg path,
 .cp-color-model-arrow svg path {
 	fill: #bcbcbc;
+}
+.cp-clipboard-color-input {
+	opacity: 0;
+	position: absolute;
+	pointer-events: none;
 }
