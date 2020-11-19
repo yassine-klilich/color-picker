@@ -39,17 +39,16 @@
          }
       }
       let currentColorModel = null;
-      let _user_options_ = null;
+      let config = null;
 
       /**
        * Initialize the color picker library
        */
       function init({
-         onOpened, onClosed
-      } = _options.defaultOptions) {
-         _user_options_ = {
-            onOpened, onClosed
-         }
+         onOpened = () => {},
+         onClosed = (color) => color
+      }) {
+         config = { onOpened, onClosed }
          _guiBuilder.initGUI();
          _eventListeners.initEvents();
          
@@ -61,33 +60,6 @@
        */
       function getSelectedColorModel() {
          return currentColorModel;
-      }
-
-      /**
-       * Default Options
-       */
-      const _options = {
-         defaultOptions: {
-            onOpened: function() {},
-            onClosed: function(color) { return color; },
-         },
-
-         /**
-          * Get option
-          * @param {string} optionName 
-          */
-         getOption(optionName) {
-            let option = null;
-
-            if(_user_options_ == null || (_user_options_ != null && _user_options_[optionName] == undefined)) {
-               option = this.defaultOptions[optionName];
-            }
-            else {
-               option = _user_options_[optionName];
-            }
-
-            return option;
-         }
       }
 
       /**
@@ -1203,7 +1175,7 @@
             document.body.appendChild(DOM.overlayContainer);
             _helper.applyColor();
 
-            _options.getOption("onOpened")();
+            config.onOpened();
          },
 
          /**
@@ -1246,7 +1218,7 @@
                      } break;
                   }
                   
-                  _options.getOption("onClosed")(result);
+                  config.onClosed(result);
                }
             }
          },
