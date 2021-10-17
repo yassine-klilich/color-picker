@@ -1,7 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 .cp-overlay-container {
-	font-family: 'Roboto', sans-serif;
+	font-family: sans-serif;
 	position: fixed;
 	top: 0px;
 	left: 0px;
