@@ -200,8 +200,3 @@
 .cp-color-model-arrow:hover {
 	background-color: #373737;
 }
-.cp-clipboard-color-input {
-	opacity: 0;
-	position: absolute;
-	pointer-events: none;
-}

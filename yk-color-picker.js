@@ -9,10 +9,10 @@ function ColorPicker(options) {
 
   const _dom = {};
   let _isOpen = false;
-  let _color = new Color(0, 100, 100)
+  let _color = new HSVColor(0, 100, 100, 1)
 
   Object.defineProperty(this, "options", {
-    value: options,
+    value: _options,
   });
   Object.defineProperty(this, "DOM", {
     get: () => _dom,
@@ -41,14 +41,24 @@ ColorPicker.prototype.close = function () {
   document.body.removeChild(this.DOM.overlayContainer);
 };
 
+ColorPicker.prototype.copyIcon = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-201 290.3 16 16' width='16' height='16'%3E%3Cpath d='M-199.1,301.3v-6.7c0-2,1.6-3.7,3.7-3.7h4.3c0.8,0,1.5,0.5,1.7,1.2l-5.4,0l-0.2,0c-1.6,0.1-2.9,1.4-2.9,3.1 l0,7.9C-198.6,302.8-199.1,302.1-199.1,301.3z M-194.8,305.6c-1,0-1.8-0.8-1.8-1.8v-8.6c0-1,0.8-1.8,1.8-1.8h6.1 c1,0,1.8,0.8,1.8,1.8v8.6c0,1-0.8,1.8-1.8,1.8H-194.8z M-188.1,303.8v-8.6c0-0.3-0.3-0.6-0.6-0.6h-6.1c-0.3,0-0.6,0.3-0.6,0.6v8.6 c0,0.3,0.3,0.6,0.6,0.6h6.1C-188.4,304.4-188.1,304.1-188.1,303.8z' fill='%23bcbcbc'%3E%3C/path%3E%3C/svg%3E")`
+
 // ********************************  Color Class
-function Color(h, s, v) {
+/**
+ * 
+ * @param {number} h Hue
+ * @param {number} s Saturate
+ * @param {number} v Value
+ * @param {number} a Alpha
+ */
+function HSVColor(h, s, v, a) {
   this.h = h;
   this.s = s;
   this.v = v;
+  this.a = a;
 }
 
-Color.prototype.toRGB = function () {
+HSVColor.prototype.toRGB = function () {
   let { h, s, v } = this;
 
   h /= 360;
@@ -91,7 +101,7 @@ Color.prototype.toRGB = function () {
   };
 };
 
-Color.prototype.toHSL = function () {
+HSVColor.prototype.toHSL = function () {
   let { h, s, v } = this;
   let _saturation = s * 0.01;
   let _value = v * 0.01;
@@ -112,7 +122,7 @@ Color.prototype.toHSL = function () {
   return { h, s, l };
 };
 
-Color.prototype.toHEX = function () {
+HSVColor.prototype.toHEX = function () {
   let { h, s, v } = this;
   let { r, g, b } = this.toRGB(h, s, v);
 
@@ -192,14 +202,14 @@ function _initDOM() {
   // build palette
   const paletteSection = _buildPaletteColor.call(this);
   // build color settings
-  // ----------------- const colorSettings = _buildColorSettings.call(this)
+  const colorSettings = _buildColorSettings.call(this)
 
   // Append child nodes
   cp_overlayContainer.appendChild(cp_overlayBackdrop);
   cp_overlayContainer.appendChild(cp_overlayWrapper);
   cp_overlayWrapper.appendChild(cp_Wrapper);
   cp_Wrapper.appendChild(paletteSection);
-  // ----------------- cp_Wrapper.appendChild(colorSettings)
+  cp_Wrapper.appendChild(colorSettings)
 
   // Append events
   cp_overlayBackdrop.addEventListener("click", this.close.bind(this));
@@ -245,7 +255,7 @@ function _cursorMouseUp() {
 function _cursorMouseMove(event) {
   const { x, y } = _getCursorPosition.call(this, event.clientX, event.clientY);
   this.DOM.cursor.style.transform = `translate(${x}px, ${y}px)`;
-  const colorHSV = _getHSVColor.call(this, x, y);
+  _extractHSVColor.call(this, x, y);
   
   // const { representation } = this.options
 
@@ -290,52 +300,193 @@ function _getCursorPosition(clientX, clientY) {
   };
 }
 
-function _getHSVColor(x, y) {
+/**
+ * Extract HSV color from x and y cursor position
+ * @param {number} x 
+ * @param {number} y 
+ */
+function _extractHSVColor(x, y) {
   const paletteHeight = this.DOM.palette.offsetHeight;
   const paletteWidth = this.DOM.palette.offsetWidth;
 
-  return {
-    h: this.color.h,
-    s: ((paletteHeight - y) / paletteHeight) * 100,
-    v: (x / paletteWidth) * 100,
-  };
+  this.color.s = ((paletteHeight - y) / paletteHeight) * 100
+  this.color.v = (x / paletteWidth) * 100
 }
 
-// ********************************
-// The code below for color settings
-// ********************************
-
+/**
+* Build color settings section
+*/
 function _buildColorSettings() {
   const colorSettings = document.createElement("div");
   colorSettings.classList.add("cp-color-settings");
 
   // Build clipboard color
-  const clipboardColor = _buildCopyColor.call(this);
+  const copyColor = _buildCopyColor.call(this);
   // Build SVG color preview
-  const svgColorPreview = _buildColorPreview.call(this);
+  const colorPreview = _buildColorPreview.call(this);
   // Build sliders
   const sliders = _buildColorSliders.call(this);
 
-  colorSettings.appendChild(clipboardColor);
-  colorSettings.appendChild(svgColorPreview);
-  colorSettings.appendChild(sliders);
+  colorSettings.appendChild(copyColor)
+  colorSettings.appendChild(colorPreview)
+  colorSettings.appendChild(sliders)
 
   return colorSettings;
 }
 
+/**
+* Build clipboard color icon for coping the color
+*/
 function _buildCopyColor() {
-  const clipboardColor = document.createElement("span");
-  clipboardColor.classList.add("cp-clipboard-color");
-  const copyClipboardIcon = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-201 290.3 16 16' width='16' height='16'%3E%3Cpath d='M-199.1,301.3v-6.7c0-2,1.6-3.7,3.7-3.7h4.3c0.8,0,1.5,0.5,1.7,1.2l-5.4,0l-0.2,0c-1.6,0.1-2.9,1.4-2.9,3.1 l0,7.9C-198.6,302.8-199.1,302.1-199.1,301.3z M-194.8,305.6c-1,0-1.8-0.8-1.8-1.8v-8.6c0-1,0.8-1.8,1.8-1.8h6.1 c1,0,1.8,0.8,1.8,1.8v8.6c0,1-0.8,1.8-1.8,1.8H-194.8z M-188.1,303.8v-8.6c0-0.3-0.3-0.6-0.6-0.6h-6.1c-0.3,0-0.6,0.3-0.6,0.6v8.6 c0,0.3,0.3,0.6,0.6,0.6h6.1C-188.4,304.4-188.1,304.1-188.1,303.8z' fill='%23bcbcbc'%3E%3C/path%3E%3C/svg%3E")`;
-  const copiedClipboardIcon = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='14' height='14'%3E%3Cpath fill='%23bcbcbc' d='M15.2,4.7c0.3-0.3,0.2-0.7-0.1-1l-0.8-0.8c-0.3-0.3-0.7-0.2-1,0.1l-6.7,7.5L2.5,6.7c-0.3-0.3-0.7-0.2-1,0.1 L0.7,7.6c-0.3,0.3-0.2,0.7,0.1,1l5.5,5c0.3,0.3,0.7,0.2,1-0.1L15.2,4.7z'/%3E%3C/svg%3E")`;
-  clipboardColor.style.setProperty("background-image", copyClipboardIcon);
+  const copyColorWrapper = document.createElement("span")
+  const copyColor = document.createElement("button")
+  const hiddenInput = document.createElement("input")
+  copyColor.classList.add("cp-clipboard-color")
+  copyColor.style.setProperty("background-image", this.copyIcon)
+  copyColor.addEventListener("click", _onClickCopyColor.bind(this))
+  hiddenInput.setAttribute("style", "opacity: 0 !important;position: absolute !important;pointer-events: none !important")
 
-  DOM.clipboardColor = clipboardColor;
-  DOM.copyClipboardIcon = copyClipboardIcon;
-  DOM.copiedClipboardIcon = copiedClipboardIcon;
+  copyColorWrapper.appendChild(copyColor)
+  copyColorWrapper.appendChild(hiddenInput)
 
-  return clipboardColor;
+  this.DOM["copyColor"] = copyColor
+  this.DOM["hiddenInput"] = hiddenInput
+
+  return copyColorWrapper
 }
+
+/**
+ * Click event for copy color button
+ */
+function _onClickCopyColor() {
+  this.DOM.hiddenInput.value = _getColorText.call(this)
+  this.DOM.hiddenInput.select()
+  document.execCommand('copy')
+  this.DOM.copyColor.style.setProperty("background-image", `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='14' height='14'%3E%3Cpath fill='%23bcbcbc' d='M15.2,4.7c0.3-0.3,0.2-0.7-0.1-1l-0.8-0.8c-0.3-0.3-0.7-0.2-1,0.1l-6.7,7.5L2.5,6.7c-0.3-0.3-0.7-0.2-1,0.1 L0.7,7.6c-0.3,0.3-0.2,0.7,0.1,1l5.5,5c0.3,0.3,0.7,0.2,1-0.1L15.2,4.7z'/%3E%3C/svg%3E")`)
+  
+  setTimeout(()=>{
+    this.DOM.copyColor.style.setProperty("background-image", this.copyIcon)
+  }, 600);
+}
+
+/**
+ * Get color in text format
+ */
+function _getColorText() {
+  switch (this.options.representation) {
+    case RGB:
+      const { r, g, b } = this.color.toRGB()
+      return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${this.color.a})`;
+      
+    case HSV:
+      const { h, s, v, a } = this.color
+      return `hsva(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(v)}%, ${a})`;
+
+    case HSL:
+      const hsl = this.color.toHSL()
+      return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%, ${this.color.a})`;
+
+    case HEX: return this.color.toHEX()
+  }
+}
+
+/**
+* Build slider wrapper that wraps the hue and opacity sliders
+*/
+function _buildColorSliders() {
+  let sliders = document.createElement("div");
+
+  sliders.classList.add("cp-sliders");
+  
+  // Build hue slider
+  let hueSliderWrapper = _buildHueSlider.call(this);
+  // Build hue slider
+  let opacitySliderWrapper = _buildOpacitySlider.call(this);
+
+  sliders.appendChild(hueSliderWrapper);
+  sliders.appendChild(opacitySliderWrapper);
+
+  return sliders;
+}
+
+/**
+* Build hue slider
+*/
+function _buildHueSlider() {
+  let hueSliderWrapper = document.createElement("div");
+  let hueSlider = document.createElement("div");
+  let hueSliderThumb = document.createElement("div");
+
+  hueSliderWrapper.classList.add("cp-hue-slider-wrapper");
+  hueSlider.classList.add("cp-hue-slider");
+  hueSliderThumb.classList.add("cp-hue-slider-thumb");
+
+  hueSliderWrapper.appendChild(hueSlider);
+  hueSliderWrapper.appendChild(hueSliderThumb);
+
+  this.DOM.hueSliderWrapper = hueSliderWrapper;
+  this.DOM.hueSlider = hueSlider;
+  this.DOM.hueSliderThumb = hueSliderThumb;
+
+  return hueSliderWrapper;
+}
+
+/**
+* Build opacity slider
+*/
+function _buildOpacitySlider() {
+  let opacitySliderWrapper = document.createElement("div");
+  let opacitySlider = document.createElement("div");
+  let opacityColor = document.createElement("div");
+  let opacitySliderThumb = document.createElement("div");
+
+  opacitySliderWrapper.classList.add("cp-opacity-slider-wrapper");
+  opacitySlider.classList.add("cp-opacity-slider");
+  opacityColor.classList.add("cp-opacity-color");
+  opacitySliderThumb.classList.add("cp-opacity-slider-thumb");
+
+  opacitySliderWrapper.appendChild(opacitySlider);
+  opacitySliderWrapper.appendChild(opacitySliderThumb);
+  opacitySlider.appendChild(opacityColor);
+
+  this.DOM.opacitySliderWrapper = opacitySliderWrapper;
+  this.DOM.opacityColor = opacityColor;
+  this.DOM.opacitySliderThumb = opacitySliderThumb;
+
+  return opacitySliderWrapper;
+}
+
+/**
+* Build color preview in SVG
+*/
+function _buildColorPreview() {
+  let colorPreviewWrapper = document.createElement("span");
+  colorPreviewWrapper.classList.add("cp-color-preview-wrapper");
+
+  let svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svgElement.setAttribute("width", 38);
+  svgElement.setAttribute("height", 38);
+
+  let circleColorPreview = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  circleColorPreview.setAttribute("cx", 19);
+  circleColorPreview.setAttribute("cy", 19);
+  circleColorPreview.setAttribute("r", 18);
+  circleColorPreview.setAttribute("stroke", "gray");
+  circleColorPreview.setAttribute("stroke-width", 1);
+  circleColorPreview.setAttribute("fill", "red");
+  circleColorPreview.setAttribute("fill-opacity", "0.1");
+
+  svgElement.innerHTML = '<defs><pattern id="transparent-grid" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="3" height="3" fill="#DBDBDB"/><rect x="3" y="0" width="3" height="3" fill="white"/><rect x="3" y="3" width="3" height="3" fill="#DBDBDB"/><rect x="0" y="3" width="3" height="3" fill="white"/></pattern></defs><circle cx="19" cy="19" r="18" fill="url(#transparent-grid)" />';
+  svgElement.appendChild(circleColorPreview);
+  colorPreviewWrapper.appendChild(svgElement);
+
+  this.DOM.circleColorPreview = circleColorPreview;
+  return colorPreviewWrapper;
+}
+
+
+
+
 
 // ********************************
 // The code below is all about positioning
