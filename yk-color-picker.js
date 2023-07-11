@@ -453,14 +453,12 @@ function _onMouseMoveHueSlider(event) {
 function _buildOpacitySlider() {
   // Create elements
   const sliderWrapper = createElement("div", ["cp-opacity-slider-wrapper"])
-  const slider = createElement("div", ["cp-opacity-slider"])
   const color = createElement("div", ["cp-opacity-color"])
   const sliderThumb = createElement("div", ["cp-opacity-slider-thumb"])
 
   // Appench child element
-  sliderWrapper.appendChild(slider)
+  sliderWrapper.appendChild(color)
   sliderWrapper.appendChild(sliderThumb)
-  slider.appendChild(color)
 
   // Attach events
   this.__onMouseDownOpacitySlider = _onMouseDownOpacitySlider.bind(this)
@@ -468,7 +466,7 @@ function _buildOpacitySlider() {
   this.__onMouseMoveOpacitySlider = _onMouseMoveOpacitySlider.bind(this)
   sliderWrapper.addEventListener('mousedown', this.__onMouseDownOpacitySlider)
 
-  this.DOM["opacitySlider"] = slider
+  this.DOM["opacitySlider"] = sliderWrapper
   this.DOM["opacitySliderThumb"] = sliderThumb
 
   return sliderWrapper
