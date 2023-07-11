@@ -188,28 +188,19 @@ function onClickTarget(event) {
 
 function _initDOM() {
   // DOM declaration
-  const cp_overlayContainer = document.createElement("div");
-  const cp_overlayBackdrop = document.createElement("div");
-  const cp_overlayWrapper = document.createElement("div");
-  const cp_Wrapper = document.createElement("div");
-
-  // Add class names
-  cp_overlayContainer.classList.add("cp-overlay-container");
-  cp_overlayBackdrop.classList.add("cp-overlay-backdrop");
-  cp_overlayWrapper.classList.add("cp-overlay-wrapper");
-  cp_Wrapper.classList.add("cp-wrapper");
-
-  // build palette
-  const paletteSection = _buildPaletteColor.call(this);
-  // build color settings
-  const colorSettings = _buildColorSettings.call(this)
+  const cp_overlayContainer = createElement("div", ["cp-overlay-container"])
+  const cp_overlayBackdrop = createElement("div", ["cp-overlay-backdrop"])
+  const cp_overlayWrapper = createElement("div", ["cp-overlay-wrapper"])
+  const cp_Wrapper = createElement("div", ["cp-wrapper"])
 
   // Append child nodes
   cp_overlayContainer.appendChild(cp_overlayBackdrop);
   cp_overlayContainer.appendChild(cp_overlayWrapper);
   cp_overlayWrapper.appendChild(cp_Wrapper);
-  cp_Wrapper.appendChild(paletteSection);
-  cp_Wrapper.appendChild(colorSettings)
+  // build palette
+  cp_Wrapper.appendChild(_buildPaletteColor.call(this));
+  // build color settings
+  cp_Wrapper.appendChild(_buildColorSettings.call(this))
 
   // Append events
   cp_overlayBackdrop.addEventListener("click", this.close.bind(this));
@@ -218,21 +209,18 @@ function _initDOM() {
 }
 
 function _buildPaletteColor() {
-  const paletteWrapper = document.createElement("div");
-  const palette = document.createElement("div");
-  const cursor = document.createElement("div");
-
-  paletteWrapper.classList.add("cp-palette-wrapper");
-  palette.classList.add("cp-palette");
-  cursor.classList.add("cp-cursor");
+  const paletteWrapper = createElement("div", ["cp-palette-wrapper"]);
+  const palette = createElement("div", ["cp-palette"]);
+  const cursor = createElement("div", ["cp-cursor"]);
+  
   paletteWrapper.appendChild(palette);
   paletteWrapper.appendChild(cursor);
 
   // Append event
-  this.__cursorMouseDown = _cursorMouseDown.bind(this);
-  this.__cursorMouseUp = _cursorMouseUp.bind(this);
-  this.__cursorMouseMove = _cursorMouseMove.bind(this);
-  paletteWrapper.addEventListener("mousedown", this.__cursorMouseDown);
+  this.__onMouseDownCursor = _onMouseDownCursor.bind(this);
+  this.__onMouseUpCusror = _onMouseUpCusror.bind(this);
+  this.__onMouseMoveCursor = _onMouseMoveCursor.bind(this);
+  paletteWrapper.addEventListener("mousedown", this.__onMouseDownCursor);
 
   this.DOM["palette"] = palette;
   this.DOM["cursor"] = cursor;
@@ -240,19 +228,19 @@ function _buildPaletteColor() {
   return paletteWrapper;
 }
 
-function _cursorMouseDown(event) {
-  document.addEventListener("mousemove", this.__cursorMouseMove);
-  document.addEventListener("mouseup", this.__cursorMouseUp);
+function _onMouseDownCursor(event) {
+  document.addEventListener("mousemove", this.__onMouseMoveCursor);
+  document.addEventListener("mouseup", this.__onMouseUpCusror);
 
-  this.__cursorMouseMove(event);
+  this.__onMouseMoveCursor(event);
 }
 
-function _cursorMouseUp() {
-  document.removeEventListener("mousemove", this.__cursorMouseMove);
-  document.removeEventListener("mouseup", this.__cursorMouseUp);
+function _onMouseUpCusror() {
+  document.removeEventListener("mousemove", this.__onMouseMoveCursor);
+  document.removeEventListener("mouseup", this.__onMouseUpCusror);
 }
 
-function _cursorMouseMove(event) {
+function _onMouseMoveCursor(event) {
   const { x, y } = _getCursorPosition.call(this, event.clientX, event.clientY);
   this.DOM.cursor.style.transform = `translate(${x}px, ${y}px)`;
   _extractHSVColor.call(this, x, y);
@@ -317,19 +305,14 @@ function _extractHSVColor(x, y) {
 * Build color settings section
 */
 function _buildColorSettings() {
-  const colorSettings = document.createElement("div");
-  colorSettings.classList.add("cp-color-settings");
+  const colorSettings = createElement("div", ["cp-color-settings"]);
 
-  // Build clipboard color
-  const copyColor = _buildCopyColor.call(this);
-  // Build SVG color preview
-  const colorPreview = _buildColorPreview.call(this);
+  // Build color color
+  colorSettings.appendChild(_buildCopyColor.call(this))
+  // Build color preview
+  colorSettings.appendChild(_buildColorPreview.call(this))
   // Build sliders
-  const sliders = _buildColorSliders.call(this);
-
-  colorSettings.appendChild(copyColor)
-  colorSettings.appendChild(colorPreview)
-  colorSettings.appendChild(sliders)
+  colorSettings.appendChild(_buildColorSliders.call(this))
 
   return colorSettings;
 }
@@ -394,98 +377,188 @@ function _getColorText() {
 * Build slider wrapper that wraps the hue and opacity sliders
 */
 function _buildColorSliders() {
-  let sliders = document.createElement("div");
-
-  sliders.classList.add("cp-sliders");
+  const sliders = createElement("div", ["cp-sliders"])
   
   // Build hue slider
-  let hueSliderWrapper = _buildHueSlider.call(this);
+  sliders.appendChild(_buildHueSlider.call(this))
   // Build hue slider
-  let opacitySliderWrapper = _buildOpacitySlider.call(this);
+  sliders.appendChild(_buildOpacitySlider.call(this))
 
-  sliders.appendChild(hueSliderWrapper);
-  sliders.appendChild(opacitySliderWrapper);
-
-  return sliders;
+  return sliders
 }
 
 /**
 * Build hue slider
 */
 function _buildHueSlider() {
-  let hueSliderWrapper = document.createElement("div");
-  let hueSlider = document.createElement("div");
-  let hueSliderThumb = document.createElement("div");
+  // Create elements
+  const sliderWrapper = createElement("div", ["cp-hue-slider-wrapper"])
+  const slider = createElement("div", ["cp-hue-slider"])
+  const sliderThumb = createElement("div", ["cp-hue-slider-thumb"])
 
-  hueSliderWrapper.classList.add("cp-hue-slider-wrapper");
-  hueSlider.classList.add("cp-hue-slider");
-  hueSliderThumb.classList.add("cp-hue-slider-thumb");
+  // Appench child element
+  sliderWrapper.appendChild(slider)
+  sliderWrapper.appendChild(sliderThumb)
 
-  hueSliderWrapper.appendChild(hueSlider);
-  hueSliderWrapper.appendChild(hueSliderThumb);
+  // Attach events
+  this.__onMouseDownHueSlider = _onMouseDownHueSlider.bind(this)
+  this.__onMouseUpHueSlider = _onMouseUpHueSlider.bind(this)
+  this.__onMouseMoveHueSlider = _onMouseMoveHueSlider.bind(this)
+  sliderWrapper.addEventListener('mousedown', this.__onMouseDownHueSlider)
 
-  this.DOM.hueSliderWrapper = hueSliderWrapper;
-  this.DOM.hueSlider = hueSlider;
-  this.DOM.hueSliderThumb = hueSliderThumb;
+  this.DOM["hueSlider"] = slider
+  this.DOM["hueSliderThumb"] = sliderThumb
 
-  return hueSliderWrapper;
+  return sliderWrapper
+}
+
+function _onMouseDownHueSlider(event) {
+  document.addEventListener('mousemove', this.__onMouseMoveHueSlider)
+  document.addEventListener('mouseup', this.__onMouseUpHueSlider)
+
+  this.__onMouseMoveHueSlider(event)
+}
+
+function _onMouseUpHueSlider() {
+  document.removeEventListener('mousemove', this.__onMouseMoveHueSlider)
+  document.removeEventListener('mouseup', this.__onMouseUpHueSlider)
+}
+
+function _onMouseMoveHueSlider(event) {
+  const { hueSlider, hueSliderThumb } = this.DOM
+  const sliderRect = hueSlider.getBoundingClientRect()
+  const sliderThumbHalfWidth = hueSliderThumb.offsetWidth / 2
+  const minPosition = (sliderThumbHalfWidth * -1)
+  const maxPosition = (sliderRect.width - sliderThumbHalfWidth)
+  let thumbX = (event.clientX - sliderRect.left) - sliderThumbHalfWidth
+
+  if(thumbX < minPosition) {
+    thumbX = minPosition;
+  }
+  if(thumbX > maxPosition) {
+    thumbX = maxPosition;
+  }
+
+  this.color.h = (((thumbX + sliderThumbHalfWidth) / sliderRect.width) * 360)
+  hueSliderThumb.style.transform = `translate(${thumbX}px, -50%)`
+
+  
+  // _helper.updateColorModelInput();
+  // _helper.updateViewColors();
 }
 
 /**
 * Build opacity slider
 */
 function _buildOpacitySlider() {
-  let opacitySliderWrapper = document.createElement("div");
-  let opacitySlider = document.createElement("div");
-  let opacityColor = document.createElement("div");
-  let opacitySliderThumb = document.createElement("div");
+  // Create elements
+  const sliderWrapper = createElement("div", ["cp-opacity-slider-wrapper"])
+  const slider = createElement("div", ["cp-opacity-slider"])
+  const color = createElement("div", ["cp-opacity-color"])
+  const sliderThumb = createElement("div", ["cp-opacity-slider-thumb"])
 
-  opacitySliderWrapper.classList.add("cp-opacity-slider-wrapper");
-  opacitySlider.classList.add("cp-opacity-slider");
-  opacityColor.classList.add("cp-opacity-color");
-  opacitySliderThumb.classList.add("cp-opacity-slider-thumb");
+  // Appench child element
+  sliderWrapper.appendChild(slider)
+  sliderWrapper.appendChild(sliderThumb)
+  slider.appendChild(color)
 
-  opacitySliderWrapper.appendChild(opacitySlider);
-  opacitySliderWrapper.appendChild(opacitySliderThumb);
-  opacitySlider.appendChild(opacityColor);
+  // Attach events
+  this.__onMouseDownOpacitySlider = _onMouseDownOpacitySlider.bind(this)
+  this.__onMouseUpOpacitySlider = _onMouseUpOpacitySlider.bind(this)
+  this.__onMouseMoveOpacitySlider = _onMouseMoveOpacitySlider.bind(this)
+  sliderWrapper.addEventListener('mousedown', this.__onMouseDownOpacitySlider)
 
-  this.DOM.opacitySliderWrapper = opacitySliderWrapper;
-  this.DOM.opacityColor = opacityColor;
-  this.DOM.opacitySliderThumb = opacitySliderThumb;
+  this.DOM["opacitySlider"] = slider
+  this.DOM["opacitySliderThumb"] = sliderThumb
 
-  return opacitySliderWrapper;
+  return sliderWrapper
+}
+
+/**
+* Opacity slider thumb mouse down event handler
+* @param {MouseEvent} event 
+*/
+function _onMouseDownOpacitySlider(event) {
+  document.addEventListener('mousemove', this.__onMouseMoveOpacitySlider)
+  document.addEventListener('mouseup', this.__onMouseUpOpacitySlider)
+
+  this.__onMouseMoveOpacitySlider(event)
+}
+
+/**
+* Opacity slider thumb mouse up event handler
+*/
+function _onMouseUpOpacitySlider() {
+  document.removeEventListener('mousemove', this.__onMouseMoveOpacitySlider)
+  document.removeEventListener('mouseup', this.__onMouseUpOpacitySlider)
+}
+
+/**
+* Opacity slider thumb mouse move event handler
+* @param {MouseEvent} event 
+*/
+function _onMouseMoveOpacitySlider(event) {
+  const { opacitySlider, opacitySliderThumb } = this.DOM
+  const opacitySliderRect = opacitySlider.getBoundingClientRect()
+  const opacitySliderThumbHalfWidth = opacitySliderThumb.offsetWidth / 2;
+  const minPosition = (opacitySliderThumbHalfWidth * -1);
+  const maxPosition = (opacitySliderRect.width - opacitySliderThumbHalfWidth);
+  let thumbX = (event.clientX - opacitySliderRect.left) - opacitySliderThumbHalfWidth;
+  
+  if(thumbX < minPosition) {
+    thumbX = minPosition
+  }
+  if(thumbX > maxPosition) {
+    thumbX = maxPosition
+  }
+
+  this.color.a = parseFloat(((thumbX + opacitySliderThumbHalfWidth) / opacitySliderRect.width).toFixed(2))
+  opacitySliderThumb.style.transform = `translate(${thumbX}px, -50%)`;
+  
+  // _helper.updateColorModelInput();
+  // _helper.updateViewColors();
 }
 
 /**
 * Build color preview in SVG
 */
 function _buildColorPreview() {
-  let colorPreviewWrapper = document.createElement("span");
-  colorPreviewWrapper.classList.add("cp-color-preview-wrapper");
+  const colorPreviewWrapper = createElement("span", ["cp-color-preview-wrapper"])
 
-  let svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svgElement.setAttribute("width", 38);
-  svgElement.setAttribute("height", 38);
+  const svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+  svgElement.setAttribute("width", 38)
+  svgElement.setAttribute("height", 38)
 
-  let circleColorPreview = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-  circleColorPreview.setAttribute("cx", 19);
-  circleColorPreview.setAttribute("cy", 19);
-  circleColorPreview.setAttribute("r", 18);
-  circleColorPreview.setAttribute("stroke", "gray");
-  circleColorPreview.setAttribute("stroke-width", 1);
-  circleColorPreview.setAttribute("fill", "red");
-  circleColorPreview.setAttribute("fill-opacity", "0.1");
+  const colorPreview = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+  colorPreview.setAttribute("cx", 19)
+  colorPreview.setAttribute("cy", 19)
+  colorPreview.setAttribute("r", 18)
+  colorPreview.setAttribute("stroke", "gray")
+  colorPreview.setAttribute("stroke-width", 1)
+  colorPreview.setAttribute("fill", "red")
+  colorPreview.setAttribute("fill-opacity", "0.1")
 
-  svgElement.innerHTML = '<defs><pattern id="transparent-grid" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="3" height="3" fill="#DBDBDB"/><rect x="3" y="0" width="3" height="3" fill="white"/><rect x="3" y="3" width="3" height="3" fill="#DBDBDB"/><rect x="0" y="3" width="3" height="3" fill="white"/></pattern></defs><circle cx="19" cy="19" r="18" fill="url(#transparent-grid)" />';
-  svgElement.appendChild(circleColorPreview);
-  colorPreviewWrapper.appendChild(svgElement);
+  svgElement.innerHTML = '<defs><pattern id="transparent-grid" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="3" height="3" fill="#DBDBDB"/><rect x="3" y="0" width="3" height="3" fill="white"/><rect x="3" y="3" width="3" height="3" fill="#DBDBDB"/><rect x="0" y="3" width="3" height="3" fill="white"/></pattern></defs><circle cx="19" cy="19" r="18" fill="url(#transparent-grid)" />'
+  svgElement.appendChild(colorPreview)
+  colorPreviewWrapper.appendChild(svgElement)
 
-  this.DOM.circleColorPreview = circleColorPreview;
+  this.DOM.colorPreview = colorPreview
+
   return colorPreviewWrapper;
 }
 
-
-
+/**
+ * Create element
+ * @param {string} tag 
+ * @param {Array} classList 
+ */
+function createElement(tag, classList) {
+  const el = document.createElement(tag)
+  if (classList != null) {
+    el.classList.add(...classList)
+  }
+  return el
+}
 
 
 // ********************************
