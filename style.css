@@ -180,7 +180,7 @@
 }
 
 .cp-clipboard-color,
-.cp-color-model-arrow {
+.cp-color-model-switch {
 	width: 16px;
 	height: 16px;
 	background-position: center;
@@ -194,6 +194,6 @@
 	border: none;
 }
 .cp-clipboard-color:hover,
-.cp-color-model-arrow:hover {
+.cp-color-model-switch:hover {
 	background-color: #373737;
 }

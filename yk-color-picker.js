@@ -10,20 +10,25 @@ function ColorPicker(options) {
   const _dom = {};
   let _isOpen = false;
   let _color = new HSVColor(0, 100, 100, 1)
+  let _currentRepresentation = _options.representation
 
   Object.defineProperty(this, "options", {
     value: _options,
-  });
+  })
   Object.defineProperty(this, "DOM", {
     get: () => _dom,
-  });
+  })
   Object.defineProperty(this, "isOpen", {
     get: () => _isOpen,
     set: (value) => (_isOpen = value),
-  });
+  })
   Object.defineProperty(this, "color", {
     get: () => _color,
-  });
+  })
+  Object.defineProperty(this, "currentRepresentation", {
+    get: () => _currentRepresentation,
+    set: (value) => _currentRepresentation = value,
+  })
 
   // init click and enter key to target
   target.addEventListener("click", (event) => onClickTarget.call(this, event));
@@ -313,8 +318,58 @@ function _buildColorSettings() {
   colorSettings.appendChild(_buildColorPreview.call(this))
   // Build sliders
   colorSettings.appendChild(_buildColorSliders.call(this))
+  // Build inputs
+  colorSettings.appendChild(_buildColorInputs.call(this))
 
   return colorSettings;
+}
+
+/**
+ * Build color inputs
+ */
+function _buildColorInputs() {
+  // Create elements
+  const modelWrapper = createElement("div", ["cp-color-model-wrapper"])
+  const model = createElement("div", ["cp-color-model"])
+  const modelSwitch = createElement("button", ["cp-color-model-switch"])
+  modelSwitch.style.setProperty("background-image", `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-203 292.3 12 12'%3E%3Cpath fill='%23bcbcbc' d='M-200.5,300.9l1.2-1.2l2.3,2.3l2.3-2.3l1.2,1.2l-3.5,3.4L-200.5,300.9z'%3E%3C/path%3E%3Cpath fill='%23bcbcbc' d='M-197,292.3l3.5,3.4l-1.2,1.2l-2.3-2.3l-2.3,2.3l-1.2-1.2L-197,292.3z'%3E%3C/path%3E%3C/svg%3E")`)
+  
+  // Append elements
+  modelWrapper.appendChild(model)
+  modelWrapper.appendChild(modelSwitch)
+
+  // Events
+  modelSwitch.addEventListener("click", _onClickModelSwitch.bind(this))
+
+  this.DOM["inputsWrapper"] = model
+
+  return modelWrapper
+}
+
+function _onClickModelSwitch() {
+  this.DOM.inputsWrapper.innerHTML = ""
+  switch (this.currentRepresentation) {
+    case RGB:
+      // set HSV
+      inputsWrapper.innerHTML = "HSV"
+      this.currentRepresentation = HSV
+      break;
+    case HSV:
+      // set HSL
+      inputsWrapper.innerHTML = "HSL"
+      this.currentRepresentation = HSL
+      break;
+    case HSL:
+      // set HEX
+      inputsWrapper.innerHTML = "HEX"
+      this.currentRepresentation = HEX
+      break;
+    case HEX:
+      // set RGB
+      inputsWrapper.innerHTML = "RGB"
+      this.currentRepresentation = RGB
+      break;
+  }
 }
 
 /**
