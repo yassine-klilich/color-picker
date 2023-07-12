@@ -329,47 +329,97 @@ function _buildColorSettings() {
  */
 function _buildColorInputs() {
   // Create elements
-  const modelWrapper = createElement("div", ["cp-color-model-wrapper"])
-  const model = createElement("div", ["cp-color-model"])
-  const modelSwitch = createElement("button", ["cp-color-model-switch"])
-  modelSwitch.style.setProperty("background-image", `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-203 292.3 12 12'%3E%3Cpath fill='%23bcbcbc' d='M-200.5,300.9l1.2-1.2l2.3,2.3l2.3-2.3l1.2,1.2l-3.5,3.4L-200.5,300.9z'%3E%3C/path%3E%3Cpath fill='%23bcbcbc' d='M-197,292.3l3.5,3.4l-1.2,1.2l-2.3-2.3l-2.3,2.3l-1.2-1.2L-197,292.3z'%3E%3C/path%3E%3C/svg%3E")`)
+  const inputsSettings = createElement("div", ["cp-color-model-wrapper"])
+  const inputsWrapper = createElement("div", ["cp-color-model"])
+  const inputsSwitch = createElement("button", ["cp-color-model-switch"])
+  inputsSwitch.style.setProperty("background-image", `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-203 292.3 12 12'%3E%3Cpath fill='%23bcbcbc' d='M-200.5,300.9l1.2-1.2l2.3,2.3l2.3-2.3l1.2,1.2l-3.5,3.4L-200.5,300.9z'%3E%3C/path%3E%3Cpath fill='%23bcbcbc' d='M-197,292.3l3.5,3.4l-1.2,1.2l-2.3-2.3l-2.3,2.3l-1.2-1.2L-197,292.3z'%3E%3C/path%3E%3C/svg%3E")`)
   
   // Append elements
-  modelWrapper.appendChild(model)
-  modelWrapper.appendChild(modelSwitch)
+  inputsWrapper.appendChild(_buildInput.call(this))
+  inputsSettings.appendChild(inputsWrapper)
+  inputsSettings.appendChild(inputsSwitch)
 
   // Events
-  modelSwitch.addEventListener("click", _onClickModelSwitch.bind(this))
+  inputsSwitch.addEventListener("click", _onClickInputsSwitch.bind(this))
 
-  this.DOM["inputsWrapper"] = model
+  this.DOM["inputsWrapper"] = inputsWrapper
 
-  return modelWrapper
+  return inputsSettings
 }
 
-function _onClickModelSwitch() {
-  this.DOM.inputsWrapper.innerHTML = ""
+function _onClickInputsSwitch() {
+  const { inputsWrapper } = this.DOM
+  inputsWrapper.innerHTML = ""
   switch (this.currentRepresentation) {
     case RGB:
-      // set HSV
-      inputsWrapper.innerHTML = "HSV"
       this.currentRepresentation = HSV
       break;
     case HSV:
-      // set HSL
-      inputsWrapper.innerHTML = "HSL"
       this.currentRepresentation = HSL
       break;
     case HSL:
-      // set HEX
-      inputsWrapper.innerHTML = "HEX"
       this.currentRepresentation = HEX
       break;
     case HEX:
-      // set RGB
-      inputsWrapper.innerHTML = "RGB"
       this.currentRepresentation = RGB
       break;
+	}
+  inputsWrapper.appendChild(_buildInput.call(this))
+}
+
+function _buildInput() {
+  if (this.currentRepresentation == HEX) {
+    return _buildHEXInput.call(this)
   }
+  else {
+    return _buildQuadrupedInput.call(this)
+  }
+}
+
+function _buildHEXInput() {
+  const inputWrapper = createElement("div", ["cp-hex-input"])
+  const inputHEX = createElement("input", ["cp-color-input"])
+  const labelHEX = createElement("label", ["cp-color-model-label"])
+  inputHEX.setAttribute("type", "text")
+  labelHEX.textContent = "HEX"
+  inputWrapper.appendChild(inputHEX)
+  inputWrapper.appendChild(labelHEX)
+
+  return inputWrapper
+}
+
+function _buildQuadrupedInput() {
+  const inputWrapper = createElement("div", ["cp-input-wrapper"])
+  const inputA = createElement("input", ["cp-color-input"])
+  const inputB = createElement("input", ["cp-color-input"])
+  const inputC = createElement("input", ["cp-color-input"])
+  const inputD = createElement("input", ["cp-color-input"])
+  const labelA = createElement("label", ["cp-color-model-label"])
+  const labelB = createElement("label", ["cp-color-model-label"])
+  const labelC = createElement("label", ["cp-color-model-label"])
+  const labelD = createElement("label", ["cp-color-model-label"])
+
+  inputA.setAttribute("type", "text")
+  inputB.setAttribute("type", "text")
+  inputC.setAttribute("type", "text")
+  inputD.setAttribute("type", "text")
+
+  const model = this.currentRepresentation.toUpperCase()
+  labelA.textContent = model[0]
+  labelB.textContent = model[1]
+  labelC.textContent = model[2]
+  labelD.textContent = "A"
+
+  inputWrapper.appendChild(inputA)
+  inputWrapper.appendChild(inputB)
+  inputWrapper.appendChild(inputC)
+  inputWrapper.appendChild(inputD)
+  inputWrapper.appendChild(labelA)
+  inputWrapper.appendChild(labelB)
+  inputWrapper.appendChild(labelC)
+  inputWrapper.appendChild(labelD)
+
+  return inputWrapper
 }
 
 /**
@@ -604,6 +654,7 @@ function _buildColorPreview() {
  * Create element
  * @param {string} tag 
  * @param {Array} classList 
+ * @returns {HTMLElement}
  */
 function createElement(tag, classList) {
   const el = document.createElement(tag)
