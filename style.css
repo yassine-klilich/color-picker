@@ -202,8 +202,11 @@
 	margin: 0;
 	background-color: transparent;
 	border: none;
+	outline: none;
 }
 .cp-clipboard-color:hover,
-.cp-color-model-switch:hover {
+.cp-clipboard-color:focus,
+.cp-color-model-switch:hover,
+.cp-color-model-switch:focus {
 	background-color: #373737;
 }
