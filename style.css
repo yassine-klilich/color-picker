@@ -111,6 +111,11 @@
 	top: 50%;
 	transform: translate(-8px, -50%);
 }
+.cp-hue-slider-thumb:focus,
+.cp-opacity-slider-thumb:focus {
+	background-color: red;
+}
+
 .cp-color-preview-wrapper {
 	margin: 0px 16px 0px 10px;
 }
