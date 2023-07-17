@@ -110,10 +110,11 @@
 	box-shadow: 0px 0px 6px #777;
 	top: 50%;
 	transform: translate(-8px, -50%);
+	outline: none;
 }
 .cp-hue-slider-thumb:focus,
 .cp-opacity-slider-thumb:focus {
-	background-color: red;
+	outline: 1px solid #fff;
 }
 
 .cp-color-preview-wrapper {
