@@ -40,6 +40,24 @@
   <script>
     const colorPicker = new ColorPicker({
       target: document.getElementById("color-box"),
+      onOpen: function() {
+        console.log("on open", this.isOpen);
+      },
+      onClose: function() {
+        console.log("on close", this.isOpen);
+      },
+      onCopy: function() {
+        console.log("on copy", this);
+      },
+      onRepresentationChange: function() {
+        console.log("on representation change", this.currentRepresentation);
+      },
+      onInput: function() {
+        console.log("on input", this.getRGB())
+        console.log("on input", this.getHSV())
+        console.log("on input", this.getHSL())
+        console.log("on input", this.getHEX())
+      },
       //color: "antiquewhite"
       // color: {
       //   r: 127,
@@ -47,7 +65,7 @@
       //   b: 190,
       //   a: 0.8
       // }
-       color: "#FF0000"
+       color: "#FF0000",
       // color: "rgb(120, 4, 64)"
       // color: "rgba(120, 4, 64, 1)"
       // color: "rgb(120 4 64)"
