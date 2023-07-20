@@ -40,6 +40,9 @@
   <script>
     const colorPicker = new ColorPicker({
       target: document.getElementById("color-box"),
+      onInit: function() {
+        console.log("Init")
+      },
       onOpen: function() {
         console.log("on open", this.isOpen);
       },
