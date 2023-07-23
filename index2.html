@@ -45,9 +45,9 @@
   <script>
     const colorPicker = new ColorPicker({
       target: document.getElementById("color-box"),
-      // container: "container",
+      container: "container",
       onInit: function() {
-        console.log("Init")
+        console.log("on init")
       },
       onOpen: function() {
         console.log("on open", this.isOpen);
@@ -62,7 +62,7 @@
         console.log("on representation change", this.currentRepresentation);
       },
       onInput: function() {
-        // console.log("on input");
+        console.log("on input");
       },
       position: BOTTOM,
       color: "rgb(120 4 64)",

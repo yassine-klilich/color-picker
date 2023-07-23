@@ -4,7 +4,7 @@
 	z-index: 1;
 }
 
-.cp-overlay-wrapper.container-attach {
+.cp-overlay-wrapper.cp-overlay-wrapper--static {
 	position: static;
 }
 
