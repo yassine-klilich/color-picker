@@ -54,13 +54,13 @@
         colorBox.style.backgroundColor = instance.getHEX()
       },
       onOpen: function() {
-        console.log("on open", this.isOpen);
+        console.log("on open");
       },
       onClose: function() {
-        console.log("on close", this.isOpen);
+        console.log("on close");
       },
       onCopy: function() {
-        console.log("on copy", this);
+        console.log("on copy");
       },
       onRepresentationChange: function() {
         console.log("on representation change", this.currentRepresentation);
@@ -71,6 +71,9 @@
       },
       onChange: function() {
         console.log("on change");
+      },
+      onContainerChange: function(instance, prevContainer) {
+        console.log("on container change");
       },
       position: BOTTOM,
       color: "brown",
