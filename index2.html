@@ -44,11 +44,14 @@
   <script src="./lib/yk-color-picker.js"></script>
 
   <script>
+    const colorBox = document.getElementById("color-box")
+
     const colorPicker = new ColorPicker({
       target: document.getElementById("color-box"),
       // container: "container",
-      onInit: function() {
+      onInit: function(instance) {
         console.log("on init")
+        colorBox.style.backgroundColor = instance.getHEX()
       },
       onOpen: function() {
         console.log("on open", this.isOpen);
@@ -62,8 +65,9 @@
       onRepresentationChange: function() {
         console.log("on representation change", this.currentRepresentation);
       },
-      onInput: function() {
+      onInput: function(instance) {
         console.log("on input");
+        colorBox.style.backgroundColor = instance.getHEX()
       },
       onChange: function() {
         console.log("on change");
