@@ -118,7 +118,6 @@
   top: 50%;
   transform: translate(-8px, -50%);
   outline: none;
-  cursor: grab;
 }
 .cp-hue-slider-thumb:focus,
 .cp-opacity-slider-thumb:focus {
