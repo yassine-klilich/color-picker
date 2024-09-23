@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      .color-box {
+        position: relative;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 2px;
+        background-color: darkgoldenrod;
+        cursor: pointer;
+
+        top: 650px;
+        left: 200px;
+      }
+      .cp-overlay-wrapper {
+        top: 20px;
+        left: 20px;
+      }
+      body {
+        height: 2000px;
+      }
+    </style>
+
+    <link rel="stylesheet" href="./lib/style.css" />
+  </head>
+  <body>
+    <div id="color-box" class="color-box"></div>
+
+    <div id="container"></div>
+    <div id="container-2"></div>
+
+    <script src="./lib/color-parser.js"></script>
+    <script src="./lib/color.js"></script>
+    <script src="./lib/color-picker.js"></script>
+    <script src="./lib/yk-color-picker.js"></script>
+
+    <script>
+      const colorBox = document.getElementById("color-box");
+
+      const colorPicker = new ColorPicker({
+        target: document.getElementById("color-box"),
+        // container: "container",
+        onInit: function (instance) {
+          console.log("on init");
+          colorBox.style.backgroundColor = instance.getHEX();
+        },
+        onOpen: function () {
+          console.log("on open");
+        },
+        onClose: function () {
+          console.log("on close");
+        },
+        onCopy: function () {
+          console.log("on copy");
+        },
+        onRepresentationChange: function () {
+          console.log("on representation change", this.currentRepresentation);
+        },
+        onInput: function (instance) {
+          console.log("on input");
+          colorBox.style.backgroundColor = instance.getHEX();
+        },
+        onChange: function () {
+          console.log("on change");
+        },
+        onContainerChange: function (instance, prevContainer) {
+          console.log("on container change");
+        },
+        position: BOTTOM,
+        color: "brown",
+        theme: "dark",
+        closeOnScroll: false,
+      });
+      colorPicker.open();
+
+      //color: {
+      //  r: 127,
+      //  g: 30,
+      //  b: 190,
+      //  a: 0.8
+      //},
+      //console.log("on input", this.getRGB())
+      //console.log("on input", this.getHSV())
+      //console.log("on input", this.getHSL())
+      //console.log("on input", this.getHEX())
+      //color: "antiquewhite"
+      // color: "#FF0000",
+      // color: "rgba(120 4 64 .15)"
+      //color: "rgb(151 145 37)"
+      // color: "  rgb(19   4   64    1.0   )   "
+      // color: "  rgb(19   4   64    0.7   )   "
+      // color: "  rgb(19   4   64       )   "
+      // color: "  rgb(19   4   641.    )   " -- expect an error
+      // color: "  rgba(   120   4   64    1.0   )   "
+      // color: "  rgba(   255   255   255    0.958   )   "
+      // color: "  rgba(   255   255   255 0.958   )   "
+    </script>
+  </body>
+</html>
