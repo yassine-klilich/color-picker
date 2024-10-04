@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      .color-box {
+        position: relative;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 2px;
+        background-color: darkgoldenrod;
+        cursor: pointer;
+
+        top: 650px;
+        left: 200px;
+      }
+      /* .cp-overlay-wrapper {
+        top: 20px;
+        left: 20px;
+      } */
+      body {
+        height: 2000px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="colorBox" class="color-box"></div>
+
+    <div id="container"></div>
+    <div id="container-2"></div>
+
+    <script src="./color.js"></script>
+    <script src="./color-parser.js"></script>
+    <script src="./color-picker.js"></script>
+  </body>
+</html>
