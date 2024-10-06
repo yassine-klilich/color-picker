@@ -21,6 +21,7 @@ class YKColorPicker {
   #onKeyUpCloseBind;
   #onMouseMoveCursorBind;
   #onMouseUpCursorBind;
+  #copyTimeout = null;
 
   static TOP = "t";
   static BOTTOM = "b";
@@ -1512,19 +1513,38 @@ class YKColorPicker {
   }
 
   #onClickCopyColor() {
-    navigator.clipboard.writeText(this.#getColorText()).then(() => {
+    if (this.#copyTimeout) {
+      clearTimeout(this.#copyTimeout);
+    }
+    const input = document.createElement("input");
+    input.style.position = "absolute";
+    input.style.left = "-99999px";
+    input.style.top = "-99999px";
+    input.value = this.#getColorText();
+    document.body.appendChild(input);
+    input.select();
+
+    try {
+      document.execCommand("copy");
       this.#dom.copyColor.style.setProperty(
         "background-image",
         `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='14' height='14'%3E%3Cpath fill='%23bcbcbc' d='M15.2 4.7c.3-.3.2-.7-.1-1l-.8-.8c-.3-.3-.7-.2-1 .1l-6.7 7.5-4.1-3.8c-.3-.3-.7-.2-1 .1l-.8.8c-.3.3-.2.7.1 1l5.5 5c.3.3.7.2 1-.1l7.9-8.8z'/%3E%3C/svg%3E")`
       );
       this.#options.onCopy(this);
-      setTimeout(() => {
+
+      this.#copyTimeout = setTimeout(() => {
         this.#dom.copyColor.style.setProperty(
           "background-image",
           YKColorPicker.copyIcon
         );
+        this.#copyTimeout = null;
       }, 600);
-    });
+    } catch (err) {
+      document.body.removeChild(input);
+      throw new Error("YKColorPicker:: Failed to copy color.", {
+        cause: err,
+      });
+    }
   }
 
   #onMouseDownHueSlider(event) {
