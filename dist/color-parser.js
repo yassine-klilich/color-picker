@@ -19,7 +19,7 @@ const YKColorParser = Object.freeze({
       let rgb = this.NAMED_COLORS[color.toLowerCase()];
       if (rgb != undefined) {
         rgb = rgb.split(" ");
-        const { h, s, v } = YKColor.prototype.RGBtoHSV(rgb[0], rgb[1], rgb[2]);
+        const { h, s, v } = YKColor.RGBtoHSV(rgb[0], rgb[1], rgb[2]);
         return { h, s, v, a: 1 };
       }
     } else {
@@ -34,7 +34,7 @@ const YKColorParser = Object.freeze({
         a >= 0 &&
         a <= 1
       ) {
-        const { h, s, v } = YKColor.prototype.RGBtoHSV(r, g, b);
+        const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
         return { h, s, v, a };
       }
       throw new Error(
@@ -78,7 +78,7 @@ const YKColorParser = Object.freeze({
         );
       }
 
-      const { h, s, v } = YKColor.prototype.RGBtoHSV(r, g, b);
+      const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
       return { h, s, v, a: isNaN(a) ? 1 : a };
     }
 
@@ -88,10 +88,10 @@ const YKColorParser = Object.freeze({
   },
 
   compileHEX: function (color) {
-    const rgb = YKColor.prototype.HEXtoRGBA(color);
+    const rgb = YKColor.HEXtoRGBA(color);
     if (rgb) {
       const { r, g, b, a } = rgb;
-      const { h, s, v } = YKColor.prototype.RGBtoHSV(r, g, b);
+      const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
       return { h, s, v, a };
     }
     throw new Error(`YKColorParser:: '${color}' is an invalid HEX format`);

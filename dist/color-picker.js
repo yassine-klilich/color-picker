@@ -1,19 +1,9 @@
-const TOP = "t";
-const BOTTOM = "b";
-const LEFT = "l";
-const RIGHT = "r";
-
-const RGB = "rgb";
-const HSV = "hsv";
-const HSL = "hsl";
-const HEX = "hex";
-
 /**
  * Color Picker
  */
 class YKColorPicker {
   isOpen = false;
-  #options = this.DEFAULT_OPTIONS;
+  #options = YKColorPicker.DEFAULT_OPTIONS;
   #color = null;
   #dom = {};
   #currentRepresentation;
@@ -32,6 +22,39 @@ class YKColorPicker {
   #onMouseMoveCursorBind;
   #onMouseUpCursorBind;
 
+  static TOP = "t";
+  static BOTTOM = "b";
+  static LEFT = "l";
+  static RIGHT = "r";
+
+  static RGB = "rgb";
+  static HSV = "hsv";
+  static HSL = "hsl";
+  static HEX = "hex";
+
+  static DEFAULT_OPTIONS = Object.freeze({
+    target: null,
+    container: null,
+    position: YKColorPicker.BOTTOM,
+    positionFlipOrder: "btrl",
+    representation: YKColorPicker.RGB,
+    color: "red",
+    closeOnScroll: true,
+    closeOnResize: false,
+    escapeKey: true,
+    theme: "light",
+    onInit: () => {},
+    onOpen: () => {},
+    onClose: () => {},
+    onInput: () => {},
+    onChange: () => {},
+    onCopy: () => {},
+    onRepresentationChange: () => {},
+    onContainerChange: () => {},
+  });
+
+  static copyIcon = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-201 290.3 16 16' width='16' height='16'%3E%3Cpath d='M-199.1 301.3v-6.7c0-2 1.6-3.7 3.7-3.7h4.3c.8 0 1.5.5 1.7 1.2H-195c-1.6.1-2.9 1.4-2.9 3.1v7.9c-.7-.3-1.2-1-1.2-1.8zm4.3 4.3c-1 0-1.8-.8-1.8-1.8v-8.6c0-1 .8-1.8 1.8-1.8h6.1c1 0 1.8.8 1.8 1.8v8.6c0 1-.8 1.8-1.8 1.8h-6.1zm6.7-1.8v-8.6c0-.3-.3-.6-.6-.6h-6.1c-.3 0-.6.3-.6.6v8.6c0 .3.3.6.6.6h6.1c.3 0 .6-.3.6-.6z' fill='%23bcbcbc'/%3E%3C/svg%3E")`;
+
   get currentRepresentation() {
     return this.#currentRepresentation;
   }
@@ -42,8 +65,8 @@ class YKColorPicker {
   }
 
   constructor(options) {
-    this.#options = _YKColorPickerUtils.buildOptions(
-      this.DEFAULT_OPTIONS,
+    this.#options = YKColorPicker.#buildOptions(
+      YKColorPicker.DEFAULT_OPTIONS,
       options
     );
 
@@ -113,7 +136,7 @@ class YKColorPicker {
   }
 
   updateOptions(options) {
-    const _options = _YKColorPickerUtils.buildOptions(this.#options, options);
+    const _options = YKColorPicker.#buildOptions(this.#options, options);
     this.#options = _options;
     const { target, representation } = this.#options;
 
@@ -144,7 +167,7 @@ class YKColorPicker {
 
   getColor() {
     switch (this.currentRepresentation) {
-      case RGB: {
+      case YKColorPicker.RGB: {
         const { r, g, b } = this.#color.rgb;
         return {
           r: Math.round(r),
@@ -154,7 +177,7 @@ class YKColorPicker {
         };
       }
 
-      case HSV: {
+      case YKColorPicker.HSV: {
         const { h, s, v } = this.#color.hsv;
         return {
           h: Math.round(h),
@@ -164,7 +187,7 @@ class YKColorPicker {
         };
       }
 
-      case HSL: {
+      case YKColorPicker.HSL: {
         const { h, s, l } = this.#color.hsl;
         return {
           h: Math.round(h),
@@ -174,7 +197,7 @@ class YKColorPicker {
         };
       }
 
-      case HEX:
+      case YKColorPicker.HEX:
         return this.getHEX();
     }
   }
@@ -291,7 +314,7 @@ class YKColorPicker {
   #buildInput() {
     const { inputsWrapper } = this.#dom;
     inputsWrapper.innerHTML = "";
-    if (this.currentRepresentation == HEX) {
+    if (this.currentRepresentation == YKColorPicker.HEX) {
       inputsWrapper.appendChild(this.#buildHEXInput());
     } else {
       inputsWrapper.appendChild(this.#buildQuadrupedInput());
@@ -416,14 +439,14 @@ class YKColorPicker {
 
   #updateInputsValue() {
     switch (this.currentRepresentation) {
-      case RGB:
+      case YKColorPicker.RGB:
         {
           const { r, g, b } = (this.#color.rgb = this.#color.toRGB());
           this.#setQuadrupedValue(Math.round(r), Math.round(g), Math.round(b));
         }
         break;
 
-      case HSV:
+      case YKColorPicker.HSV:
         {
           const { h, s, v } = this.#color.hsv;
           this.#setQuadrupedValue(
@@ -434,7 +457,7 @@ class YKColorPicker {
         }
         break;
 
-      case HSL:
+      case YKColorPicker.HSL:
         {
           const { h, s, l } = (this.#color.hsl = this.#color.toHSL());
           this.#setQuadrupedValue(
@@ -445,7 +468,7 @@ class YKColorPicker {
         }
         break;
 
-      case HEX:
+      case YKColorPicker.HEX:
         {
           this.#updateHEXColor();
           this.#updateHEXInput();
@@ -483,7 +506,7 @@ class YKColorPicker {
   #buildCopyColor() {
     const copyColorWrapper = this.#createElement("span");
     const copyColor = this.#createElement("button", ["cp-clipboard-color"]);
-    copyColor.style.setProperty("background-image", this.copyIcon);
+    copyColor.style.setProperty("background-image", YKColorPicker.copyIcon);
     copyColor.addEventListener("click", this.#onClickCopyColor.bind(this));
 
     copyColorWrapper.appendChild(copyColor);
@@ -625,10 +648,10 @@ class YKColorPicker {
       rgb[color] = op(rgb[color], 1);
       this.#color.hex =
         hex.substring(0, startSelect) +
-        _YKColorPickerUtils.hexPad2(Math.round(rgb[color])) +
+        YKColorPicker.hexPad2(Math.round(rgb[color])) +
         hex.substring(endSelect);
       const { r, g, b } = rgb;
-      this.#color.hsv = this.#color.RGBtoHSV(r, g, b);
+      this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
       this.#rgbUpdateView();
     }
     target.value = this.#color.hex;
@@ -643,7 +666,7 @@ class YKColorPicker {
       this.#color.a = parseFloat(op(a, 0.01).toFixed(2));
       target.value = this.#color.hex =
         hex.substring(0, 7) +
-        _YKColorPickerUtils.hexPad2(Math.round(this.#color.a * 255));
+        YKColorPicker.hexPad2(Math.round(this.#color.a * 255));
       this.#updateColorPreview(true);
       this.#updateOpacityThumb();
     }
@@ -654,7 +677,7 @@ class YKColorPicker {
 
   #updateOpacityValue(value) {
     this.#color.a = parseFloat(value.toFixed(2));
-    if (this.currentRepresentation == HEX) {
+    if (this.currentRepresentation == YKColorPicker.HEX) {
       this.#updateHEXColor(this);
       this.#updateHEXInput();
     } else {
@@ -667,7 +690,7 @@ class YKColorPicker {
     if (this.#options.target == null) {
       return;
     }
-    if (!this.#isTargetInViewport()) {
+    if (!YKColorPicker.#isTargetInViewport(this.#options.target)) {
       this.close();
       return;
     }
@@ -756,33 +779,33 @@ class YKColorPicker {
 
   #onClickInputsSwitch() {
     switch (this.currentRepresentation) {
-      case RGB:
-        this.currentRepresentation = HSV;
+      case YKColorPicker.RGB:
+        this.currentRepresentation = YKColorPicker.HSV;
         break;
-      case HSV:
-        this.currentRepresentation = HSL;
+      case YKColorPicker.HSV:
+        this.currentRepresentation = YKColorPicker.HSL;
         break;
-      case HSL:
-        this.currentRepresentation = HEX;
+      case YKColorPicker.HSL:
+        this.currentRepresentation = YKColorPicker.HEX;
         break;
-      case HEX:
-        this.currentRepresentation = RGB;
+      case YKColorPicker.HEX:
+        this.currentRepresentation = YKColorPicker.RGB;
         break;
     }
   }
 
   #onFocusInput() {
     switch (this.currentRepresentation) {
-      case RGB:
+      case YKColorPicker.RGB:
         this.#color.rgb = this.getRGB();
         break;
-      case HSV:
+      case YKColorPicker.HSV:
         this.#color.hsv = this.getHSV();
         break;
-      case HSL:
+      case YKColorPicker.HSL:
         this.#color.hsl = this.getHSL();
         break;
-      case HEX:
+      case YKColorPicker.HEX:
         this.#updateHEXColor();
         break;
     }
@@ -865,9 +888,9 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "r",
                 event,
-                _YKColorPickerUtils.lt,
+                YKColorPicker.#lt,
                 255,
-                _YKColorPickerUtils.add,
+                YKColorPicker.#add,
                 1,
                 3
               );
@@ -875,9 +898,9 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "g",
                 event,
-                _YKColorPickerUtils.lt,
+                YKColorPicker.#lt,
                 255,
-                _YKColorPickerUtils.add,
+                YKColorPicker.#add,
                 3,
                 5
               );
@@ -885,18 +908,18 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "b",
                 event,
-                _YKColorPickerUtils.lt,
+                YKColorPicker.#lt,
                 255,
-                _YKColorPickerUtils.add,
+                YKColorPicker.#add,
                 5,
                 7
               );
             } else if (caret <= 5) {
               this.#updateHEXAlphaSection(
                 event,
-                _YKColorPickerUtils.lt,
+                YKColorPicker.#lt,
                 1,
-                _YKColorPickerUtils.add
+                YKColorPicker.#add
               );
             }
           } else {
@@ -904,9 +927,9 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "r",
                 event,
-                _YKColorPickerUtils.lt,
+                YKColorPicker.#lt,
                 255,
-                _YKColorPickerUtils.add,
+                YKColorPicker.#add,
                 1,
                 3
               );
@@ -914,9 +937,9 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "g",
                 event,
-                _YKColorPickerUtils.lt,
+                YKColorPicker.#lt,
                 255,
-                _YKColorPickerUtils.add,
+                YKColorPicker.#add,
                 3,
                 5
               );
@@ -924,18 +947,18 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "b",
                 event,
-                _YKColorPickerUtils.lt,
+                YKColorPicker.#lt,
                 255,
-                _YKColorPickerUtils.add,
+                YKColorPicker.#add,
                 5,
                 7
               );
             } else if (caret <= 9) {
               this.#updateHEXAlphaSection(
                 event,
-                _YKColorPickerUtils.lt,
+                YKColorPicker.#lt,
                 1,
-                _YKColorPickerUtils.add
+                YKColorPicker.#add
               );
             }
           }
@@ -957,9 +980,9 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "r",
                 event,
-                _YKColorPickerUtils.gt,
+                YKColorPicker.#gt,
                 0,
-                _YKColorPickerUtils.sub,
+                YKColorPicker.#sub,
                 1,
                 3
               );
@@ -967,9 +990,9 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "g",
                 event,
-                _YKColorPickerUtils.gt,
+                YKColorPicker.#gt,
                 0,
-                _YKColorPickerUtils.sub,
+                YKColorPicker.#sub,
                 3,
                 5
               );
@@ -977,18 +1000,18 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "b",
                 event,
-                _YKColorPickerUtils.gt,
+                YKColorPicker.#gt,
                 0,
-                _YKColorPickerUtils.sub,
+                YKColorPicker.#sub,
                 5,
                 7
               );
             } else if (caret <= 5) {
               this.#updateHEXAlphaSection(
                 event,
-                _YKColorPickerUtils.gt,
+                YKColorPicker.#gt,
                 0,
-                _YKColorPickerUtils.sub
+                YKColorPicker.#sub
               );
             }
           } else {
@@ -996,9 +1019,9 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "r",
                 event,
-                _YKColorPickerUtils.gt,
+                YKColorPicker.#gt,
                 0,
-                _YKColorPickerUtils.sub,
+                YKColorPicker.#sub,
                 1,
                 3
               );
@@ -1006,9 +1029,9 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "g",
                 event,
-                _YKColorPickerUtils.gt,
+                YKColorPicker.#gt,
                 0,
-                _YKColorPickerUtils.sub,
+                YKColorPicker.#sub,
                 3,
                 5
               );
@@ -1016,18 +1039,18 @@ class YKColorPicker {
               this.#updateHEXColorSection(
                 "b",
                 event,
-                _YKColorPickerUtils.gt,
+                YKColorPicker.#gt,
                 0,
-                _YKColorPickerUtils.sub,
+                YKColorPicker.#sub,
                 5,
                 7
               );
             } else if (caret <= 9) {
               this.#updateHEXAlphaSection(
                 event,
-                _YKColorPickerUtils.gt,
+                YKColorPicker.#gt,
                 0,
-                _YKColorPickerUtils.sub
+                YKColorPicker.#sub
               );
             }
           }
@@ -1037,13 +1060,13 @@ class YKColorPicker {
   }
 
   #onInputHEX(event) {
-    const rgb = this.#color.HEXtoRGBA(event.target.value.trim());
+    const rgb = YKColor.HEXtoRGBA(event.target.value.trim());
     if (rgb != null) {
       const { r, g, b, a } = rgb;
       this.#color.a = a;
       this.#color.rgb = { r, g, b };
-      this.#color.hex = this.#color.RGBAtoHEX(r, g, b, a);
-      this.#color.hsv = this.#color.RGBtoHSV(r, g, b);
+      this.#color.hex = YKColor.RGBAtoHEX(r, g, b, a);
+      this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
       this.#updateColorPreview(true);
       this.#updateHueThumb();
       this.#updateOpacityThumb();
@@ -1061,20 +1084,20 @@ class YKColorPicker {
       case "ArrowUp":
         {
           switch (this.currentRepresentation) {
-            case RGB:
+            case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
                 r = Math.round(r);
                 if (r < 255) {
                   this.#color.rgb.r = target.value = ++r;
-                  this.#color.hsv = this.#color.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
               break;
 
-            case HSV:
-            case HSL:
+            case YKColorPicker.HSV:
+            case YKColorPicker.HSL:
               {
                 let { h } = this.#color.hsv;
                 h = Math.round(h);
@@ -1092,20 +1115,20 @@ class YKColorPicker {
       case "ArrowDown":
         {
           switch (this.currentRepresentation) {
-            case RGB:
+            case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
                 r = Math.round(r);
                 if (r > 0) {
                   this.#color.rgb.r = target.value = --r;
-                  this.#color.hsv = this.#color.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
               break;
 
-            case HSV:
-            case HSL:
+            case YKColorPicker.HSV:
+            case YKColorPicker.HSL:
               {
                 let { h } = this.#color.hsv;
                 h = Math.round(h);
@@ -1127,12 +1150,12 @@ class YKColorPicker {
     const value = parseInt(event.target.value || 0);
     if (/^(\d{1,3})(°?)$/.test(value)) {
       switch (this.currentRepresentation) {
-        case RGB:
+        case YKColorPicker.RGB:
           {
             const { g, b } = this.#color.rgb;
             if (!isNaN(value) && value >= 0 && value <= 255) {
               this.#color.rgb.r = value;
-              this.#color.hsv = this.#color.RGBtoHSV(value, g, b);
+              this.#color.hsv = YKColor.RGBtoHSV(value, g, b);
               this.#updateColorPreview(true);
               this.#updateHueThumb();
               this.#updateCursorThumb();
@@ -1140,8 +1163,8 @@ class YKColorPicker {
           }
           break;
 
-        case HSV:
-        case HSL:
+        case YKColorPicker.HSV:
+        case YKColorPicker.HSL:
           {
             if (!isNaN(value) && value >= 0 && value <= 360) {
               this.#color.hsv.h = this.#color.hsl.h = value;
@@ -1157,14 +1180,14 @@ class YKColorPicker {
   #onChangeInputA(event) {
     let value = event.target.value;
     switch (this.currentRepresentation) {
-      case RGB:
+      case YKColorPicker.RGB:
         {
           value = Math.round(this.#color.rgb.r);
         }
         break;
 
-      case HSV:
-      case HSL:
+      case YKColorPicker.HSV:
+      case YKColorPicker.HSL:
         {
           value = `${Math.round(this.#color.hsv.h)}°`;
         }
@@ -1179,19 +1202,19 @@ class YKColorPicker {
       case "ArrowUp":
         {
           switch (this.currentRepresentation) {
-            case RGB:
+            case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
                 g = Math.round(g);
                 if (g < 255) {
                   this.#color.rgb.g = target.value = ++g;
-                  this.#color.hsv = this.#color.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
               break;
 
-            case HSV:
+            case YKColorPicker.HSV:
               {
                 let { s } = this.#color.hsv;
                 s = Math.round(s);
@@ -1204,14 +1227,14 @@ class YKColorPicker {
               }
               break;
 
-            case HSL:
+            case YKColorPicker.HSL:
               {
                 const { h, s, l } = this.#color.hsl;
                 let hsl_s = Math.round(s);
                 if (hsl_s < 100) {
                   target.value = ++hsl_s + "%";
                   this.#color.hsl.s = hsl_s;
-                  this.#color.hsv.s = this.#color.HSLtoHSV(h, hsl_s, l).s;
+                  this.#color.hsv.s = YKColor.HSLtoHSV(h, hsl_s, l).s;
                   this.#updateColorPreview(true);
                   this.#updateCursorThumb();
                 }
@@ -1223,19 +1246,19 @@ class YKColorPicker {
       case "ArrowDown":
         {
           switch (this.currentRepresentation) {
-            case RGB:
+            case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
                 g = Math.round(g);
                 if (g > 0) {
                   this.#color.rgb.g = target.value = --g;
-                  this.#color.hsv = this.#color.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
               break;
 
-            case HSV:
+            case YKColorPicker.HSV:
               {
                 let { s } = this.#color.hsv;
                 s = Math.round(s);
@@ -1248,14 +1271,14 @@ class YKColorPicker {
               }
               break;
 
-            case HSL:
+            case YKColorPicker.HSL:
               {
                 const { h, s, l } = this.#color.hsl;
                 let hsl_s = Math.round(s);
                 if (hsl_s > 0) {
                   target.value = --hsl_s + "%";
                   this.#color.hsl.s = hsl_s;
-                  this.#color.hsv.s = this.#color.HSLtoHSV(h, hsl_s, l).s;
+                  this.#color.hsv.s = YKColor.HSLtoHSV(h, hsl_s, l).s;
                   this.#updateColorPreview(true);
                   this.#updateCursorThumb();
                 }
@@ -1271,12 +1294,12 @@ class YKColorPicker {
     const value = parseInt(event.target.value || 0);
     if (/^(\d{1,3})(%?)$/.test(value)) {
       switch (this.currentRepresentation) {
-        case RGB:
+        case YKColorPicker.RGB:
           {
             const { r, b } = this.#color.rgb;
             if (!isNaN(value) && value >= 0 && value <= 255) {
               this.#color.rgb.g = value;
-              this.#color.hsv = this.#color.RGBtoHSV(r, value, b);
+              this.#color.hsv = YKColor.RGBtoHSV(r, value, b);
               this.#updateColorPreview(true);
               this.#updateHueThumb();
               this.#updateCursorThumb();
@@ -1284,7 +1307,7 @@ class YKColorPicker {
           }
           break;
 
-        case HSV:
+        case YKColorPicker.HSV:
           {
             if (!isNaN(value) && value >= 0 && value <= 100) {
               this.#color.hsv.s = value;
@@ -1294,12 +1317,12 @@ class YKColorPicker {
           }
           break;
 
-        case HSL:
+        case YKColorPicker.HSL:
           {
             const { h, l } = this.#color.hsl;
             if (!isNaN(value) && value >= 0 && value <= 100) {
               this.#color.hsl.s = value;
-              this.#color.hsv = this.#color.HSLtoHSV(h, value, l);
+              this.#color.hsv = YKColor.HSLtoHSV(h, value, l);
               this.#updateColorPreview(true);
               this.#updateCursorThumb();
             }
@@ -1312,19 +1335,19 @@ class YKColorPicker {
   #onChangeInputB(event) {
     let value = event.target.value;
     switch (this.currentRepresentation) {
-      case RGB:
+      case YKColorPicker.RGB:
         {
           value = Math.round(this.#color.rgb.g);
         }
         break;
 
-      case HSV:
+      case YKColorPicker.HSV:
         {
           value = `${Math.round(this.#color.hsv.s)}%`;
         }
         break;
 
-      case HSL:
+      case YKColorPicker.HSL:
         {
           value = `${Math.round(this.#color.hsl.s)}%`;
         }
@@ -1339,19 +1362,19 @@ class YKColorPicker {
       case "ArrowUp":
         {
           switch (this.currentRepresentation) {
-            case RGB:
+            case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
                 b = Math.round(b);
                 if (b < 255) {
                   this.#color.rgb.b = target.value = ++b;
-                  this.#color.hsv = this.#color.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
               break;
 
-            case HSV:
+            case YKColorPicker.HSV:
               {
                 let { v } = this.#color.hsv;
                 v = Math.round(v);
@@ -1364,14 +1387,14 @@ class YKColorPicker {
               }
               break;
 
-            case HSL:
+            case YKColorPicker.HSL:
               {
                 const { h, s, l } = this.#color.hsl;
                 let hsl_l = Math.round(l);
                 if (hsl_l < 100) {
                   target.value = ++hsl_l + "%";
                   this.#color.hsl.l = hsl_l;
-                  this.#color.hsv.v = this.#color.HSLtoHSV(h, s, hsl_l).v;
+                  this.#color.hsv.v = YKColor.HSLtoHSV(h, s, hsl_l).v;
                   this.#updateColorPreview(true);
                   this.#updateCursorThumb();
                 }
@@ -1383,19 +1406,19 @@ class YKColorPicker {
       case "ArrowDown":
         {
           switch (this.currentRepresentation) {
-            case RGB:
+            case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
                 b = Math.round(b);
                 if (b > 0) {
                   this.#color.rgb.b = target.value = --b;
-                  this.#color.hsv = this.#color.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
               break;
 
-            case HSV:
+            case YKColorPicker.HSV:
               {
                 let { v } = this.#color.hsv;
                 v = Math.round(v);
@@ -1408,14 +1431,14 @@ class YKColorPicker {
               }
               break;
 
-            case HSL:
+            case YKColorPicker.HSL:
               {
                 const { h, s, l } = this.#color.hsl;
                 let hsl_l = Math.round(l);
                 if (l > 0) {
                   target.value = --hsl_l + "%";
                   this.#color.hsl.l = hsl_l;
-                  this.#color.hsv.v = this.#color.HSLtoHSV(h, s, hsl_l).v;
+                  this.#color.hsv.v = YKColor.HSLtoHSV(h, s, hsl_l).v;
                   this.#updateColorPreview(true);
                   this.#updateCursorThumb();
                 }
@@ -1431,12 +1454,12 @@ class YKColorPicker {
     const value = parseInt(event.target.value || 0);
     if (/^(\d{1,3})(%?)$/.test(value)) {
       switch (this.currentRepresentation) {
-        case RGB:
+        case YKColorPicker.RGB:
           {
             const { r, g } = this.#color.rgb;
             if (!isNaN(value) && value >= 0 && value <= 255) {
               this.#color.rgb.b = value;
-              this.#color.hsv = this.#color.RGBtoHSV(r, g, value);
+              this.#color.hsv = YKColor.RGBtoHSV(r, g, value);
               this.#updateColorPreview(true);
               this.#updateHueThumb();
               this.#updateCursorThumb();
@@ -1444,7 +1467,7 @@ class YKColorPicker {
           }
           break;
 
-        case HSV:
+        case YKColorPicker.HSV:
           {
             if (!isNaN(value) && value >= 0 && value <= 100) {
               this.#color.hsv.v = value;
@@ -1454,12 +1477,12 @@ class YKColorPicker {
           }
           break;
 
-        case HSL:
+        case YKColorPicker.HSL:
           {
             const { h, s } = this.#color.hsl;
             if (!isNaN(value) && value >= 0 && value <= 100) {
               this.#color.hsl.l = value;
-              this.#color.hsv = this.#color.HSLtoHSV(h, s, value);
+              this.#color.hsv = YKColor.HSLtoHSV(h, s, value);
               this.#updateColorPreview(true);
               this.#updateCursorThumb();
             }
@@ -1472,19 +1495,19 @@ class YKColorPicker {
   #onChangeInputC(event) {
     let value = event.target.value;
     switch (this.currentRepresentation) {
-      case RGB:
+      case YKColorPicker.RGB:
         {
           value = Math.round(this.#color.rgb.b);
         }
         break;
 
-      case HSV:
+      case YKColorPicker.HSV:
         {
           value = `${Math.round(this.#color.hsv.v)}%`;
         }
         break;
 
-      case HSL:
+      case YKColorPicker.HSL:
         {
           value = `${Math.round(this.#color.hsl.l)}%`;
         }
@@ -1503,7 +1526,7 @@ class YKColorPicker {
       setTimeout(() => {
         this.#dom.copyColor.style.setProperty(
           "background-image",
-          this.copyIcon
+          YKColorPicker.copyIcon
         );
       }, 600);
     });
@@ -1670,7 +1693,7 @@ class YKColorPicker {
       if (target == null) {
         return;
       }
-      if (!this.#isTargetInViewport()) {
+      if (!YKColorPicker.#isTargetInViewport(this.#options.target)) {
         this.close();
         return;
       }
@@ -1709,32 +1732,32 @@ class YKColorPicker {
 
   #updateHEXColor() {
     const { r, g, b } = (this.#color.rgb = this.#color.toRGB());
-    this.#color.hex = this.#color.RGBAtoHEX(r, g, b, this.#color.a);
+    this.#color.hex = YKColor.RGBAtoHEX(r, g, b, this.#color.a);
   }
 
   #getColorText() {
     switch (this.currentRepresentation) {
-      case RGB:
+      case YKColorPicker.RGB:
         const { r, g, b } = this.#color.rgb;
         return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${
           this.#color.a
         })`;
 
-      case HSV: {
+      case YKColorPicker.HSV: {
         const { h, s, v } = this.#color.hsv;
         return `hsva(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(v)}%, ${
           this.#color.a
         })`;
       }
 
-      case HSL: {
+      case YKColorPicker.HSL: {
         const { h, s, l } = this.#color.hsl;
         return `hsla(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%, ${
           this.#color.a
         })`;
       }
 
-      case HEX:
+      case YKColorPicker.HEX:
         return this.getHEX();
     }
   }
@@ -1757,26 +1780,26 @@ class YKColorPicker {
     const offset = 6;
     let _position = position;
 
-    const _stateSpaceInTop = this.#enoughSpace(
+    const _stateSpaceInTop = YKColorPicker.#enoughSpace(
       () => scrollTop + targetRect.top,
       () => targetRect.top,
       colorPickerRect.height + offset
     );
-    const _stateSpaceInBottom = this.#enoughSpace(
+    const _stateSpaceInBottom = YKColorPicker.#enoughSpace(
       () =>
-        this.#getPageHeight() -
+        YKColorPicker.#getPageHeight() -
         (scrollTop + targetRect.top + targetRect.height),
       () => window.innerHeight - (targetRect.top + targetRect.height),
       colorPickerRect.height + offset
     );
-    const _stateSpaceInLeft = this.#enoughSpace(
+    const _stateSpaceInLeft = YKColorPicker.#enoughSpace(
       () => scrollLeft + targetRect.left,
       () => targetRect.left,
       colorPickerRect.width + offset
     );
-    const _stateSpaceInRight = this.#enoughSpace(
+    const _stateSpaceInRight = YKColorPicker.#enoughSpace(
       () =>
-        this.#getPageWidth() -
+        YKColorPicker.#getPageWidth() -
         (scrollLeft + targetRect.left + targetRect.width),
       () => window.innerWidth - (targetRect.left + targetRect.width),
       colorPickerRect.width + offset
@@ -1816,32 +1839,32 @@ class YKColorPicker {
         _position = secondPositions[0];
       }
     } else {
-      _position = BOTTOM;
+      _position = YKColorPicker.BOTTOM;
     }
 
     let x_axis = 0;
     let y_axis = 0;
 
     switch (_position) {
-      case TOP:
+      case YKColorPicker.TOP:
         y_axis = targetRect.top - colorPickerRect.height - offset;
         x_axis =
           targetRect.left + targetRect.width / 2 - colorPickerRect.width / 2;
         break;
 
-      case BOTTOM:
+      case YKColorPicker.BOTTOM:
         y_axis = targetRect.top + targetRect.height + offset;
         x_axis =
           targetRect.left + targetRect.width / 2 - colorPickerRect.width / 2;
         break;
 
-      case LEFT:
+      case YKColorPicker.LEFT:
         y_axis =
           targetRect.top + targetRect.height / 2 - colorPickerRect.height / 2;
         x_axis = targetRect.left - colorPickerRect.width - offset;
         break;
 
-      case RIGHT:
+      case YKColorPicker.RIGHT:
         y_axis =
           targetRect.top + targetRect.height / 2 - colorPickerRect.height / 2;
         x_axis = targetRect.left + targetRect.width + offset;
@@ -1871,47 +1894,19 @@ class YKColorPicker {
     };
   }
 
-  #getPageHeight() {
-    return Math.max(
-      document.body.scrollHeight,
-      document.documentElement.scrollHeight,
-      document.body.offsetHeight,
-      document.documentElement.offsetHeight,
-      document.body.clientHeight,
-      document.documentElement.clientHeight
-    );
-  }
-
-  #getPageWidth() {
-    return Math.max(
-      document.body.scrollWidth,
-      document.documentElement.scrollWidth,
-      document.body.offsetWidth,
-      document.documentElement.offsetWidth,
-      document.body.clientWidth,
-      document.documentElement.clientWidth
-    );
-  }
-
-  #enoughSpace(condition1, condition2, boxSize) {
-    if (condition1() >= boxSize) {
-      if (condition2() >= boxSize) {
-        return 2;
-      }
-      return 1;
-    }
-    return 0;
-  }
-
   #setPositionAxis(axis) {
     const { x, y } = axis;
     this.#dom.overlayWrapper.style.top = `${y}px`;
     this.#dom.overlayWrapper.style.left = `${x}px`;
   }
 
-  #isTargetInViewport() {
-    if (this.#options.target) {
-      const rect = this.#options.target.getBoundingClientRect();
+  static hexPad2(value) {
+    return value.toString(16).padStart(2, "0");
+  }
+
+  static #isTargetInViewport(target) {
+    if (target) {
+      const rect = target.getBoundingClientRect();
       return (
         rect.top >= 0 &&
         rect.left >= 0 &&
@@ -1922,33 +1917,40 @@ class YKColorPicker {
       );
     }
   }
-}
 
-YKColorPicker.prototype.DEFAULT_OPTIONS = Object.freeze({
-  target: null,
-  container: null,
-  position: BOTTOM,
-  positionFlipOrder: "rltb",
-  representation: RGB,
-  color: "red",
-  closeOnScroll: true,
-  closeOnResize: false,
-  escapeKey: true,
-  theme: "light",
-  onInit: () => {},
-  onOpen: () => {},
-  onClose: () => {},
-  onInput: () => {},
-  onChange: () => {},
-  onCopy: () => {},
-  onRepresentationChange: () => {},
-  onContainerChange: () => {},
-});
+  static #getPageHeight() {
+    return Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.offsetHeight,
+      document.body.clientHeight,
+      document.documentElement.clientHeight
+    );
+  }
 
-YKColorPicker.prototype.copyIcon = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-201 290.3 16 16' width='16' height='16'%3E%3Cpath d='M-199.1 301.3v-6.7c0-2 1.6-3.7 3.7-3.7h4.3c.8 0 1.5.5 1.7 1.2H-195c-1.6.1-2.9 1.4-2.9 3.1v7.9c-.7-.3-1.2-1-1.2-1.8zm4.3 4.3c-1 0-1.8-.8-1.8-1.8v-8.6c0-1 .8-1.8 1.8-1.8h6.1c1 0 1.8.8 1.8 1.8v8.6c0 1-.8 1.8-1.8 1.8h-6.1zm6.7-1.8v-8.6c0-.3-.3-.6-.6-.6h-6.1c-.3 0-.6.3-.6.6v8.6c0 .3.3.6.6.6h6.1c.3 0 .6-.3.6-.6z' fill='%23bcbcbc'/%3E%3C/svg%3E")`;
+  static #getPageWidth() {
+    return Math.max(
+      document.body.scrollWidth,
+      document.documentElement.scrollWidth,
+      document.body.offsetWidth,
+      document.documentElement.offsetWidth,
+      document.body.clientWidth,
+      document.documentElement.clientWidth
+    );
+  }
 
-const _YKColorPickerUtils = Object.freeze({
-  buildOptions: function (baseOptions, options) {
+  static #enoughSpace(condition1, condition2, boxSize) {
+    if (condition1() >= boxSize) {
+      if (condition2() >= boxSize) {
+        return 2;
+      }
+      return 1;
+    }
+    return 0;
+  }
+
+  static #buildOptions(baseOptions, options) {
     if (options == null) {
       options = {};
     }
@@ -1963,22 +1965,23 @@ const _YKColorPickerUtils = Object.freeze({
       }
     }
     return _options;
-  },
-  lt: function (a, b) {
+  }
+
+  static #lt(a, b) {
     return a < b;
-  },
-  gt: function (a, b) {
+  }
+
+  static #gt(a, b) {
     return a > b;
-  },
-  add: function (a, b) {
+  }
+
+  static #add(a, b) {
     return a + b;
-  },
-  sub: function (a, b) {
+  }
+
+  static #sub(a, b) {
     return a - b;
-  },
-  hexPad2: function (value) {
-    return value.toString(16).padStart(2, "0");
-  },
-});
+  }
+}
 
 window.YKColorPicker = YKColorPicker;
