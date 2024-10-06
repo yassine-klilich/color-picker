@@ -234,13 +234,17 @@
   border-color: #d6d6d6;
 }
 .cp-overlay-wrapper--light .cp-color-input:focus {
-  border-color: #383838;
+  border-color: #467dff;
 }
 .cp-overlay-wrapper--light .cp-color-model-label {
   color: #3b3b3b;
 }
 .cp-overlay-wrapper--light .cp-preview-stroke {
   stroke: #c8c8c8;
+}
+.cp-overlay-wrapper--light
+  :where(.cp-clipboard-color svg, .cp-color-model-switch svg) {
+  fill: #696969;
 }
 .cp-overlay-wrapper--light
   :where(
@@ -277,6 +281,10 @@
 }
 .cp-overlay-wrapper--dark .cp-preview-stroke {
   stroke: gray;
+}
+.cp-overlay-wrapper--dark
+  :where(.cp-clipboard-color svg, .cp-color-model-switch svg) {
+  fill: #bcbcbc;
 }
 .cp-overlay-wrapper--dark
   :where(

@@ -54,8 +54,6 @@ class YKColorPicker {
     onContainerChange: () => {},
   });
 
-  static copyIcon = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-201 290.3 16 16' width='16' height='16'%3E%3Cpath d='M-199.1 301.3v-6.7c0-2 1.6-3.7 3.7-3.7h4.3c.8 0 1.5.5 1.7 1.2H-195c-1.6.1-2.9 1.4-2.9 3.1v7.9c-.7-.3-1.2-1-1.2-1.8zm4.3 4.3c-1 0-1.8-.8-1.8-1.8v-8.6c0-1 .8-1.8 1.8-1.8h6.1c1 0 1.8.8 1.8 1.8v8.6c0 1-.8 1.8-1.8 1.8h-6.1zm6.7-1.8v-8.6c0-.3-.3-.6-.6-.6h-6.1c-.3 0-.6.3-.6.6v8.6c0 .3.3.6.6.6h6.1c.3 0 .6-.3.6-.6z' fill='%23bcbcbc'/%3E%3C/svg%3E")`;
-
   constructor(options) {
     this.#options = YKColorPicker.#buildOptions(
       YKColorPicker.DEFAULT_OPTIONS,
@@ -287,9 +285,10 @@ class YKColorPicker {
     const inputsSwitch = this.#createElement("button", [
       "cp-color-model-switch",
     ]);
-    inputsSwitch.style.setProperty(
-      "background-image",
-      `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-203 292.3 12 12'%3E%3Cpath fill='%23bcbcbc' d='m-200.5 300.9 1.2-1.2 2.3 2.3 2.3-2.3 1.2 1.2-3.5 3.4-3.5-3.4zM-197 292.3l3.5 3.4-1.2 1.2-2.3-2.3-2.3 2.3-1.2-1.2 3.5-3.4z'/%3E%3C/svg%3E")`
+    inputsSwitch.appendChild(
+      this.#createSVGIcon(
+        `<path d="m3.5045 11.431 1.5786-1.5786 3.0256 3.0256 3.0256-3.0256 1.5786 1.5786-4.6042 4.4726zm4.6042-11.313 4.6042 4.4726-1.5786 1.5786-3.0256-3.0256-3.0256 3.0256-1.5786-1.5786z"/>`
+      )
     );
 
     // Append elements
@@ -500,16 +499,37 @@ class YKColorPicker {
   }
 
   #buildCopyColor() {
-    const copyColorWrapper = this.#createElement("span");
     const copyColor = this.#createElement("button", ["cp-clipboard-color"]);
-    copyColor.style.setProperty("background-image", YKColorPicker.copyIcon);
     copyColor.addEventListener("click", this.#onClickCopyColor.bind(this));
-
-    copyColorWrapper.appendChild(copyColor);
-
     this.#dom["copyColor"] = copyColor;
+    this.#attachCopyIcon();
 
-    return copyColorWrapper;
+    return copyColor;
+  }
+
+  #attachCopyIcon() {
+    const path = `<path d="m1.9695 11.037v-6.7c0-2 1.6-3.7 3.7-3.7h4.3c0.8 0 1.5 0.5 1.7 1.2h-5.6c-1.6 0.1-2.9 1.4-2.9 3.1v7.9c-0.7-0.3-1.2-1-1.2-1.8zm4.3 4.3c-1 0-1.8-0.8-1.8-1.8v-8.6c0-1 0.8-1.8 1.8-1.8h6.1c1 0 1.8 0.8 1.8 1.8v8.6c0 1-0.8 1.8-1.8 1.8zm6.7-1.8v-8.6c0-0.3-0.3-0.6-0.6-0.6h-6.1c-0.3 0-0.6 0.3-0.6 0.6v8.6c0 0.3 0.3 0.6 0.6 0.6h6.1c0.3 0 0.6-0.3 0.6-0.6z"/>`;
+    this.#dom.copyColor.innerHTML = "";
+    this.#dom.copyColor.appendChild(this.#createSVGIcon(path));
+  }
+
+  #attachCheckIcon() {
+    const path = `<path d="m13.975 5.3001c0.24929-0.24929 0.16619-0.58168-0.0831-0.83097l-0.66477-0.66477c-0.24929-0.24929-0.58168-0.16619-0.83097 0.083097l-5.5675 6.2322-3.407-3.1577c-0.24929-0.24929-0.58168-0.16619-0.83097 0.083097l-0.66477 0.66477c-0.24929 0.24929-0.16619 0.58168 0.083097 0.83097l4.5703 4.1548c0.24929 0.24929 0.58168 0.16619 0.83097-0.0831z"/>`;
+    this.#dom.copyColor.innerHTML = "";
+    this.#dom.copyColor.appendChild(this.#createSVGIcon(path));
+  }
+
+  #createSVGIcon(path) {
+    const svgElement = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    );
+    svgElement.setAttribute("viewBox", "0 0 16 16");
+    svgElement.setAttribute("width", "16px");
+    svgElement.setAttribute("height", "16px");
+    svgElement.innerHTML = path;
+
+    return svgElement;
   }
 
   #buildColorSliders() {
@@ -704,6 +724,10 @@ class YKColorPicker {
     const { overlayWrapper } = this.#dom;
     const parent = overlayWrapper.parentElement;
     container.appendChild(overlayWrapper);
+    overlayWrapper.classList.remove(
+      "cp-overlay-wrapper--light",
+      "cp-overlay-wrapper--dark"
+    );
     overlayWrapper.classList.add("cp-overlay-wrapper--static");
     overlayWrapper.classList.add("cp-overlay-wrapper--open");
     overlayWrapper.classList.add("cp-overlay-wrapper--" + this.#options.theme);
@@ -719,9 +743,13 @@ class YKColorPicker {
     const { overlayWrapper } = this.#dom;
     const parent = overlayWrapper.parentElement;
     document.body.appendChild(overlayWrapper);
+    overlayWrapper.classList.remove(
+      "cp-overlay-wrapper--light",
+      "cp-overlay-wrapper--dark"
+    );
     overlayWrapper.classList.remove("cp-overlay-wrapper--static");
-    overlayWrapper.classList.add("cp-overlay-wrapper--" + this.#options.theme);
     overlayWrapper.classList.add("cp-overlay-wrapper--open");
+    overlayWrapper.classList.add("cp-overlay-wrapper--" + this.#options.theme);
     this.#updateGUI();
     this.#updatePosition();
     window.addEventListener("resize", this.#onResizeScrollWindowBind);
@@ -1526,17 +1554,11 @@ class YKColorPicker {
 
     try {
       document.execCommand("copy");
-      this.#dom.copyColor.style.setProperty(
-        "background-image",
-        `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='14' height='14'%3E%3Cpath fill='%23bcbcbc' d='M15.2 4.7c.3-.3.2-.7-.1-1l-.8-.8c-.3-.3-.7-.2-1 .1l-6.7 7.5-4.1-3.8c-.3-.3-.7-.2-1 .1l-.8.8c-.3.3-.2.7.1 1l5.5 5c.3.3.7.2 1-.1l7.9-8.8z'/%3E%3C/svg%3E")`
-      );
+      this.#attachCheckIcon();
       this.#options.onCopy(this);
 
       this.#copyTimeout = setTimeout(() => {
-        this.#dom.copyColor.style.setProperty(
-          "background-image",
-          YKColorPicker.copyIcon
-        );
+        this.#attachCopyIcon();
         this.#copyTimeout = null;
       }, 600);
     } catch (err) {
