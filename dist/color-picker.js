@@ -651,10 +651,11 @@ class YKColorPicker {
     if (this.#options.target == null) {
       return;
     }
-    let { x, y } = this.#getPositionAxis();
-    x = x < 0 ? 0 : x;
-    y = y < 0 ? 0 : y;
-    this.#setPositionAxis({ x, y });
+    if (!this.#isTargetInViewport()) {
+      this.close();
+      return;
+    }
+    this.#setPositionAxis(this.#getPositionAxis());
   }
 
   #attachToContainer(callEvent) {
@@ -1650,12 +1651,11 @@ class YKColorPicker {
       if (target == null) {
         return;
       }
-      let { x, y } = this.#getPositionAxis();
-      if (type != "scroll") {
-        x = x < 0 ? 0 : x;
-        y = y < 0 ? 0 : y;
+      if (!this.#isTargetInViewport()) {
+        this.close();
+        return;
       }
-      this.#setPositionAxis({ x, y });
+      this.#setPositionAxis(this.#getPositionAxis());
     }
   }
 
@@ -1731,36 +1731,36 @@ class YKColorPicker {
 
   #getPositionAxis() {
     const { target, position, positionFlipOrder } = this.#options;
-    const offset = 6;
-    let _position = position;
     const targetRect = target.getBoundingClientRect();
-    const boxRect = this.#dom.overlayWrapper.getBoundingClientRect();
+    const colorPickerRect = this.#dom.overlayWrapper.getBoundingClientRect();
     const scrollTop = document.documentElement.scrollTop;
     const scrollLeft = document.documentElement.scrollLeft;
+    const offset = 6;
+    let _position = position;
 
     const _stateSpaceInTop = this.#enoughSpace(
       () => scrollTop + targetRect.top,
       () => targetRect.top,
-      boxRect.height + offset
+      colorPickerRect.height + offset
     );
     const _stateSpaceInBottom = this.#enoughSpace(
       () =>
         this.#getPageHeight() -
         (scrollTop + targetRect.top + targetRect.height),
       () => window.innerHeight - (targetRect.top + targetRect.height),
-      boxRect.height + offset
+      colorPickerRect.height + offset
     );
     const _stateSpaceInLeft = this.#enoughSpace(
       () => scrollLeft + targetRect.left,
       () => targetRect.left,
-      boxRect.width + offset
+      colorPickerRect.width + offset
     );
     const _stateSpaceInRight = this.#enoughSpace(
       () =>
         this.#getPageWidth() -
         (scrollLeft + targetRect.left + targetRect.width),
       () => window.innerWidth - (targetRect.left + targetRect.width),
-      boxRect.width + offset
+      colorPickerRect.width + offset
     );
 
     const states = {
@@ -1805,22 +1805,26 @@ class YKColorPicker {
 
     switch (_position) {
       case TOP:
-        y_axis = targetRect.top - boxRect.height - offset;
-        x_axis = targetRect.left + targetRect.width / 2 - boxRect.width / 2;
+        y_axis = targetRect.top - colorPickerRect.height - offset;
+        x_axis =
+          targetRect.left + targetRect.width / 2 - colorPickerRect.width / 2;
         break;
 
       case BOTTOM:
         y_axis = targetRect.top + targetRect.height + offset;
-        x_axis = targetRect.left + targetRect.width / 2 - boxRect.width / 2;
+        x_axis =
+          targetRect.left + targetRect.width / 2 - colorPickerRect.width / 2;
         break;
 
       case LEFT:
-        y_axis = targetRect.top + targetRect.height / 2 - boxRect.height / 2;
-        x_axis = targetRect.left - boxRect.width - offset;
+        y_axis =
+          targetRect.top + targetRect.height / 2 - colorPickerRect.height / 2;
+        x_axis = targetRect.left - colorPickerRect.width - offset;
         break;
 
       case RIGHT:
-        y_axis = targetRect.top + targetRect.height / 2 - boxRect.height / 2;
+        y_axis =
+          targetRect.top + targetRect.height / 2 - colorPickerRect.height / 2;
         x_axis = targetRect.left + targetRect.width + offset;
         break;
     }
@@ -1831,11 +1835,12 @@ class YKColorPicker {
     const yScrollbar =
       window.innerHeight - document.documentElement.clientHeight;
 
-    if (window.innerWidth - xScrollbar < x_axis + boxRect.width) {
-      x_axis -= x_axis + boxRect.width - window.innerWidth + xScrollbar;
+    if (window.innerWidth - xScrollbar < x_axis + colorPickerRect.width) {
+      x_axis -= x_axis + colorPickerRect.width - window.innerWidth + xScrollbar;
     }
-    if (window.innerHeight - yScrollbar < y_axis + boxRect.height) {
-      y_axis -= y_axis + boxRect.height - window.innerHeight + yScrollbar;
+    if (window.innerHeight - yScrollbar < y_axis + colorPickerRect.height) {
+      y_axis -=
+        y_axis + colorPickerRect.height - window.innerHeight + yScrollbar;
     }
 
     x_axis = Math.max(x_axis, 0);
@@ -1883,6 +1888,20 @@ class YKColorPicker {
     const { x, y } = axis;
     this.#dom.overlayWrapper.style.top = `${y}px`;
     this.#dom.overlayWrapper.style.left = `${x}px`;
+  }
+
+  #isTargetInViewport() {
+    if (this.#options.target) {
+      const rect = this.#options.target.getBoundingClientRect();
+      return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <=
+          (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <=
+          (window.innerWidth || document.documentElement.clientWidth)
+      );
+    }
   }
 }
 

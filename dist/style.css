@@ -1,12 +1,12 @@
 .cp-overlay-wrapper {
   position: fixed;
   z-index: 1;
-  transition: opacity 0.3s, visibility 0s 0.3s;
+  transition: opacity 300ms, visibility 300ms;
   opacity: 0;
   visibility: hidden;
 }
 .cp-overlay-wrapper--open {
-  transition: opacity 0.3s;
+  transition: opacity 300ms;
   opacity: 1;
   visibility: visible;
 }

@@ -17,7 +17,7 @@
         background-color: darkgoldenrod;
         cursor: pointer;
 
-        top: 650px;
+        top: 1550px;
         left: 200px;
       }
       /* .cp-overlay-wrapper {
@@ -25,7 +25,7 @@
         left: 20px;
       } */
       body {
-        height: 2000px;
+        height: 3000px;
       }
     </style>
   </head>
@@ -38,5 +38,43 @@
     <script src="./color.js"></script>
     <script src="./color-parser.js"></script>
     <script src="./color-picker.js"></script>
+
+    <script>
+      const colorPicker = new YKColorPicker({
+        target: document.getElementById("colorBox"),
+        // container: "container",
+        onInit: function (instance) {
+          console.log("on init", instance);
+          colorBox.style.backgroundColor = instance.getHEX();
+        },
+        onOpen: function (instance) {
+          console.log("on open", instance);
+        },
+        onClose: function (instance) {
+          console.log("on close");
+        },
+        onCopy: function (instance) {
+          console.log("on copy");
+        },
+        onRepresentationChange: function (instance) {
+          console.log("on representation change", instance);
+        },
+        onInput: function (instance) {
+          console.log("on input", instance);
+          colorBox.style.backgroundColor = instance.getHEX();
+        },
+        onChange: function (instance) {
+          console.log("on change", instance);
+        },
+        onContainerChange: function (instance, prevContainer) {
+          console.log("on container change", instance, prevContainer);
+        },
+        position: BOTTOM,
+        color: "brown",
+        theme: "dark",
+        closeOnScroll: false,
+        closeOnResize: false,
+      });
+    </script>
   </body>
 </html>
