@@ -1555,6 +1555,7 @@ class YKColorPicker {
     try {
       document.execCommand("copy");
       this.#attachCheckIcon();
+      this.#dom.copyColor.focus();
       this.#options.onCopy(this);
 
       this.#copyTimeout = setTimeout(() => {
