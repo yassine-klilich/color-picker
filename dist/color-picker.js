@@ -2,7 +2,7 @@
  * Color Picker
  */
 class YKColorPicker {
-  isOpen = false;
+  #isOpen = false;
   #options = YKColorPicker.DEFAULT_OPTIONS;
   #color = null;
   #dom = {};
@@ -55,15 +55,6 @@ class YKColorPicker {
 
   static copyIcon = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-201 290.3 16 16' width='16' height='16'%3E%3Cpath d='M-199.1 301.3v-6.7c0-2 1.6-3.7 3.7-3.7h4.3c.8 0 1.5.5 1.7 1.2H-195c-1.6.1-2.9 1.4-2.9 3.1v7.9c-.7-.3-1.2-1-1.2-1.8zm4.3 4.3c-1 0-1.8-.8-1.8-1.8v-8.6c0-1 .8-1.8 1.8-1.8h6.1c1 0 1.8.8 1.8 1.8v8.6c0 1-.8 1.8-1.8 1.8h-6.1zm6.7-1.8v-8.6c0-.3-.3-.6-.6-.6h-6.1c-.3 0-.6.3-.6.6v8.6c0 .3.3.6.6.6h6.1c.3 0 .6-.3.6-.6z' fill='%23bcbcbc'/%3E%3C/svg%3E")`;
 
-  get currentRepresentation() {
-    return this.#currentRepresentation;
-  }
-  set currentRepresentation(value) {
-    this.#currentRepresentation = value;
-    this.#updateInputs();
-    this.#options.onRepresentationChange(this);
-  }
-
   constructor(options) {
     this.#options = YKColorPicker.#buildOptions(
       YKColorPicker.DEFAULT_OPTIONS,
@@ -84,6 +75,10 @@ class YKColorPicker {
     this.setColor(this.#options.color);
     this._prevColor = this.getHEX();
     this.#initDOM();
+  }
+
+  isOpen() {
+    return this.#isOpen;
   }
 
   open() {
@@ -141,8 +136,8 @@ class YKColorPicker {
     const { target, representation } = this.#options;
 
     // update representation
-    if (this.currentRepresentation != representation) {
-      this.currentRepresentation = representation;
+    if (this.#currentRepresentation != representation) {
+      this.#updateRepresentation(representation);
     }
 
     // update target
@@ -156,7 +151,7 @@ class YKColorPicker {
       }
     }
 
-    if (this.isOpen) {
+    if (this.#isOpen) {
       if (this.#options.container) {
         this.#attachToContainer(true);
       } else {
@@ -166,7 +161,7 @@ class YKColorPicker {
   }
 
   getColor() {
-    switch (this.currentRepresentation) {
+    switch (this.#currentRepresentation) {
       case YKColorPicker.RGB: {
         const { r, g, b } = this.#color.rgb;
         return {
@@ -314,7 +309,7 @@ class YKColorPicker {
   #buildInput() {
     const { inputsWrapper } = this.#dom;
     inputsWrapper.innerHTML = "";
-    if (this.currentRepresentation == YKColorPicker.HEX) {
+    if (this.#currentRepresentation == YKColorPicker.HEX) {
       inputsWrapper.appendChild(this.#buildHEXInput());
     } else {
       inputsWrapper.appendChild(this.#buildQuadrupedInput());
@@ -358,7 +353,7 @@ class YKColorPicker {
     inputD.setAttribute("type", "text");
 
     // Set labels' text
-    const model = this.currentRepresentation.toUpperCase();
+    const model = this.#currentRepresentation.toUpperCase();
     labelA.textContent = model[0];
     labelB.textContent = model[1];
     labelC.textContent = model[2];
@@ -438,7 +433,7 @@ class YKColorPicker {
   }
 
   #updateInputsValue() {
-    switch (this.currentRepresentation) {
+    switch (this.#currentRepresentation) {
       case YKColorPicker.RGB:
         {
           const { r, g, b } = (this.#color.rgb = this.#color.toRGB());
@@ -677,7 +672,7 @@ class YKColorPicker {
 
   #updateOpacityValue(value) {
     this.#color.a = parseFloat(value.toFixed(2));
-    if (this.currentRepresentation == YKColorPicker.HEX) {
+    if (this.#currentRepresentation == YKColorPicker.HEX) {
       this.#updateHEXColor(this);
       this.#updateHEXInput();
     } else {
@@ -712,7 +707,7 @@ class YKColorPicker {
     overlayWrapper.classList.add("cp-overlay-wrapper--open");
     overlayWrapper.classList.add("cp-overlay-wrapper--" + this.#options.theme);
     this.#updateGUI();
-    this.isOpen = true;
+    this.#isOpen = true;
     if (callEvent && parent != overlayWrapper.parentElement) {
       this.#options.onContainerChange(this, parent);
     }
@@ -734,7 +729,7 @@ class YKColorPicker {
     if (this.#options.escapeKey) {
       document.addEventListener("keyup", this.#onKeyUpCloseBind);
     }
-    this.isOpen = true;
+    this.#isOpen = true;
     if (parent != overlayWrapper.parentElement) {
       this.#options.onContainerChange(this, parent);
     }
@@ -743,12 +738,12 @@ class YKColorPicker {
   #detachOverlay() {
     this.#dom.overlayWrapper.classList.remove("cp-overlay-wrapper--open");
     this.#removeWindowEvents(this);
-    this.isOpen = false;
+    this.#isOpen = false;
   }
 
   #onClickTarget(event) {
     event.stopPropagation();
-    if (this.isOpen) this.close();
+    if (this.#isOpen) this.close();
     else this.open();
   }
 
@@ -778,24 +773,24 @@ class YKColorPicker {
   }
 
   #onClickInputsSwitch() {
-    switch (this.currentRepresentation) {
+    switch (this.#currentRepresentation) {
       case YKColorPicker.RGB:
-        this.currentRepresentation = YKColorPicker.HSV;
+        this.#updateRepresentation(YKColorPicker.HSV);
         break;
       case YKColorPicker.HSV:
-        this.currentRepresentation = YKColorPicker.HSL;
+        this.#updateRepresentation(YKColorPicker.HSL);
         break;
       case YKColorPicker.HSL:
-        this.currentRepresentation = YKColorPicker.HEX;
+        this.#updateRepresentation(YKColorPicker.HEX);
         break;
       case YKColorPicker.HEX:
-        this.currentRepresentation = YKColorPicker.RGB;
+        this.#updateRepresentation(YKColorPicker.RGB);
         break;
     }
   }
 
   #onFocusInput() {
-    switch (this.currentRepresentation) {
+    switch (this.#currentRepresentation) {
       case YKColorPicker.RGB:
         this.#color.rgb = this.getRGB();
         break;
@@ -1083,7 +1078,7 @@ class YKColorPicker {
     switch (key) {
       case "ArrowUp":
         {
-          switch (this.currentRepresentation) {
+          switch (this.#currentRepresentation) {
             case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
@@ -1114,7 +1109,7 @@ class YKColorPicker {
         break;
       case "ArrowDown":
         {
-          switch (this.currentRepresentation) {
+          switch (this.#currentRepresentation) {
             case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
@@ -1149,7 +1144,7 @@ class YKColorPicker {
   #onInputA(event) {
     const value = parseInt(event.target.value || 0);
     if (/^(\d{1,3})(°?)$/.test(value)) {
-      switch (this.currentRepresentation) {
+      switch (this.#currentRepresentation) {
         case YKColorPicker.RGB:
           {
             const { g, b } = this.#color.rgb;
@@ -1179,7 +1174,7 @@ class YKColorPicker {
 
   #onChangeInputA(event) {
     let value = event.target.value;
-    switch (this.currentRepresentation) {
+    switch (this.#currentRepresentation) {
       case YKColorPicker.RGB:
         {
           value = Math.round(this.#color.rgb.r);
@@ -1201,7 +1196,7 @@ class YKColorPicker {
     switch (key) {
       case "ArrowUp":
         {
-          switch (this.currentRepresentation) {
+          switch (this.#currentRepresentation) {
             case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
@@ -1245,7 +1240,7 @@ class YKColorPicker {
         break;
       case "ArrowDown":
         {
-          switch (this.currentRepresentation) {
+          switch (this.#currentRepresentation) {
             case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
@@ -1293,7 +1288,7 @@ class YKColorPicker {
   #onInputB(event) {
     const value = parseInt(event.target.value || 0);
     if (/^(\d{1,3})(%?)$/.test(value)) {
-      switch (this.currentRepresentation) {
+      switch (this.#currentRepresentation) {
         case YKColorPicker.RGB:
           {
             const { r, b } = this.#color.rgb;
@@ -1334,7 +1329,7 @@ class YKColorPicker {
 
   #onChangeInputB(event) {
     let value = event.target.value;
-    switch (this.currentRepresentation) {
+    switch (this.#currentRepresentation) {
       case YKColorPicker.RGB:
         {
           value = Math.round(this.#color.rgb.g);
@@ -1361,7 +1356,7 @@ class YKColorPicker {
     switch (key) {
       case "ArrowUp":
         {
-          switch (this.currentRepresentation) {
+          switch (this.#currentRepresentation) {
             case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
@@ -1405,7 +1400,7 @@ class YKColorPicker {
         break;
       case "ArrowDown":
         {
-          switch (this.currentRepresentation) {
+          switch (this.#currentRepresentation) {
             case YKColorPicker.RGB:
               {
                 let { r, g, b } = this.#color.rgb;
@@ -1453,7 +1448,7 @@ class YKColorPicker {
   #onInputC(event) {
     const value = parseInt(event.target.value || 0);
     if (/^(\d{1,3})(%?)$/.test(value)) {
-      switch (this.currentRepresentation) {
+      switch (this.#currentRepresentation) {
         case YKColorPicker.RGB:
           {
             const { r, g } = this.#color.rgb;
@@ -1494,7 +1489,7 @@ class YKColorPicker {
 
   #onChangeInputC(event) {
     let value = event.target.value;
-    switch (this.currentRepresentation) {
+    switch (this.#currentRepresentation) {
       case YKColorPicker.RGB:
         {
           value = Math.round(this.#color.rgb.b);
@@ -1736,7 +1731,7 @@ class YKColorPicker {
   }
 
   #getColorText() {
-    switch (this.currentRepresentation) {
+    switch (this.#currentRepresentation) {
       case YKColorPicker.RGB:
         const { r, g, b } = this.#color.rgb;
         return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${
@@ -1898,6 +1893,12 @@ class YKColorPicker {
     const { x, y } = axis;
     this.#dom.overlayWrapper.style.top = `${y}px`;
     this.#dom.overlayWrapper.style.left = `${x}px`;
+  }
+
+  #updateRepresentation(value) {
+    this.#currentRepresentation = value;
+    this.#updateInputs();
+    this.#options.onRepresentationChange(this);
   }
 
   static hexPad2(value) {
