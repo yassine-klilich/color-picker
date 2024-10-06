@@ -17,6 +17,20 @@ class YKColorPicker {
   #color = null;
   #dom = {};
   #currentRepresentation;
+  #dc;
+  #onClickTargetBind;
+  #onMouseDownCursorBind;
+  #onMouseUpHueSliderBind;
+  #onMouseMoveHueSliderBind;
+  #onMouseDownHueSliderBind;
+  #onMouseDownOpacitySliderBind;
+  #onMouseUpOpacitySliderBind;
+  #onMouseMoveOpacitySliderBind;
+  #onResizeScrollWindowBind;
+  #onClickCloseBind;
+  #onKeyUpCloseBind;
+  #onMouseMoveCursorBind;
+  #onMouseUpCursorBind;
 
   get currentRepresentation() {
     return this.#currentRepresentation;
@@ -40,8 +54,8 @@ class YKColorPicker {
 
     // init click and enter key to target
     if (target) {
-      this.__onClickTarget = this.#onClickTarget.bind(this);
-      target.addEventListener("click", this.__onClickTarget);
+      this.#onClickTargetBind = this.#onClickTarget.bind(this);
+      target.addEventListener("click", this.#onClickTargetBind);
     }
 
     this.setColor(this.#options.color);
@@ -60,14 +74,14 @@ class YKColorPicker {
   }
 
   close() {
-    if (!this.__dc) {
+    if (!this.#dc) {
       if (this._prevColor != this.getHEX()) {
         this.#options.onChange(this);
       }
       this.#detachOverlay();
       this.#options.onClose(this);
     }
-    this.__dc = false;
+    this.#dc = false;
   }
 
   getRGB() {
@@ -111,11 +125,11 @@ class YKColorPicker {
     // update target
     if (this.#dom.target != target) {
       if (this.#dom.target != null) {
-        this.#dom.target.removeEventListener("click", this.__onClickTarget);
+        this.#dom.target.removeEventListener("click", this.#onClickTargetBind);
       }
       this.#dom.target = target;
       if (this.#dom.target != null) {
-        this.#dom.target.addEventListener("click", this.__onClickTarget);
+        this.#dom.target.addEventListener("click", this.#onClickTargetBind);
       }
     }
 
@@ -189,9 +203,9 @@ class YKColorPicker {
     );
     this.#dom["overlayWrapper"] = cp_overlayWrapper;
 
-    this.__onKeyUpClose = this.#onKeyUpClose.bind(this);
-    this.__onResizeScrollWindow = this.#onResizeScrollWindow.bind(this);
-    this.__onClickClose = this.close.bind(this);
+    this.#onKeyUpCloseBind = this.#onKeyUpClose.bind(this);
+    this.#onResizeScrollWindowBind = this.#onResizeScrollWindow.bind(this);
+    this.#onClickCloseBind = this.close.bind(this);
 
     if (this.#options.container) {
       this.#attachToContainer(false);
@@ -219,10 +233,10 @@ class YKColorPicker {
     paletteWrapper.appendChild(cursor);
 
     // Append event
-    this.__onMouseDownCursor = this.#onMouseDownCursor.bind(this);
-    this.__onMouseUpCursor = this.#onMouseUpCursor.bind(this);
-    this.__onMouseMoveCursor = this.#onMouseMoveCursor.bind(this);
-    paletteWrapper.addEventListener("mousedown", this.__onMouseDownCursor);
+    this.#onMouseDownCursorBind = this.#onMouseDownCursor.bind(this);
+    this.#onMouseUpCursorBind = this.#onMouseUpCursor.bind(this);
+    this.#onMouseMoveCursorBind = this.#onMouseMoveCursor.bind(this);
+    paletteWrapper.addEventListener("mousedown", this.#onMouseDownCursorBind);
 
     this.#dom["palette"] = palette;
     this.#dom["cursor"] = cursor;
@@ -502,10 +516,10 @@ class YKColorPicker {
     sliderWrapper.appendChild(sliderThumb);
 
     // Attach events
-    this.__onMouseDownHueSlider = this.#onMouseDownHueSlider.bind(this);
-    this.__onMouseUpHueSlider = this.#onMouseUpHueSlider.bind(this);
-    this.__onMouseMoveHueSlider = this.#onMouseMoveHueSlider.bind(this);
-    sliderWrapper.addEventListener("mousedown", this.__onMouseDownHueSlider);
+    this.#onMouseDownHueSliderBind = this.#onMouseDownHueSlider.bind(this);
+    this.#onMouseUpHueSliderBind = this.#onMouseUpHueSlider.bind(this);
+    this.#onMouseMoveHueSliderBind = this.#onMouseMoveHueSlider.bind(this);
+    sliderWrapper.addEventListener("mousedown", this.#onMouseDownHueSliderBind);
     sliderThumb.addEventListener(
       "keydown",
       this.#onKeyDownHueSlider.bind(this)
@@ -531,12 +545,14 @@ class YKColorPicker {
     sliderWrapper.appendChild(sliderThumb);
 
     // Attach events
-    this.__onMouseDownOpacitySlider = this.#onMouseDownOpacitySlider.bind(this);
-    this.__onMouseUpOpacitySlider = this.#onMouseUpOpacitySlider.bind(this);
-    this.__onMouseMoveOpacitySlider = this.#onMouseMoveOpacitySlider.bind(this);
+    this.#onMouseDownOpacitySliderBind =
+      this.#onMouseDownOpacitySlider.bind(this);
+    this.#onMouseUpOpacitySliderBind = this.#onMouseUpOpacitySlider.bind(this);
+    this.#onMouseMoveOpacitySliderBind =
+      this.#onMouseMoveOpacitySlider.bind(this);
     sliderWrapper.addEventListener(
       "mousedown",
-      this.__onMouseDownOpacitySlider
+      this.#onMouseDownOpacitySliderBind
     );
     sliderThumb.addEventListener(
       "keydown",
@@ -689,11 +705,11 @@ class YKColorPicker {
     overlayWrapper.classList.add("cp-overlay-wrapper--open");
     this.#updateGUI();
     this.#updatePosition();
-    window.addEventListener("resize", this.__onResizeScrollWindow);
-    window.addEventListener("scroll", this.__onResizeScrollWindow);
-    document.addEventListener("click", this.__onClickClose);
+    window.addEventListener("resize", this.#onResizeScrollWindowBind);
+    window.addEventListener("scroll", this.#onResizeScrollWindowBind);
+    document.addEventListener("click", this.#onClickCloseBind);
     if (this.#options.escapeKey) {
-      document.addEventListener("keyup", this.__onKeyUpClose);
+      document.addEventListener("keyup", this.#onKeyUpCloseBind);
     }
     this.isOpen = true;
     if (parent != overlayWrapper.parentElement) {
@@ -714,17 +730,17 @@ class YKColorPicker {
   }
 
   #onMouseDownCursor(event) {
-    this.__dc = true;
-    document.addEventListener("mousemove", this.__onMouseMoveCursor);
-    document.addEventListener("mouseup", this.__onMouseUpCursor);
-    this.__onMouseMoveCursor(event);
+    this.#dc = true;
+    document.addEventListener("mousemove", this.#onMouseMoveCursorBind);
+    document.addEventListener("mouseup", this.#onMouseUpCursorBind);
+    this.#onMouseMoveCursorBind(event);
   }
 
   #onMouseUpCursor(e) {
-    document.removeEventListener("mousemove", this.__onMouseMoveCursor);
-    document.removeEventListener("mouseup", this.__onMouseUpCursor);
+    document.removeEventListener("mousemove", this.#onMouseMoveCursorBind);
+    document.removeEventListener("mouseup", this.#onMouseUpCursorBind);
     if (this.#dom.overlayWrapper.contains(e.target)) {
-      this.__dc = false;
+      this.#dc = false;
     }
   }
 
@@ -1495,18 +1511,18 @@ class YKColorPicker {
 
   #onMouseDownHueSlider(event) {
     event.preventDefault(); // prevent default to set focus on the thumb
-    this.__dc = true;
-    document.addEventListener("mousemove", this.__onMouseMoveHueSlider);
-    document.addEventListener("mouseup", this.__onMouseUpHueSlider);
+    this.#dc = true;
+    document.addEventListener("mousemove", this.#onMouseMoveHueSliderBind);
+    document.addEventListener("mouseup", this.#onMouseUpHueSliderBind);
     this.#dom.hueThumb.focus();
-    this.__onMouseMoveHueSlider(event);
+    this.#onMouseMoveHueSliderBind(event);
   }
 
   #onMouseUpHueSlider(e) {
-    document.removeEventListener("mousemove", this.__onMouseMoveHueSlider);
-    document.removeEventListener("mouseup", this.__onMouseUpHueSlider);
+    document.removeEventListener("mousemove", this.#onMouseMoveHueSliderBind);
+    document.removeEventListener("mouseup", this.#onMouseUpHueSliderBind);
     if (this.#dom.overlayWrapper.contains(e.target)) {
-      this.__dc = false;
+      this.#dc = false;
     }
   }
 
@@ -1531,18 +1547,21 @@ class YKColorPicker {
 
   #onMouseDownOpacitySlider(event) {
     event.preventDefault(); // prevent default to set focus on the thumb
-    this.__dc = true;
-    document.addEventListener("mousemove", this.__onMouseMoveOpacitySlider);
-    document.addEventListener("mouseup", this.__onMouseUpOpacitySlider);
+    this.#dc = true;
+    document.addEventListener("mousemove", this.#onMouseMoveOpacitySliderBind);
+    document.addEventListener("mouseup", this.#onMouseUpOpacitySliderBind);
     this.#dom.opacityThumb.focus();
-    this.__onMouseMoveOpacitySlider(event);
+    this.#onMouseMoveOpacitySliderBind(event);
   }
 
   #onMouseUpOpacitySlider(e) {
-    document.removeEventListener("mousemove", this.__onMouseMoveOpacitySlider);
-    document.removeEventListener("mouseup", this.__onMouseUpOpacitySlider);
+    document.removeEventListener(
+      "mousemove",
+      this.#onMouseMoveOpacitySliderBind
+    );
+    document.removeEventListener("mouseup", this.#onMouseUpOpacitySliderBind);
     if (this.#dom.overlayWrapper.contains(e.target)) {
-      this.__dc = false;
+      this.#dc = false;
     }
   }
 
@@ -1660,10 +1679,10 @@ class YKColorPicker {
   }
 
   #removeWindowEvents() {
-    window.removeEventListener("resize", this.__onResizeScrollWindow);
-    window.removeEventListener("scroll", this.__onResizeScrollWindow);
-    document.removeEventListener("keyup", this.__onKeyUpClose);
-    document.removeEventListener("click", this.__onClickClose);
+    window.removeEventListener("resize", this.#onResizeScrollWindowBind);
+    window.removeEventListener("scroll", this.#onResizeScrollWindowBind);
+    document.removeEventListener("keyup", this.#onKeyUpCloseBind);
+    document.removeEventListener("click", this.#onClickCloseBind);
   }
 
   #getCursorPosition(clientX, clientY) {
