@@ -673,7 +673,7 @@ class YKColorPicker {
     this.#onMouseDownCursorBind = this.#onMouseDownCursor.bind(this);
     this.#onMouseUpCursorBind = this.#onMouseUpCursor.bind(this);
     this.#onMouseMoveCursorBind = this.#onMouseMoveCursor.bind(this);
-    paletteWrapper.addEventListener("mousedown", this.#onMouseDownCursorBind);
+    paletteWrapper.addEventListener("pointerdown", this.#onMouseDownCursorBind);
 
     this.#dom["palette"] = palette;
     this.#dom["cursor"] = cursor;
@@ -978,7 +978,10 @@ class YKColorPicker {
     this.#onMouseDownHueSliderBind = this.#onMouseDownHueSlider.bind(this);
     this.#onMouseUpHueSliderBind = this.#onMouseUpHueSlider.bind(this);
     this.#onMouseMoveHueSliderBind = this.#onMouseMoveHueSlider.bind(this);
-    sliderWrapper.addEventListener("mousedown", this.#onMouseDownHueSliderBind);
+    sliderWrapper.addEventListener(
+      "pointerdown",
+      this.#onMouseDownHueSliderBind
+    );
     sliderThumb.addEventListener(
       "keydown",
       this.#onKeyDownHueSlider.bind(this)
@@ -1010,7 +1013,7 @@ class YKColorPicker {
     this.#onMouseMoveOpacitySliderBind =
       this.#onMouseMoveOpacitySlider.bind(this);
     sliderWrapper.addEventListener(
-      "mousedown",
+      "pointerdown",
       this.#onMouseDownOpacitySliderBind
     );
     sliderThumb.addEventListener(
@@ -1198,14 +1201,14 @@ class YKColorPicker {
 
   #onMouseDownCursor(event) {
     this.#dc = true;
-    document.addEventListener("mousemove", this.#onMouseMoveCursorBind);
-    document.addEventListener("mouseup", this.#onMouseUpCursorBind);
+    document.addEventListener("pointermove", this.#onMouseMoveCursorBind);
+    document.addEventListener("pointerup", this.#onMouseUpCursorBind);
     this.#onMouseMoveCursorBind(event);
   }
 
   #onMouseUpCursor(e) {
-    document.removeEventListener("mousemove", this.#onMouseMoveCursorBind);
-    document.removeEventListener("mouseup", this.#onMouseUpCursorBind);
+    document.removeEventListener("pointermove", this.#onMouseMoveCursorBind);
+    document.removeEventListener("pointerup", this.#onMouseUpCursorBind);
     if (this.#dom.overlayWrapper.contains(e.target)) {
       this.#dc = false;
     }
@@ -1993,15 +1996,15 @@ class YKColorPicker {
   #onMouseDownHueSlider(event) {
     event.preventDefault(); // prevent default to set focus on the thumb
     this.#dc = true;
-    document.addEventListener("mousemove", this.#onMouseMoveHueSliderBind);
-    document.addEventListener("mouseup", this.#onMouseUpHueSliderBind);
+    document.addEventListener("pointermove", this.#onMouseMoveHueSliderBind);
+    document.addEventListener("pointerup", this.#onMouseUpHueSliderBind);
     this.#dom.hueThumb.focus();
     this.#onMouseMoveHueSliderBind(event);
   }
 
   #onMouseUpHueSlider(e) {
-    document.removeEventListener("mousemove", this.#onMouseMoveHueSliderBind);
-    document.removeEventListener("mouseup", this.#onMouseUpHueSliderBind);
+    document.removeEventListener("pointermove", this.#onMouseMoveHueSliderBind);
+    document.removeEventListener("pointerup", this.#onMouseUpHueSliderBind);
     if (this.#dom.overlayWrapper.contains(e.target)) {
       this.#dc = false;
     }
@@ -2029,18 +2032,21 @@ class YKColorPicker {
   #onMouseDownOpacitySlider(event) {
     event.preventDefault(); // prevent default to set focus on the thumb
     this.#dc = true;
-    document.addEventListener("mousemove", this.#onMouseMoveOpacitySliderBind);
-    document.addEventListener("mouseup", this.#onMouseUpOpacitySliderBind);
+    document.addEventListener(
+      "pointermove",
+      this.#onMouseMoveOpacitySliderBind
+    );
+    document.addEventListener("pointerup", this.#onMouseUpOpacitySliderBind);
     this.#dom.opacityThumb.focus();
     this.#onMouseMoveOpacitySliderBind(event);
   }
 
   #onMouseUpOpacitySlider(e) {
     document.removeEventListener(
-      "mousemove",
+      "pointermove",
       this.#onMouseMoveOpacitySliderBind
     );
-    document.removeEventListener("mouseup", this.#onMouseUpOpacitySliderBind);
+    document.removeEventListener("pointerup", this.#onMouseUpOpacitySliderBind);
     if (this.#dom.overlayWrapper.contains(e.target)) {
       this.#dc = false;
     }

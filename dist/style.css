@@ -1,4 +1,5 @@
 .cp-overlay-wrapper {
+  touch-action: none;
   position: fixed;
   z-index: 1;
   transition: opacity 300ms, visibility 300ms;
