@@ -494,6 +494,11 @@ class YKColorPicker {
     this.setColor(this.#options.color);
     this._prevColor = this.getHEX();
     this.#initDOM();
+    document.addEventListener("keyup", (e) => {
+      if (e.key == "Enter" && this.#isOpen) {
+        this.close();
+      }
+    });
   }
 
   isOpen() {
