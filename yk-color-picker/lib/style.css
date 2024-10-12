@@ -219,7 +219,7 @@
 
 /* Light theme */
 .cp-overlay-wrapper--light .cp-wrapper {
-  background-color: #fff;
+  background-color: #f7f7f7;
 }
 .cp-overlay-wrapper--light
   :where(.cp-hue-slider-thumb, .cp-opacity-slider-thumb) {
@@ -230,7 +230,7 @@
   outline-color: #383838;
 }
 .cp-overlay-wrapper--light .cp-color-input {
-  background-color: #fff;
+  background-color: #fcfcfc;
   color: #3b3b3b;
   border-color: #d6d6d6;
 }
