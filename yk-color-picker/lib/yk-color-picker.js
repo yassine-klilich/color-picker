@@ -457,12 +457,11 @@ class YKColorPicker {
     target: null,
     container: null,
     position: YKColorPicker.BOTTOM,
-    positionFlipOrder: "btrl",
+    positionFallback: "btrl",
     representation: YKColorPicker.RGB,
     color: "red",
     closeOnScroll: true,
     closeOnResize: false,
-    escapeKey: true,
     theme: "light",
     onInit: () => {},
     onOpen: () => {},
@@ -494,11 +493,6 @@ class YKColorPicker {
     this.setColor(this.#options.color);
     this._prevColor = this.getHEX();
     this.#initDOM();
-    document.addEventListener("keyup", (e) => {
-      if (e.key == "Enter" && this.#isOpen) {
-        this.close();
-      }
-    });
   }
 
   isOpen() {
@@ -1197,9 +1191,7 @@ class YKColorPicker {
     window.addEventListener("resize", this.#onResizeScrollWindowBind);
     window.addEventListener("scroll", this.#onResizeScrollWindowBind);
     document.addEventListener("click", this.#onClickCloseBind);
-    if (this.#options.escapeKey) {
-      document.addEventListener("keyup", this.#onKeyUpCloseBind);
-    }
+    document.addEventListener("keyup", this.#onKeyUpCloseBind);
     this.#isOpen = true;
     if (parent != overlayWrapper.parentElement) {
       this.#options.onContainerChange(this, parent);
@@ -2154,6 +2146,11 @@ class YKColorPicker {
   }
 
   #onKeyUpClose(event) {
+    if (event.key == "Enter" && this.#isOpen) {
+      this.close();
+      return;
+    }
+
     if (event.key == "Escape") {
       if (this._prevColor != this.getHEX()) {
         this.setColor(this._prevColor);
@@ -2255,7 +2252,7 @@ class YKColorPicker {
   }
 
   #getPositionAxis() {
-    const { target, position, positionFlipOrder } = this.#options;
+    const { target, position, positionFallback } = this.#options;
     const targetRect = target.getBoundingClientRect();
     const colorPickerRect = this.#dom.overlayWrapper.getBoundingClientRect();
     const scrollTop = document.documentElement.scrollTop;
@@ -2296,8 +2293,8 @@ class YKColorPicker {
     };
     let positions = "";
 
-    for (let i = 0; i < positionFlipOrder.length; i++) {
-      positions += positionFlipOrder[i] + states[positionFlipOrder[i]];
+    for (let i = 0; i < positionFallback.length; i++) {
+      positions += positionFallback[i] + states[positionFallback[i]];
     }
 
     let bestPositions = "";
