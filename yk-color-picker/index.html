@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
 
+    <link rel="stylesheet" href="./lib/style.css" />
+
     <style>
       .color-box {
         position: relative;
@@ -13,72 +15,61 @@
         height: 20px;
         border-radius: 2px;
         background-color: darkgoldenrod;
+        box-shadow: 0 0 4px #b0b0b0;
         cursor: pointer;
 
-        top: 650px;
+        top: 1550px;
         left: 200px;
       }
-      .cp-overlay-wrapper {
-        top: 20px;
-        left: 20px;
-      }
       body {
-        height: 2000px;
+        height: 3000px;
       }
     </style>
-
-    <link rel="stylesheet" href="./lib/style.css" />
   </head>
   <body>
-    <div id="color-box" class="color-box"></div>
+    <div id="colorBox" class="color-box"></div>
 
     <div id="container"></div>
     <div id="container-2"></div>
 
-    <script src="./lib/color-parser.js"></script>
-    <script src="./lib/color.js"></script>
-    <script src="./lib/color-picker.js"></script>
     <script src="./lib/yk-color-picker.js"></script>
 
     <script>
-      const colorBox = document.getElementById("color-box");
-
-      const colorPicker = new ColorPicker({
-        target: document.getElementById("color-box"),
+      const colorPicker = new YKColorPicker({
+        target: document.getElementById("colorBox"),
         // container: "container",
         onInit: function (instance) {
-          console.log("on init");
+          console.log("on init", instance);
           colorBox.style.backgroundColor = instance.getHEX();
         },
-        onOpen: function () {
-          console.log("on open");
+        onOpen: function (instance) {
+          console.log("on open", instance);
         },
-        onClose: function () {
+        onClose: function (instance) {
           console.log("on close");
         },
-        onCopy: function () {
+        onCopy: function (instance) {
           console.log("on copy");
         },
-        onRepresentationChange: function () {
-          console.log("on representation change", this.currentRepresentation);
+        onRepresentationChange: function (instance) {
+          console.log("on representation change", instance);
         },
         onInput: function (instance) {
-          console.log("on input");
+          console.log("on input", instance);
           colorBox.style.backgroundColor = instance.getHEX();
         },
-        onChange: function () {
-          console.log("on change");
+        onChange: function (instance) {
+          console.log("on change", instance);
         },
         onContainerChange: function (instance, prevContainer) {
-          console.log("on container change");
+          console.log("on container change", instance, prevContainer);
         },
-        position: BOTTOM,
+        position: YKColorPicker.BOTTOM,
         color: "brown",
         theme: "dark",
         closeOnScroll: false,
-        closeOnResize: true,
+        closeOnResize: false,
       });
-      colorPicker.open();
 
       //color: {
       //  r: 127,

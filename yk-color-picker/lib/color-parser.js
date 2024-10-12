@@ -1,5 +1,103 @@
-const ColorParser = (function () {
-  const NAMED_COLORS = {
+/**
+ * Color Parser
+ */
+const YKColorParser = Object.freeze({
+  parse: function (color) {
+    if (color == undefined) {
+      throw new Error("YKColorParser:: color is undefined");
+    }
+
+    if (typeof color == "string" || color instanceof String) {
+      color = color.trim();
+
+      if (/^(rgba?)/i.test(color)) {
+        return this.compileRGB(color);
+      }
+      if (/^(#)/i.test(color)) {
+        return this.compileHEX(color);
+      }
+      let rgb = this.NAMED_COLORS[color.toLowerCase()];
+      if (rgb != undefined) {
+        rgb = rgb.split(" ");
+        const { h, s, v } = YKColor.RGBtoHSV(rgb[0], rgb[1], rgb[2]);
+        return { h, s, v, a: 1 };
+      }
+    } else {
+      const { r, g, b, a } = color;
+      if (
+        r >= 0 &&
+        r <= 255 &&
+        g >= 0 &&
+        g <= 255 &&
+        b >= 0 &&
+        b <= 255 &&
+        a >= 0 &&
+        a <= 1
+      ) {
+        const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
+        return { h, s, v, a };
+      }
+      throw new Error(
+        "YKColorParser:: The provided RGB object has invalid values, please make sure red, green, blue are between 0 and 255 and alpha value is between 0 and 1"
+      );
+    }
+
+    throw new Error(
+      "YKColorParser:: Color is not in RGB or HEX format or a named color"
+    );
+  },
+
+  compileRGB: function (color) {
+    let r, g, b, a;
+
+    const regexRGB =
+      /rgba?\(\s*(\d+)\s+(\d+)\s+(\d+)\s*(\s+(0?(\.\d+)?|1(\.0*)?)\s*)?\)/i;
+
+    if (regexRGB.test(color)) {
+      const splitColor = color
+        .split(regexRGB)
+        .filter((i) => !isNaN(i) && i != "" && i != null);
+      r = parseInt(splitColor[0]);
+      g = parseInt(splitColor[1]);
+      b = parseInt(splitColor[2]);
+      a = parseFloat(splitColor[3]);
+
+      if (r > 255) {
+        throw new RangeError(
+          `YKColorParser:: '${color}' --> ${r} has an invalid red color, it must be an interger between 0 and 255`
+        );
+      }
+      if (g > 255) {
+        throw new RangeError(
+          `YKColorParser:: '${color}' --> ${g} has an invalid green color, it must be an interger between 0 and 255`
+        );
+      }
+      if (b > 255) {
+        throw new RangeError(
+          `YKColorParser:: '${color}' --> ${b} has an invalid blue color, it must be an interger between 0 and 255`
+        );
+      }
+
+      const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
+      return { h, s, v, a: isNaN(a) ? 1 : a };
+    }
+
+    throw new SyntaxError(
+      `YKColorParser:: '${color}' is an invalid RGB format`
+    );
+  },
+
+  compileHEX: function (color) {
+    const rgb = YKColor.HEXtoRGBA(color);
+    if (rgb) {
+      const { r, g, b, a } = rgb;
+      const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
+      return { h, s, v, a };
+    }
+    throw new Error(`YKColorParser:: '${color}' is an invalid HEX format`);
+  },
+
+  NAMED_COLORS: Object.freeze({
     aliceblue: "240 248 255",
     antiquewhite: "250 235 215",
     aqua: "0 255 255",
@@ -146,103 +244,6 @@ const ColorParser = (function () {
     white: "255 255 255",
     whitesmoke: "245 245 245",
     yellow: "255 255 0",
-    yellowgreen: "154 205 50"
-  }
-
-  const _colorParser = Object.freeze({
-    parse: function (color) {
-      arguments.length
-      if (arguments.length == 0) {
-        throw new Error(
-          `COLOR_CONVERT_ERR:: Failed to execute 'parse' on 'ColorParser': 1 argument required, but only 0 present`
-        )
-      }
-
-      if (color == undefined) {
-        throw new Error("COLOR_CONVERT_ERR:: color is undefined")
-      }
-      
-      if (typeof color == "string" || color instanceof String) {
-        color = color.trim()
-
-        if (/^(rgba?)/i.test(color)) {
-          return compileRGB(color)
-        }
-        if (/^(#)/i.test(color)) {
-          return compileHEX(color)
-        }
-        let rgb = NAMED_COLORS[color.toLowerCase()]
-        if (rgb != undefined) {
-          rgb = rgb.split(" ")
-          const { h, s, v } = Color.prototype.RGBtoHSV(rgb[0], rgb[1], rgb[2])
-          return { h, s, v, a: 1 }
-        }
-      }
-      else {
-        const { r, g, b, a } = color
-        if (r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255 && a >= 0 && a <= 1) {
-          const { h, s, v } = Color.prototype.RGBtoHSV(r, g, b)
-          return { h, s, v, a }
-        }
-        throw new Error(
-          "COLOR_CONVERT_ERR:: the provided RGB object has invalid values, please make sure red, green, blue are between 0 and 255 and alpha value is between 0 and 1"
-        )
-      }
-
-      throw new Error(
-        "COLOR_CONVERT_ERR:: Color is not in RGB or HEX format or a named color"
-      )
-    },
-  })
-
-  function compileRGB(color) {
-    let r, g, b, a
-
-    const regexRGB = /rgba?\(\s*(\d+)\s+(\d+)\s+(\d+)\s*(\s+(0?(\.\d+)?|1(\.0*)?)\s*)?\)/i
-    
-    if (regexRGB.test(color)) {
-      const splitColor = color.split(regexRGB).filter(i => !isNaN(i) && i != '' && i != null)
-      r = parseInt(splitColor[0])
-      g = parseInt(splitColor[1])
-      b = parseInt(splitColor[2])
-      a = parseFloat(splitColor[3])
-
-      if (r > 255) {
-        throw new RangeError(
-          `COLOR_CONVERT_ERR:: '${color}' --> ${r} has an invalid red color, it must be an interger between 0 and 255`
-        )
-      }
-      if (g > 255) {
-        throw new RangeError(
-          `COLOR_CONVERT_ERR:: '${color}' --> ${g} has an invalid green color, it must be an interger between 0 and 255`
-        )
-      }
-      if (b > 255) {
-        throw new RangeError(
-          `COLOR_CONVERT_ERR:: '${color}' --> ${b} has an invalid blue color, it must be an interger between 0 and 255`
-        )
-      }
-      
-      const { h, s, v } = Color.prototype.RGBtoHSV(r, g, b)
-      return { h, s, v, a: isNaN(a) ? 1 : a }
-    }
-
-    throw new SyntaxError(
-      `COLOR_CONVERT_ERR:: '${color}' is an invalid RGB format`
-    )
-  }
-
-  function compileHEX(color) {
-    const rgb = Color.prototype.HEXtoRGBA(color)
-    if (rgb) {
-      const { r, g, b, a } = rgb
-      const { h, s, v } = Color.prototype.RGBtoHSV(r, g, b)
-      return { h, s, v, a }
-    }
-    throw new Error(
-      `COLOR_CONVERT_ERR:: '${color}' is an invalid HEX format`
-    )
-  }
-
-  return _colorParser
-})()
+    yellowgreen: "154 205 50",
+  }),
+});
