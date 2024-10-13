@@ -208,8 +208,8 @@ export default class YKColorPicker {
 
   #initDOM() {
     // #dom declaration
-    const cp_overlayWrapper = createElement("div", ["cp-overlay-wrapper"]);
-    const cp_Wrapper = createElement("div", ["cp-wrapper"]);
+    const cp_overlayWrapper = createElement("div", ["yk-overlay-wrapper"]);
+    const cp_Wrapper = createElement("div", ["yk-wrapper"]);
 
     // Append child nodes
     cp_overlayWrapper.appendChild(cp_Wrapper);
@@ -243,9 +243,9 @@ export default class YKColorPicker {
   }
 
   #buildPaletteColor() {
-    const paletteWrapper = createElement("div", ["cp-palette-wrapper"]);
-    const palette = createElement("div", ["cp-palette"]);
-    const cursor = createElement("div", ["cp-cursor"]);
+    const paletteWrapper = createElement("div", ["yk-palette-wrapper"]);
+    const palette = createElement("div", ["yk-palette"]);
+    const cursor = createElement("div", ["yk-cursor"]);
 
     paletteWrapper.appendChild(palette);
     paletteWrapper.appendChild(cursor);
@@ -263,7 +263,7 @@ export default class YKColorPicker {
   }
 
   #buildColorSettings() {
-    const colorSettings = createElement("div", ["cp-color-settings"]);
+    const colorSettings = createElement("div", ["yk-color-settings"]);
 
     // Build color color
     colorSettings.appendChild(this.#buildCopyColor());
@@ -279,9 +279,9 @@ export default class YKColorPicker {
 
   #buildColorInputs() {
     // Create elements
-    const inputsSettings = createElement("div", ["cp-color-model-wrapper"]);
-    const inputsWrapper = createElement("div", ["cp-color-model"]);
-    const inputsSwitch = createElement("button", ["cp-color-model-switch"], {
+    const inputsSettings = createElement("div", ["yk-color-model-wrapper"]);
+    const inputsWrapper = createElement("div", ["yk-color-model"]);
+    const inputsSwitch = createElement("button", ["yk-color-model-switch"], {
       type: "button",
     });
     inputsSwitch.appendChild(
@@ -313,9 +313,9 @@ export default class YKColorPicker {
   }
 
   #buildHEXInput() {
-    const inputWrapper = createElement("div", ["cp-hex-input"]);
-    const inputHEX = createElement("input", ["cp-color-input"]);
-    const labelHEX = createElement("label", ["cp-color-model-label"]);
+    const inputWrapper = createElement("div", ["yk-hex-input"]);
+    const inputHEX = createElement("input", ["yk-color-input"]);
+    const labelHEX = createElement("label", ["yk-color-model-label"]);
     inputHEX.setAttribute("type", "text");
     labelHEX.textContent = "HEX";
     inputWrapper.appendChild(inputHEX);
@@ -333,27 +333,27 @@ export default class YKColorPicker {
 
   #buildQuadrupedInput() {
     // Create #dom elements
-    const inputWrapper = createElement("div", ["cp-input-wrapper"]);
-    const inputA = createElement("input", ["cp-color-input"], {
+    const inputWrapper = createElement("div", ["yk-input-wrapper"]);
+    const inputA = createElement("input", ["yk-color-input"], {
       type: "text",
       inputmode: "numeric",
     });
-    const inputB = createElement("input", ["cp-color-input"], {
+    const inputB = createElement("input", ["yk-color-input"], {
       type: "text",
       inputmode: "numeric",
     });
-    const inputC = createElement("input", ["cp-color-input"], {
+    const inputC = createElement("input", ["yk-color-input"], {
       type: "text",
       inputmode: "numeric",
     });
-    const inputD = createElement("input", ["cp-color-input"], {
+    const inputD = createElement("input", ["yk-color-input"], {
       type: "text",
       inputmode: "numeric",
     });
-    const labelA = createElement("label", ["cp-color-model-label"]);
-    const labelB = createElement("label", ["cp-color-model-label"]);
-    const labelC = createElement("label", ["cp-color-model-label"]);
-    const labelD = createElement("label", ["cp-color-model-label"]);
+    const labelA = createElement("label", ["yk-color-model-label"]);
+    const labelB = createElement("label", ["yk-color-model-label"]);
+    const labelC = createElement("label", ["yk-color-model-label"]);
+    const labelD = createElement("label", ["yk-color-model-label"]);
 
     // Set labels' text
     const model = this.#currentRepresentation.toUpperCase();
@@ -502,7 +502,7 @@ export default class YKColorPicker {
   }
 
   #buildCopyColor() {
-    const copyColor = createElement("button", ["cp-clipboard-color"], {
+    const copyColor = createElement("button", ["yk-clipboard-color"], {
       type: "button",
     });
     attachEvent(copyColor, "click", this.#onClickCopyColor.bind(this));
@@ -538,7 +538,7 @@ export default class YKColorPicker {
   }
 
   #buildColorSliders() {
-    const sliders = createElement("div", ["cp-sliders"]);
+    const sliders = createElement("div", ["yk-sliders"]);
 
     // Build hue slider
     sliders.appendChild(this.#buildHueSlider());
@@ -550,9 +550,9 @@ export default class YKColorPicker {
 
   #buildHueSlider() {
     // Create elements
-    const sliderWrapper = createElement("div", ["cp-hue-slider-wrapper"]);
-    const slider = createElement("div", ["cp-hue-slider"]);
-    const sliderThumb = createElement("a", ["cp-hue-slider-thumb"]);
+    const sliderWrapper = createElement("div", ["yk-hue-slider-wrapper"]);
+    const slider = createElement("div", ["yk-hue-slider"]);
+    const sliderThumb = createElement("a", ["yk-hue-slider-thumb"]);
     sliderThumb.setAttribute("tabindex", "0");
 
     // Appench child element
@@ -574,9 +574,9 @@ export default class YKColorPicker {
 
   #buildOpacitySlider() {
     // Create elements
-    const sliderWrapper = createElement("div", ["cp-opacity-slider-wrapper"]);
-    const color = createElement("div", ["cp-opacity-color"]);
-    const sliderThumb = createElement("a", ["cp-opacity-slider-thumb"]);
+    const sliderWrapper = createElement("div", ["yk-opacity-slider-wrapper"]);
+    const color = createElement("div", ["yk-opacity-color"]);
+    const sliderThumb = createElement("a", ["yk-opacity-slider-thumb"]);
     sliderThumb.setAttribute("tabindex", "0");
 
     // Appench child element
@@ -608,7 +608,7 @@ export default class YKColorPicker {
 
   #buildColorPreview() {
     const colorPreviewWrapper = createElement("span", [
-      "cp-color-preview-wrapper",
+      "yk-color-preview-wrapper",
     ]);
 
     const svgElement = document.createElementNS(
@@ -625,7 +625,7 @@ export default class YKColorPicker {
     colorPreview.setAttribute("cx", 19);
     colorPreview.setAttribute("cy", 19);
     colorPreview.setAttribute("r", 18);
-    colorPreview.classList.add("cp-preview-stroke");
+    colorPreview.classList.add("yk-preview-stroke");
 
     svgElement.innerHTML =
       '<pattern id="transparent-grid" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse"><path fill="#DBDBDB" d="M0 0h3v3H0z"/><path fill="#fff" d="M3 0h3v3H3z"/><path fill="#DBDBDB" d="M3 3h3v3H3z"/><path fill="#fff" d="M0 3h3v3H0z"/></pattern></defs><circle cx="19" cy="19" r="18" fill="url(#transparent-grid)"/>';
@@ -718,12 +718,12 @@ export default class YKColorPicker {
     const parent = overlayWrapper.parentElement;
     container.appendChild(overlayWrapper);
     overlayWrapper.classList.remove(
-      "cp-overlay-wrapper--light",
-      "cp-overlay-wrapper--dark"
+      "yk-overlay-wrapper--light",
+      "yk-overlay-wrapper--dark"
     );
-    overlayWrapper.classList.add("cp-overlay-wrapper--static");
-    overlayWrapper.classList.add("cp-overlay-wrapper--open");
-    overlayWrapper.classList.add("cp-overlay-wrapper--" + this.#options.theme);
+    overlayWrapper.classList.add("yk-overlay-wrapper--static");
+    overlayWrapper.classList.add("yk-overlay-wrapper--open");
+    overlayWrapper.classList.add("yk-overlay-wrapper--" + this.#options.theme);
     this.#updateGUI();
     this.#isOpen = true;
     if (callEvent && parent != overlayWrapper.parentElement) {
@@ -737,12 +737,12 @@ export default class YKColorPicker {
     const parent = overlayWrapper.parentElement;
     document.body.appendChild(overlayWrapper);
     overlayWrapper.classList.remove(
-      "cp-overlay-wrapper--light",
-      "cp-overlay-wrapper--dark"
+      "yk-overlay-wrapper--light",
+      "yk-overlay-wrapper--dark"
     );
-    overlayWrapper.classList.remove("cp-overlay-wrapper--static");
-    overlayWrapper.classList.add("cp-overlay-wrapper--open");
-    overlayWrapper.classList.add("cp-overlay-wrapper--" + this.#options.theme);
+    overlayWrapper.classList.remove("yk-overlay-wrapper--static");
+    overlayWrapper.classList.add("yk-overlay-wrapper--open");
+    overlayWrapper.classList.add("yk-overlay-wrapper--" + this.#options.theme);
     this.#updateGUI();
     this.#updatePosition();
     attachEvent(window, "resize", this.#onResizeScrollWindowBind);
@@ -756,7 +756,7 @@ export default class YKColorPicker {
   }
 
   #detachOverlay() {
-    this.#dom.overlayWrapper.classList.remove("cp-overlay-wrapper--open");
+    this.#dom.overlayWrapper.classList.remove("yk-overlay-wrapper--open");
     this.#removeWindowEvents(this);
     this.#isOpen = false;
   }
