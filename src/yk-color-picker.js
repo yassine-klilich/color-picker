@@ -281,10 +281,10 @@ export default class YKColorPicker {
     // Create elements
     const inputsSettings = createElement("div", ["yk-color-model-wrapper"]);
     const inputsWrapper = createElement("div", ["yk-color-model"]);
-    const inputsSwitch = createElement("button", ["yk-color-model-switch"], {
+    const btnSwitch = createElement("button", ["yk-color-model-switch"], {
       type: "button",
     });
-    inputsSwitch.appendChild(
+    btnSwitch.appendChild(
       this.#createSVGIcon(
         `<path d="m3.5045 11.431 1.5786-1.5786 3.0256 3.0256 3.0256-3.0256 1.5786 1.5786-4.6042 4.4726zm4.6042-11.313 4.6042 4.4726-1.5786 1.5786-3.0256-3.0256-3.0256 3.0256-1.5786-1.5786z"/>`
       )
@@ -292,11 +292,12 @@ export default class YKColorPicker {
 
     // Append elements
     inputsSettings.appendChild(inputsWrapper);
-    inputsSettings.appendChild(inputsSwitch);
+    inputsSettings.appendChild(btnSwitch);
 
     // Attach Events
-    attachEvent(inputsSwitch, "click", this.#onClickInputsSwitch.bind(this));
+    attachEvent(btnSwitch, "click", this.#onClickInputsSwitch.bind(this));
 
+    this.#dom["btnSwitch"] = btnSwitch;
     this.#dom["inputsWrapper"] = inputsWrapper;
 
     return inputsSettings;
@@ -1700,7 +1701,11 @@ export default class YKColorPicker {
   }
 
   #onKeyUpClose(event) {
-    if (event.key == "Enter" && this.#isOpen) {
+    if (
+      event.key == "Enter" &&
+      this.#isOpen &&
+      ![this.#dom.copyColor, this.#dom.btnSwitch].includes(event.target)
+    ) {
       this.close();
       return;
     }
