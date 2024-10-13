@@ -1,424 +1,8 @@
 import "./yk-color-picker.css";
 
-/**
- * Color
- */
-class YKColor {
-  constructor(h, s, v, a) {
-    this.a = a;
-    this.hsv = { h, s, v };
-    this.rgb = this.toRGB();
-    this.hsl = this.toHSL();
-    this.hex = this.toHEX();
-  }
-
-  toRGB() {
-    let { h, s, v } = this.hsv;
-
-    h /= 360;
-    s /= 100;
-    v /= 100;
-
-    var r, g, b, i, f, p, q, t;
-    i = Math.floor(h * 6);
-    f = h * 6 - i;
-    p = v * (1 - s);
-    q = v * (1 - f * s);
-    t = v * (1 - (1 - f) * s);
-    switch (i % 6) {
-      case 0:
-        (r = v), (g = t), (b = p);
-        break;
-      case 1:
-        (r = q), (g = v), (b = p);
-        break;
-      case 2:
-        (r = p), (g = v), (b = t);
-        break;
-      case 3:
-        (r = p), (g = q), (b = v);
-        break;
-      case 4:
-        (r = t), (g = p), (b = v);
-        break;
-      case 5:
-        (r = v), (g = p), (b = q);
-        break;
-    }
-    return {
-      r: Math.round(r * 255),
-      g: Math.round(g * 255),
-      b: Math.round(b * 255),
-    };
-  }
-
-  toHSL() {
-    let { h, s, v } = this.hsv;
-    let _saturation = s * 0.01;
-    let _value = v * 0.01;
-
-    let _lightness = _value - (_value * _saturation) / 2;
-    let _saturate = NaN;
-
-    if (_lightness == 0 || _lightness == 1) {
-      _saturate = 0;
-    } else {
-      _saturate =
-        ((_value - _lightness) / Math.min(_lightness, 1 - _lightness)) * 100;
-    }
-
-    let l = _lightness * 100;
-    s = _saturate;
-
-    return {
-      h,
-      s: s,
-      l: l,
-    };
-  }
-
-  toHEX() {
-    let { r, g, b } = this.toRGB();
-    return YKColor.RGBAtoHEX(r, g, b, this.a);
-  }
-
-  static RGBtoHSV(r, g, b) {
-    (r /= 255), (g /= 255), (b /= 255);
-
-    let max = Math.max(r, g, b),
-      min = Math.min(r, g, b);
-    let h,
-      s,
-      v = max;
-
-    let d = max - min;
-    s = max == 0 ? 0 : d / max;
-
-    if (max == min) {
-      h = 0;
-    } else {
-      switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-
-      h /= 6;
-    }
-
-    h = h * 360;
-    s = s * 100;
-    v = v * 100;
-
-    return { h, s, v };
-  }
-
-  static HSLtoHSV(h, s, l) {
-    const hsv1 = (s * (l < 50 ? l : 100 - l)) / 100;
-
-    return {
-      h,
-      s: hsv1 === 0 ? 0 : ((2 * hsv1) / (l + hsv1)) * 100,
-      v: l + hsv1,
-    };
-  }
-
-  static HEXtoRGBA(hex) {
-    let r = 0,
-      g = 0,
-      b = 0,
-      a = 0;
-
-    if (/^#(([a-f0-9]){3,4}|([a-f0-9]){6}|([a-f0-9]){8})$/i.test(hex)) {
-      if (hex.length < 6) {
-        const splitHexValues = hex.split("");
-        r = +("0x" + splitHexValues[1] + splitHexValues[1]);
-        g = +("0x" + splitHexValues[2] + splitHexValues[2]);
-        b = +("0x" + splitHexValues[3] + splitHexValues[3]);
-        a = splitHexValues[4]
-          ? parseFloat(
-              (+("0x" + splitHexValues[4] + splitHexValues[4]) / 255).toFixed(2)
-            )
-          : 1;
-      } else if (hex.length < 10) {
-        const splitHexValues = hex.split(/([a-f0-9]{2})/i);
-        r = +("0x" + splitHexValues[1]);
-        g = +("0x" + splitHexValues[3]);
-        b = +("0x" + splitHexValues[5]);
-        a = splitHexValues[7]
-          ? parseFloat((+("0x" + splitHexValues[7]) / 255).toFixed(2))
-          : 1;
-      }
-
-      return { r, g, b, a };
-    }
-  }
-
-  static RGBAtoHEX(r, g, b, a) {
-    r = YKColorPicker.hexPad2(Math.round(r));
-    g = YKColorPicker.hexPad2(Math.round(g));
-    b = YKColorPicker.hexPad2(Math.round(b));
-    a = a == 1 ? "" : YKColorPicker.hexPad2(Math.round(a * 255));
-
-    return "#" + r + g + b + a;
-  }
-}
-
-/**
- * Color Parser
- */
-const YKColorParser = Object.freeze({
-  parse: function (color) {
-    if (color == undefined) {
-      throw new Error("YKColorParser:: color is undefined");
-    }
-
-    if (typeof color == "string" || color instanceof String) {
-      color = color.trim();
-
-      if (/^(rgba?)/i.test(color)) {
-        return this.compileRGB(color);
-      }
-      if (/^(#)/i.test(color)) {
-        return this.compileHEX(color);
-      }
-      let rgb = this.NAMED_COLORS[color.toLowerCase()];
-      if (rgb != undefined) {
-        rgb = rgb.split(" ");
-        const { h, s, v } = YKColor.RGBtoHSV(rgb[0], rgb[1], rgb[2]);
-        return { h, s, v, a: 1 };
-      }
-    } else {
-      const { r, g, b, a } = color;
-      if (
-        r >= 0 &&
-        r <= 255 &&
-        g >= 0 &&
-        g <= 255 &&
-        b >= 0 &&
-        b <= 255 &&
-        a >= 0 &&
-        a <= 1
-      ) {
-        const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
-        return { h, s, v, a };
-      }
-      throw new Error(
-        "YKColorParser:: The provided RGB object has invalid values, please make sure red, green, blue are between 0 and 255 and alpha value is between 0 and 1"
-      );
-    }
-
-    throw new Error(
-      "YKColorParser:: Color is not in RGB or HEX format or a named color"
-    );
-  },
-
-  compileRGB: function (color) {
-    let r, g, b, a;
-
-    const regexRGB =
-      /rgba?\(\s*(\d+)\s+(\d+)\s+(\d+)\s*(\s+(0?(\.\d+)?|1(\.0*)?)\s*)?\)/i;
-
-    if (regexRGB.test(color)) {
-      const splitColor = color
-        .split(regexRGB)
-        .filter((i) => !isNaN(i) && i != "" && i != null);
-      r = parseInt(splitColor[0]);
-      g = parseInt(splitColor[1]);
-      b = parseInt(splitColor[2]);
-      a = parseFloat(splitColor[3]);
-
-      if (r > 255) {
-        throw new RangeError(
-          `YKColorParser:: '${color}' --> ${r} has an invalid red color, it must be an interger between 0 and 255`
-        );
-      }
-      if (g > 255) {
-        throw new RangeError(
-          `YKColorParser:: '${color}' --> ${g} has an invalid green color, it must be an interger between 0 and 255`
-        );
-      }
-      if (b > 255) {
-        throw new RangeError(
-          `YKColorParser:: '${color}' --> ${b} has an invalid blue color, it must be an interger between 0 and 255`
-        );
-      }
-
-      const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
-      return { h, s, v, a: isNaN(a) ? 1 : a };
-    }
-
-    throw new SyntaxError(
-      `YKColorParser:: '${color}' is an invalid RGB format`
-    );
-  },
-
-  compileHEX: function (color) {
-    const rgb = YKColor.HEXtoRGBA(color);
-    if (rgb) {
-      const { r, g, b, a } = rgb;
-      const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
-      return { h, s, v, a };
-    }
-    throw new Error(`YKColorParser:: '${color}' is an invalid HEX format`);
-  },
-
-  NAMED_COLORS: Object.freeze({
-    aliceblue: "240 248 255",
-    antiquewhite: "250 235 215",
-    aqua: "0 255 255",
-    aquamarine: "127 255 212",
-    azure: "240 255 255",
-    beige: "245 245 220",
-    bisque: "255 228 196",
-    black: "0 0 0",
-    blanchedalmond: "255 235 205",
-    blue: "0 0 255",
-    blueviolet: "138 43 226",
-    brown: "165 42 42",
-    burlywood: "222 184 135",
-    cadetblue: "95 158 160",
-    chartreuse: "127 255 0",
-    chocolate: "210 105 30",
-    coral: "255 127 80",
-    cornflowerblue: "100 149 237",
-    cornsilk: "255 248 220",
-    crimson: "220 20 60",
-    cyan: "0 255 255",
-    darkblue: "0 0 139",
-    darkcyan: "0 139 139",
-    darkgoldenrod: "184 134 11",
-    darkgray: "169 169 169",
-    darkgrey: "169 169 169",
-    darkgreen: "0 100 0",
-    darkkhaki: "189 183 107",
-    darkmagenta: "139 0 139",
-    darkolivegreen: "85 107 47",
-    darkorange: "255 140 0",
-    darkorchid: "153 50 204",
-    darkred: "139 0 0",
-    darksalmon: "233 150 122",
-    darkseagreen: "143 188 143",
-    darkslateblue: "72 61 139",
-    darkslategray: "47 79 79",
-    darkslategrey: "47 79 79",
-    darkturquoise: "0 206 209",
-    darkviolet: "148 0 211",
-    deeppink: "255 20 147",
-    deepskyblue: "0 191 255",
-    dimgray: "105 105 105",
-    dimgrey: "105 105 105",
-    dodgerblue: "30 144 255",
-    firebrick: "178 34 34",
-    floralwhite: "255 250 240",
-    forestgreen: "34 139 34",
-    fuchsia: "255 0 255",
-    gainsboro: "220 220 220",
-    ghostwhite: "248 248 255",
-    gold: "255 215 0",
-    goldenrod: "218 165 32",
-    gray: "128 128 128",
-    grey: "128 128 128",
-    green: "0 128 0",
-    greenyellow: "173 255 47",
-    honeydew: "240 255 240",
-    hotpink: "255 105 180",
-    indianred: "205 92 92",
-    indigo: "75 0 130",
-    ivory: "255 255 240",
-    khaki: "240 230 140",
-    lavender: "230 230 250",
-    lavenderblush: "255 240 245",
-    lawngreen: "124 252 0",
-    lemonchiffon: "255 250 205",
-    lightblue: "173 216 230",
-    lightcoral: "240 128 128",
-    lightcyan: "224 255 255",
-    lightgoldenrodyellow: "250 250 210",
-    lightgray: "211 211 211",
-    lightgrey: "211 211 211",
-    lightgreen: "144 238 144",
-    lightpink: "255 182 193",
-    lightsalmon: "255 160 122",
-    lightseagreen: "32 178 170",
-    lightskyblue: "135 206 250",
-    lightslategray: "119 136 153",
-    lightslategrey: "119 136 153",
-    lightsteelblue: "176 196 222",
-    lightyellow: "255 255 224",
-    lime: "0 255 0",
-    limegreen: "50 205 50",
-    linen: "250 240 230",
-    magenta: "255 0 255",
-    maroon: "128 0 0",
-    mediumaquamarine: "102 205 170",
-    mediumblue: "0 0 205",
-    mediumorchid: "186 85 211",
-    mediumpurple: "147 112 216",
-    mediumseagreen: "60 179 113",
-    mediumslateblue: "123 104 238",
-    mediumspringgreen: "0 250 154",
-    mediumturquoise: "72 209 204",
-    mediumvioletred: "199 21 133",
-    midnightblue: "25 25 112",
-    mintcream: "245 255 250",
-    mistyrose: "255 228 225",
-    moccasin: "255 228 181",
-    navajowhite: "255 222 173",
-    navy: "0 0 128",
-    oldlace: "253 245 230",
-    olive: "128 128 0",
-    olivedrab: "107 142 35",
-    orange: "255 165 0",
-    orangered: "255 69 0",
-    orchid: "218 112 214",
-    palegoldenrod: "238 232 170",
-    palegreen: "152 251 152",
-    paleturquoise: "175 238 238",
-    palevioletred: "216 112 147",
-    papayawhip: "255 239 213",
-    peachpuff: "255 218 185",
-    peru: "205 133 63",
-    pink: "255 192 203",
-    plum: "221 160 221",
-    powderblue: "176 224 230",
-    purple: "128 0 128",
-    red: "255 0 0",
-    rosybrown: "188 143 143",
-    royalblue: "65 105 225",
-    saddlebrown: "139 69 19",
-    salmon: "250 128 114",
-    sandybrown: "244 164 96",
-    seagreen: "46 139 87",
-    seashell: "255 245 238",
-    sienna: "160 82 45",
-    silver: "192 192 192",
-    skyblue: "135 206 235",
-    slateblue: "106 90 205",
-    slategray: "112 128 144",
-    slategrey: "112 128 144",
-    snow: "255 250 250",
-    springgreen: "0 255 127",
-    steelblue: "70 130 180",
-    tan: "210 180 140",
-    teal: "0 128 128",
-    thistle: "216 191 216",
-    tomato: "255 99 71",
-    turquoise: "64 224 208",
-    violet: "238 130 238",
-    wheat: "245 222 179",
-    white: "255 255 255",
-    whitesmoke: "245 245 245",
-    yellow: "255 255 0",
-    yellowgreen: "154 205 50",
-  }),
-});
+import { YKColor } from "./yk-color";
+import { YKColorParser } from "./yk-color-parser";
+import { hexPad2, createElement } from "./utility";
 
 /**
  * Color Picker
@@ -624,10 +208,8 @@ export default class YKColorPicker {
 
   #initDOM() {
     // #dom declaration
-    const cp_overlayWrapper = this.#createElement("div", [
-      "cp-overlay-wrapper",
-    ]);
-    const cp_Wrapper = this.#createElement("div", ["cp-wrapper"]);
+    const cp_overlayWrapper = createElement("div", ["cp-overlay-wrapper"]);
+    const cp_Wrapper = createElement("div", ["cp-wrapper"]);
 
     // Append child nodes
     cp_overlayWrapper.appendChild(cp_Wrapper);
@@ -663,9 +245,9 @@ export default class YKColorPicker {
   }
 
   #buildPaletteColor() {
-    const paletteWrapper = this.#createElement("div", ["cp-palette-wrapper"]);
-    const palette = this.#createElement("div", ["cp-palette"]);
-    const cursor = this.#createElement("div", ["cp-cursor"]);
+    const paletteWrapper = createElement("div", ["cp-palette-wrapper"]);
+    const palette = createElement("div", ["cp-palette"]);
+    const cursor = createElement("div", ["cp-cursor"]);
 
     paletteWrapper.appendChild(palette);
     paletteWrapper.appendChild(cursor);
@@ -683,7 +265,7 @@ export default class YKColorPicker {
   }
 
   #buildColorSettings() {
-    const colorSettings = this.#createElement("div", ["cp-color-settings"]);
+    const colorSettings = createElement("div", ["cp-color-settings"]);
 
     // Build color color
     colorSettings.appendChild(this.#buildCopyColor());
@@ -699,13 +281,9 @@ export default class YKColorPicker {
 
   #buildColorInputs() {
     // Create elements
-    const inputsSettings = this.#createElement("div", [
-      "cp-color-model-wrapper",
-    ]);
-    const inputsWrapper = this.#createElement("div", ["cp-color-model"]);
-    const inputsSwitch = this.#createElement("button", [
-      "cp-color-model-switch",
-    ]);
+    const inputsSettings = createElement("div", ["cp-color-model-wrapper"]);
+    const inputsWrapper = createElement("div", ["cp-color-model"]);
+    const inputsSwitch = createElement("button", ["cp-color-model-switch"]);
     inputsSwitch.appendChild(
       this.#createSVGIcon(
         `<path d="m3.5045 11.431 1.5786-1.5786 3.0256 3.0256 3.0256-3.0256 1.5786 1.5786-4.6042 4.4726zm4.6042-11.313 4.6042 4.4726-1.5786 1.5786-3.0256-3.0256-3.0256 3.0256-1.5786-1.5786z"/>`
@@ -738,9 +316,9 @@ export default class YKColorPicker {
   }
 
   #buildHEXInput() {
-    const inputWrapper = this.#createElement("div", ["cp-hex-input"]);
-    const inputHEX = this.#createElement("input", ["cp-color-input"]);
-    const labelHEX = this.#createElement("label", ["cp-color-model-label"]);
+    const inputWrapper = createElement("div", ["cp-hex-input"]);
+    const inputHEX = createElement("input", ["cp-color-input"]);
+    const labelHEX = createElement("label", ["cp-color-model-label"]);
     inputHEX.setAttribute("type", "text");
     labelHEX.textContent = "HEX";
     inputWrapper.appendChild(inputHEX);
@@ -758,27 +336,27 @@ export default class YKColorPicker {
 
   #buildQuadrupedInput() {
     // Create #dom elements
-    const inputWrapper = this.#createElement("div", ["cp-input-wrapper"]);
-    const inputA = this.#createElement("input", ["cp-color-input"], {
+    const inputWrapper = createElement("div", ["cp-input-wrapper"]);
+    const inputA = createElement("input", ["cp-color-input"], {
       type: "text",
       inputmode: "numeric",
     });
-    const inputB = this.#createElement("input", ["cp-color-input"], {
+    const inputB = createElement("input", ["cp-color-input"], {
       type: "text",
       inputmode: "numeric",
     });
-    const inputC = this.#createElement("input", ["cp-color-input"], {
+    const inputC = createElement("input", ["cp-color-input"], {
       type: "text",
       inputmode: "numeric",
     });
-    const inputD = this.#createElement("input", ["cp-color-input"], {
+    const inputD = createElement("input", ["cp-color-input"], {
       type: "text",
       inputmode: "numeric",
     });
-    const labelA = this.#createElement("label", ["cp-color-model-label"]);
-    const labelB = this.#createElement("label", ["cp-color-model-label"]);
-    const labelC = this.#createElement("label", ["cp-color-model-label"]);
-    const labelD = this.#createElement("label", ["cp-color-model-label"]);
+    const labelA = createElement("label", ["cp-color-model-label"]);
+    const labelB = createElement("label", ["cp-color-model-label"]);
+    const labelC = createElement("label", ["cp-color-model-label"]);
+    const labelD = createElement("label", ["cp-color-model-label"]);
 
     // Set labels' text
     const model = this.#currentRepresentation.toUpperCase();
@@ -927,7 +505,7 @@ export default class YKColorPicker {
   }
 
   #buildCopyColor() {
-    const copyColor = this.#createElement("button", ["cp-clipboard-color"]);
+    const copyColor = createElement("button", ["cp-clipboard-color"]);
     copyColor.addEventListener("click", this.#onClickCopyColor.bind(this));
     this.#dom["copyColor"] = copyColor;
     this.#attachCopyIcon();
@@ -961,7 +539,7 @@ export default class YKColorPicker {
   }
 
   #buildColorSliders() {
-    const sliders = this.#createElement("div", ["cp-sliders"]);
+    const sliders = createElement("div", ["cp-sliders"]);
 
     // Build hue slider
     sliders.appendChild(this.#buildHueSlider());
@@ -973,9 +551,9 @@ export default class YKColorPicker {
 
   #buildHueSlider() {
     // Create elements
-    const sliderWrapper = this.#createElement("div", ["cp-hue-slider-wrapper"]);
-    const slider = this.#createElement("div", ["cp-hue-slider"]);
-    const sliderThumb = this.#createElement("a", ["cp-hue-slider-thumb"]);
+    const sliderWrapper = createElement("div", ["cp-hue-slider-wrapper"]);
+    const slider = createElement("div", ["cp-hue-slider"]);
+    const sliderThumb = createElement("a", ["cp-hue-slider-thumb"]);
     sliderThumb.setAttribute("tabindex", "0");
 
     // Appench child element
@@ -1003,11 +581,9 @@ export default class YKColorPicker {
 
   #buildOpacitySlider() {
     // Create elements
-    const sliderWrapper = this.#createElement("div", [
-      "cp-opacity-slider-wrapper",
-    ]);
-    const color = this.#createElement("div", ["cp-opacity-color"]);
-    const sliderThumb = this.#createElement("a", ["cp-opacity-slider-thumb"]);
+    const sliderWrapper = createElement("div", ["cp-opacity-slider-wrapper"]);
+    const color = createElement("div", ["cp-opacity-color"]);
+    const sliderThumb = createElement("a", ["cp-opacity-slider-thumb"]);
     sliderThumb.setAttribute("tabindex", "0");
 
     // Appench child element
@@ -1036,7 +612,7 @@ export default class YKColorPicker {
   }
 
   #buildColorPreview() {
-    const colorPreviewWrapper = this.#createElement("span", [
+    const colorPreviewWrapper = createElement("span", [
       "cp-color-preview-wrapper",
     ]);
 
@@ -1066,21 +642,6 @@ export default class YKColorPicker {
     return colorPreviewWrapper;
   }
 
-  #createElement(tag, classList, attributes) {
-    const el = document.createElement(tag);
-    if (classList != null) {
-      el.classList.add(...classList);
-    }
-    if (attributes) {
-      for (const key in attributes) {
-        if (Object.prototype.hasOwnProperty.call(attributes, key)) {
-          el.setAttribute(key, attributes[key]);
-        }
-      }
-    }
-    return el;
-  }
-
   #rgbUpdateView() {
     this.#updateColorPreview(true);
     this.#updateHueThumb();
@@ -1102,10 +663,10 @@ export default class YKColorPicker {
       rgb[color] = op(rgb[color], 1);
       this.#color.hex =
         hex.substring(0, startSelect) +
-        YKColorPicker.hexPad2(Math.round(rgb[color])) +
+        hexPad2(Math.round(rgb[color])) +
         hex.substring(endSelect);
       const { r, g, b } = rgb;
-      this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
+      this.#color.hsv = YKColorParser.RGBtoHSV(r, g, b);
       this.#rgbUpdateView();
     }
     target.value = this.#color.hex;
@@ -1119,8 +680,7 @@ export default class YKColorPicker {
     if (con(a, conValue)) {
       this.#color.a = parseFloat(op(a, 0.01).toFixed(2));
       target.value = this.#color.hex =
-        hex.substring(0, 7) +
-        YKColorPicker.hexPad2(Math.round(this.#color.a * 255));
+        hex.substring(0, 7) + hexPad2(Math.round(this.#color.a * 255));
       this.#updateColorPreview(true);
       this.#updateOpacityThumb();
     }
@@ -1520,13 +1080,13 @@ export default class YKColorPicker {
   }
 
   #onInputHEX(event) {
-    const rgb = YKColor.HEXtoRGBA(event.target.value.trim());
+    const rgb = YKColorParser.HEXtoRGBA(event.target.value.trim());
     if (rgb != null) {
       const { r, g, b, a } = rgb;
       this.#color.a = a;
       this.#color.rgb = { r, g, b };
-      this.#color.hex = YKColor.RGBAtoHEX(r, g, b, a);
-      this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
+      this.#color.hex = YKColorParser.RGBAtoHEX(r, g, b, a);
+      this.#color.hsv = YKColorParser.RGBtoHSV(r, g, b);
       this.#updateColorPreview(true);
       this.#updateHueThumb();
       this.#updateOpacityThumb();
@@ -1550,7 +1110,7 @@ export default class YKColorPicker {
                 r = Math.round(r);
                 if (r < 255) {
                   this.#color.rgb.r = target.value = ++r;
-                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
@@ -1581,7 +1141,7 @@ export default class YKColorPicker {
                 r = Math.round(r);
                 if (r > 0) {
                   this.#color.rgb.r = target.value = --r;
-                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
@@ -1615,7 +1175,7 @@ export default class YKColorPicker {
             const { g, b } = this.#color.rgb;
             if (!isNaN(value) && value >= 0 && value <= 255) {
               this.#color.rgb.r = value;
-              this.#color.hsv = YKColor.RGBtoHSV(value, g, b);
+              this.#color.hsv = YKColorParser.RGBtoHSV(value, g, b);
               this.#updateColorPreview(true);
               this.#updateHueThumb();
               this.#updateCursorThumb();
@@ -1668,7 +1228,7 @@ export default class YKColorPicker {
                 g = Math.round(g);
                 if (g < 255) {
                   this.#color.rgb.g = target.value = ++g;
-                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
@@ -1694,7 +1254,7 @@ export default class YKColorPicker {
                 if (hsl_s < 100) {
                   target.value = ++hsl_s + "%";
                   this.#color.hsl.s = hsl_s;
-                  this.#color.hsv.s = YKColor.HSLtoHSV(h, hsl_s, l).s;
+                  this.#color.hsv.s = YKColorParser.HSLtoHSV(h, hsl_s, l).s;
                   this.#updateColorPreview(true);
                   this.#updateCursorThumb();
                 }
@@ -1712,7 +1272,7 @@ export default class YKColorPicker {
                 g = Math.round(g);
                 if (g > 0) {
                   this.#color.rgb.g = target.value = --g;
-                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
@@ -1738,7 +1298,7 @@ export default class YKColorPicker {
                 if (hsl_s > 0) {
                   target.value = --hsl_s + "%";
                   this.#color.hsl.s = hsl_s;
-                  this.#color.hsv.s = YKColor.HSLtoHSV(h, hsl_s, l).s;
+                  this.#color.hsv.s = YKColorParser.HSLtoHSV(h, hsl_s, l).s;
                   this.#updateColorPreview(true);
                   this.#updateCursorThumb();
                 }
@@ -1759,7 +1319,7 @@ export default class YKColorPicker {
             const { r, b } = this.#color.rgb;
             if (!isNaN(value) && value >= 0 && value <= 255) {
               this.#color.rgb.g = value;
-              this.#color.hsv = YKColor.RGBtoHSV(r, value, b);
+              this.#color.hsv = YKColorParser.RGBtoHSV(r, value, b);
               this.#updateColorPreview(true);
               this.#updateHueThumb();
               this.#updateCursorThumb();
@@ -1782,7 +1342,7 @@ export default class YKColorPicker {
             const { h, l } = this.#color.hsl;
             if (!isNaN(value) && value >= 0 && value <= 100) {
               this.#color.hsl.s = value;
-              this.#color.hsv = YKColor.HSLtoHSV(h, value, l);
+              this.#color.hsv = YKColorParser.HSLtoHSV(h, value, l);
               this.#updateColorPreview(true);
               this.#updateCursorThumb();
             }
@@ -1828,7 +1388,7 @@ export default class YKColorPicker {
                 b = Math.round(b);
                 if (b < 255) {
                   this.#color.rgb.b = target.value = ++b;
-                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
@@ -1854,7 +1414,7 @@ export default class YKColorPicker {
                 if (hsl_l < 100) {
                   target.value = ++hsl_l + "%";
                   this.#color.hsl.l = hsl_l;
-                  this.#color.hsv.v = YKColor.HSLtoHSV(h, s, hsl_l).v;
+                  this.#color.hsv.v = YKColorParser.HSLtoHSV(h, s, hsl_l).v;
                   this.#updateColorPreview(true);
                   this.#updateCursorThumb();
                 }
@@ -1872,7 +1432,7 @@ export default class YKColorPicker {
                 b = Math.round(b);
                 if (b > 0) {
                   this.#color.rgb.b = target.value = --b;
-                  this.#color.hsv = YKColor.RGBtoHSV(r, g, b);
+                  this.#color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this.#rgbUpdateView();
                 }
               }
@@ -1898,7 +1458,7 @@ export default class YKColorPicker {
                 if (l > 0) {
                   target.value = --hsl_l + "%";
                   this.#color.hsl.l = hsl_l;
-                  this.#color.hsv.v = YKColor.HSLtoHSV(h, s, hsl_l).v;
+                  this.#color.hsv.v = YKColorParser.HSLtoHSV(h, s, hsl_l).v;
                   this.#updateColorPreview(true);
                   this.#updateCursorThumb();
                 }
@@ -1919,7 +1479,7 @@ export default class YKColorPicker {
             const { r, g } = this.#color.rgb;
             if (!isNaN(value) && value >= 0 && value <= 255) {
               this.#color.rgb.b = value;
-              this.#color.hsv = YKColor.RGBtoHSV(r, g, value);
+              this.#color.hsv = YKColorParser.RGBtoHSV(r, g, value);
               this.#updateColorPreview(true);
               this.#updateHueThumb();
               this.#updateCursorThumb();
@@ -1942,7 +1502,7 @@ export default class YKColorPicker {
             const { h, s } = this.#color.hsl;
             if (!isNaN(value) && value >= 0 && value <= 100) {
               this.#color.hsl.l = value;
-              this.#color.hsv = YKColor.HSLtoHSV(h, s, value);
+              this.#color.hsv = YKColorParser.HSLtoHSV(h, s, value);
               this.#updateColorPreview(true);
               this.#updateCursorThumb();
             }
@@ -2214,7 +1774,7 @@ export default class YKColorPicker {
 
   #updateHEXColor() {
     const { r, g, b } = (this.#color.rgb = this.#color.toRGB());
-    this.#color.hex = YKColor.RGBAtoHEX(r, g, b, this.#color.a);
+    this.#color.hex = YKColorParser.RGBAtoHEX(r, g, b, this.#color.a);
   }
 
   #getColorText() {
@@ -2386,10 +1946,6 @@ export default class YKColorPicker {
     this.#currentRepresentation = value;
     this.#updateInputs();
     this.#options.onRepresentationChange(this);
-  }
-
-  static hexPad2(value) {
-    return value.toString(16).padStart(2, "0");
   }
 
   static #isTargetInViewport(target) {

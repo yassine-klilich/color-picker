@@ -1,7 +1,9 @@
+import { hexPad2 } from "./utility";
+
 /**
  * Color Parser
  */
-const YKColorParser = Object.freeze({
+export const YKColorParser = Object.freeze({
   parse: function (color) {
     if (color == undefined) {
       throw new Error("YKColorParser:: color is undefined");
@@ -19,7 +21,7 @@ const YKColorParser = Object.freeze({
       let rgb = this.NAMED_COLORS[color.toLowerCase()];
       if (rgb != undefined) {
         rgb = rgb.split(" ");
-        const { h, s, v } = YKColor.RGBtoHSV(rgb[0], rgb[1], rgb[2]);
+        const { h, s, v } = YKColorParser.RGBtoHSV(rgb[0], rgb[1], rgb[2]);
         return { h, s, v, a: 1 };
       }
     } else {
@@ -34,7 +36,7 @@ const YKColorParser = Object.freeze({
         a >= 0 &&
         a <= 1
       ) {
-        const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
+        const { h, s, v } = YKColorParser.RGBtoHSV(r, g, b);
         return { h, s, v, a };
       }
       throw new Error(
@@ -78,7 +80,7 @@ const YKColorParser = Object.freeze({
         );
       }
 
-      const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
+      const { h, s, v } = YKColorParser.RGBtoHSV(r, g, b);
       return { h, s, v, a: isNaN(a) ? 1 : a };
     }
 
@@ -88,13 +90,100 @@ const YKColorParser = Object.freeze({
   },
 
   compileHEX: function (color) {
-    const rgb = YKColor.HEXtoRGBA(color);
+    const rgb = YKColorParser.HEXtoRGBA(color);
     if (rgb) {
       const { r, g, b, a } = rgb;
-      const { h, s, v } = YKColor.RGBtoHSV(r, g, b);
+      const { h, s, v } = YKColorParser.RGBtoHSV(r, g, b);
       return { h, s, v, a };
     }
     throw new Error(`YKColorParser:: '${color}' is an invalid HEX format`);
+  },
+
+  RGBtoHSV: function (r, g, b) {
+    (r /= 255), (g /= 255), (b /= 255);
+
+    let max = Math.max(r, g, b),
+      min = Math.min(r, g, b);
+    let h,
+      s,
+      v = max;
+
+    let d = max - min;
+    s = max == 0 ? 0 : d / max;
+
+    if (max == min) {
+      h = 0;
+    } else {
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
+      }
+
+      h /= 6;
+    }
+
+    h = h * 360;
+    s = s * 100;
+    v = v * 100;
+
+    return { h, s, v };
+  },
+
+  HSLtoHSV: function (h, s, l) {
+    const hsv1 = (s * (l < 50 ? l : 100 - l)) / 100;
+
+    return {
+      h,
+      s: hsv1 === 0 ? 0 : ((2 * hsv1) / (l + hsv1)) * 100,
+      v: l + hsv1,
+    };
+  },
+
+  HEXtoRGBA: function (hex) {
+    let r = 0,
+      g = 0,
+      b = 0,
+      a = 0;
+
+    if (/^#(([a-f0-9]){3,4}|([a-f0-9]){6}|([a-f0-9]){8})$/i.test(hex)) {
+      if (hex.length < 6) {
+        const splitHexValues = hex.split("");
+        r = +("0x" + splitHexValues[1] + splitHexValues[1]);
+        g = +("0x" + splitHexValues[2] + splitHexValues[2]);
+        b = +("0x" + splitHexValues[3] + splitHexValues[3]);
+        a = splitHexValues[4]
+          ? parseFloat(
+              (+("0x" + splitHexValues[4] + splitHexValues[4]) / 255).toFixed(2)
+            )
+          : 1;
+      } else if (hex.length < 10) {
+        const splitHexValues = hex.split(/([a-f0-9]{2})/i);
+        r = +("0x" + splitHexValues[1]);
+        g = +("0x" + splitHexValues[3]);
+        b = +("0x" + splitHexValues[5]);
+        a = splitHexValues[7]
+          ? parseFloat((+("0x" + splitHexValues[7]) / 255).toFixed(2))
+          : 1;
+      }
+
+      return { r, g, b, a };
+    }
+  },
+
+  RGBAtoHEX: function (r, g, b, a) {
+    r = hexPad2(Math.round(r));
+    g = hexPad2(Math.round(g));
+    b = hexPad2(Math.round(b));
+    a = a == 1 ? "" : hexPad2(Math.round(a * 255));
+
+    return "#" + r + g + b + a;
   },
 
   NAMED_COLORS: Object.freeze({
