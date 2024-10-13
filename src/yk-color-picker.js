@@ -1,3 +1,5 @@
+import "./yk-color-picker.css";
+
 /**
  * Color
  */
@@ -421,7 +423,7 @@ const YKColorParser = Object.freeze({
 /**
  * Color Picker
  */
-class YKColorPicker {
+export default class YKColorPicker {
   #isOpen = false;
   #options = YKColorPicker.DEFAULT_OPTIONS;
   #color = null;
@@ -2469,5 +2471,3 @@ class YKColorPicker {
     return a - b;
   }
 }
-
-window.YKColorPicker = YKColorPicker;
