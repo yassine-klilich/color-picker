@@ -2,7 +2,7 @@ import "./yk-color-picker.css";
 
 import { YKColor } from "./yk-color";
 import { YKColorParser } from "./yk-color-parser";
-import { hexPad2, createElement } from "./utility";
+import { hexPad2, createElement, attachEvent } from "./utility";
 
 /**
  * Color Picker
@@ -73,7 +73,7 @@ export default class YKColorPicker {
     // init click and enter key to target
     if (target) {
       this.#onClickTargetBind = this.#onClickTarget.bind(this);
-      target.addEventListener("click", this.#onClickTargetBind);
+      attachEvent(target, "click", this.#onClickTargetBind);
     }
 
     this.setColor(this.#options.color);
@@ -151,7 +151,7 @@ export default class YKColorPicker {
       }
       this.#dom.target = target;
       if (this.#dom.target != null) {
-        this.#dom.target.addEventListener("click", this.#onClickTargetBind);
+        this.#dom.attachEvent(target, "click", this.#onClickTargetBind);
       }
     }
 
@@ -218,9 +218,7 @@ export default class YKColorPicker {
     // build color settings
     cp_Wrapper.appendChild(this.#buildColorSettings());
 
-    cp_overlayWrapper.addEventListener("click", (event) =>
-      event.stopPropagation()
-    );
+    attachEvent(cp_overlayWrapper, "click", (event) => event.stopPropagation());
     this.#dom["overlayWrapper"] = cp_overlayWrapper;
 
     this.#onKeyUpCloseBind = this.#onKeyUpClose.bind(this);
@@ -256,7 +254,7 @@ export default class YKColorPicker {
     this.#onMouseDownCursorBind = this.#onMouseDownCursor.bind(this);
     this.#onMouseUpCursorBind = this.#onMouseUpCursor.bind(this);
     this.#onMouseMoveCursorBind = this.#onMouseMoveCursor.bind(this);
-    paletteWrapper.addEventListener("pointerdown", this.#onMouseDownCursorBind);
+    attachEvent(paletteWrapper, "pointerdown", this.#onMouseDownCursorBind);
 
     this.#dom["palette"] = palette;
     this.#dom["cursor"] = cursor;
@@ -283,7 +281,9 @@ export default class YKColorPicker {
     // Create elements
     const inputsSettings = createElement("div", ["cp-color-model-wrapper"]);
     const inputsWrapper = createElement("div", ["cp-color-model"]);
-    const inputsSwitch = createElement("button", ["cp-color-model-switch"]);
+    const inputsSwitch = createElement("button", ["cp-color-model-switch"], {
+      type: "button",
+    });
     inputsSwitch.appendChild(
       this.#createSVGIcon(
         `<path d="m3.5045 11.431 1.5786-1.5786 3.0256 3.0256 3.0256-3.0256 1.5786 1.5786-4.6042 4.4726zm4.6042-11.313 4.6042 4.4726-1.5786 1.5786-3.0256-3.0256-3.0256 3.0256-1.5786-1.5786z"/>`
@@ -295,10 +295,7 @@ export default class YKColorPicker {
     inputsSettings.appendChild(inputsSwitch);
 
     // Attach Events
-    inputsSwitch.addEventListener(
-      "click",
-      this.#onClickInputsSwitch.bind(this)
-    );
+    attachEvent(inputsSwitch, "click", this.#onClickInputsSwitch.bind(this));
 
     this.#dom["inputsWrapper"] = inputsWrapper;
 
@@ -324,10 +321,10 @@ export default class YKColorPicker {
     inputWrapper.appendChild(inputHEX);
     inputWrapper.appendChild(labelHEX);
 
-    inputHEX.addEventListener("focus", this.#onFocusInput.bind(this));
-    inputHEX.addEventListener("keydown", this.#onKeyDownInputHEX.bind(this));
-    inputHEX.addEventListener("input", this.#onInputHEX.bind(this));
-    inputHEX.addEventListener("change", this.#onChangeInputHEX.bind(this));
+    attachEvent(inputHEX, "focus", this.#onFocusInput.bind(this));
+    attachEvent(inputHEX, "keydown", this.#onKeyDownInputHEX.bind(this));
+    attachEvent(inputHEX, "input", this.#onInputHEX.bind(this));
+    attachEvent(inputHEX, "change", this.#onChangeInputHEX.bind(this));
 
     this.#dom["inputHEX"] = inputHEX;
 
@@ -376,24 +373,24 @@ export default class YKColorPicker {
     inputWrapper.appendChild(labelD);
 
     // Attach events
-    inputA.addEventListener("focus", this.#onFocusInput.bind(this));
-    inputA.addEventListener("keydown", this.#onKeyDownInputA.bind(this));
-    inputA.addEventListener("input", this.#onInputA.bind(this));
-    inputA.addEventListener("change", this.#onChangeInputA.bind(this));
+    attachEvent(inputA, "focus", this.#onFocusInput.bind(this));
+    attachEvent(inputA, "keydown", this.#onKeyDownInputA.bind(this));
+    attachEvent(inputA, "input", this.#onInputA.bind(this));
+    attachEvent(inputA, "change", this.#onChangeInputA.bind(this));
 
-    inputB.addEventListener("focus", this.#onFocusInput.bind(this));
-    inputB.addEventListener("keydown", this.#onKeyDownInputB.bind(this));
-    inputB.addEventListener("input", this.#onInputB.bind(this));
-    inputB.addEventListener("change", this.#onChangeInputB.bind(this));
+    attachEvent(inputB, "focus", this.#onFocusInput.bind(this));
+    attachEvent(inputB, "keydown", this.#onKeyDownInputB.bind(this));
+    attachEvent(inputB, "input", this.#onInputB.bind(this));
+    attachEvent(inputB, "change", this.#onChangeInputB.bind(this));
 
-    inputC.addEventListener("focus", this.#onFocusInput.bind(this));
-    inputC.addEventListener("keydown", this.#onKeyDownInputC.bind(this));
-    inputC.addEventListener("input", this.#onInputC.bind(this));
-    inputC.addEventListener("change", this.#onChangeInputC.bind(this));
+    attachEvent(inputC, "focus", this.#onFocusInput.bind(this));
+    attachEvent(inputC, "keydown", this.#onKeyDownInputC.bind(this));
+    attachEvent(inputC, "input", this.#onInputC.bind(this));
+    attachEvent(inputC, "change", this.#onChangeInputC.bind(this));
 
-    inputD.addEventListener("keydown", this.#onKeyDownAlphaInput.bind(this));
-    inputD.addEventListener("input", this.#onKeyUpAlphaInput.bind(this));
-    inputD.addEventListener("change", this.#onChangeAlphaInput.bind(this));
+    attachEvent(inputD, "keydown", this.#onKeyDownAlphaInput.bind(this));
+    attachEvent(inputD, "input", this.#onKeyUpAlphaInput.bind(this));
+    attachEvent(inputD, "change", this.#onChangeAlphaInput.bind(this));
 
     this.#dom["inputA"] = inputA;
     this.#dom["inputB"] = inputB;
@@ -505,8 +502,10 @@ export default class YKColorPicker {
   }
 
   #buildCopyColor() {
-    const copyColor = createElement("button", ["cp-clipboard-color"]);
-    copyColor.addEventListener("click", this.#onClickCopyColor.bind(this));
+    const copyColor = createElement("button", ["cp-clipboard-color"], {
+      type: "button",
+    });
+    attachEvent(copyColor, "click", this.#onClickCopyColor.bind(this));
     this.#dom["copyColor"] = copyColor;
     this.#attachCopyIcon();
 
@@ -564,14 +563,8 @@ export default class YKColorPicker {
     this.#onMouseDownHueSliderBind = this.#onMouseDownHueSlider.bind(this);
     this.#onMouseUpHueSliderBind = this.#onMouseUpHueSlider.bind(this);
     this.#onMouseMoveHueSliderBind = this.#onMouseMoveHueSlider.bind(this);
-    sliderWrapper.addEventListener(
-      "pointerdown",
-      this.#onMouseDownHueSliderBind
-    );
-    sliderThumb.addEventListener(
-      "keydown",
-      this.#onKeyDownHueSlider.bind(this)
-    );
+    attachEvent(sliderWrapper, "pointerdown", this.#onMouseDownHueSliderBind);
+    attachEvent(sliderThumb, "keydown", this.#onKeyDownHueSlider.bind(this));
 
     this.#dom["hueSlider"] = slider;
     this.#dom["hueThumb"] = sliderThumb;
@@ -596,11 +589,13 @@ export default class YKColorPicker {
     this.#onMouseUpOpacitySliderBind = this.#onMouseUpOpacitySlider.bind(this);
     this.#onMouseMoveOpacitySliderBind =
       this.#onMouseMoveOpacitySlider.bind(this);
-    sliderWrapper.addEventListener(
+    attachEvent(
+      sliderWrapper,
       "pointerdown",
       this.#onMouseDownOpacitySliderBind
     );
-    sliderThumb.addEventListener(
+    attachEvent(
+      sliderThumb,
       "keydown",
       this.#onKeyDownOpacitySlider.bind(this)
     );
@@ -750,10 +745,10 @@ export default class YKColorPicker {
     overlayWrapper.classList.add("cp-overlay-wrapper--" + this.#options.theme);
     this.#updateGUI();
     this.#updatePosition();
-    window.addEventListener("resize", this.#onResizeScrollWindowBind);
-    window.addEventListener("scroll", this.#onResizeScrollWindowBind);
-    document.addEventListener("click", this.#onClickCloseBind);
-    document.addEventListener("keyup", this.#onKeyUpCloseBind);
+    attachEvent(window, "resize", this.#onResizeScrollWindowBind);
+    attachEvent(window, "scroll", this.#onResizeScrollWindowBind);
+    attachEvent(document, "click", this.#onClickCloseBind);
+    attachEvent(document, "keyup", this.#onKeyUpCloseBind);
     this.#isOpen = true;
     if (parent != overlayWrapper.parentElement) {
       this.#options.onContainerChange(this, parent);
@@ -774,8 +769,8 @@ export default class YKColorPicker {
 
   #onMouseDownCursor(event) {
     this.#dc = true;
-    document.addEventListener("pointermove", this.#onMouseMoveCursorBind);
-    document.addEventListener("pointerup", this.#onMouseUpCursorBind);
+    attachEvent(document, "pointermove", this.#onMouseMoveCursorBind);
+    attachEvent(document, "pointerup", this.#onMouseUpCursorBind);
     this.#onMouseMoveCursorBind(event);
   }
 
@@ -1569,8 +1564,8 @@ export default class YKColorPicker {
   #onMouseDownHueSlider(event) {
     event.preventDefault(); // prevent default to set focus on the thumb
     this.#dc = true;
-    document.addEventListener("pointermove", this.#onMouseMoveHueSliderBind);
-    document.addEventListener("pointerup", this.#onMouseUpHueSliderBind);
+    attachEvent(document, "pointermove", this.#onMouseMoveHueSliderBind);
+    attachEvent(document, "pointerup", this.#onMouseUpHueSliderBind);
     this.#dom.hueThumb.focus();
     this.#onMouseMoveHueSliderBind(event);
   }
@@ -1605,11 +1600,8 @@ export default class YKColorPicker {
   #onMouseDownOpacitySlider(event) {
     event.preventDefault(); // prevent default to set focus on the thumb
     this.#dc = true;
-    document.addEventListener(
-      "pointermove",
-      this.#onMouseMoveOpacitySliderBind
-    );
-    document.addEventListener("pointerup", this.#onMouseUpOpacitySliderBind);
+    attachEvent(document, "pointermove", this.#onMouseMoveOpacitySliderBind);
+    attachEvent(document, "pointerup", this.#onMouseUpOpacitySliderBind);
     this.#dom.opacityThumb.focus();
     this.#onMouseMoveOpacitySliderBind(event);
   }

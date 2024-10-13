@@ -17,7 +17,12 @@ export function createElement(tag, classList, attributes) {
   return el;
 }
 
+export function attachEvent(element, eventName, eventHandler) {
+  element.addEventListener(eventName, eventHandler);
+}
+
 export default {
   hexPad2,
   createElement,
+  attachEvent,
 };
