@@ -8,7 +8,7 @@ export default defineConfig({
     lib: {
       entry: "./src/yk-color-picker.ts",
       name: "YKColorPicker",
-      formats: ["es"],
+      formats: ["es", "umd"],
       fileName: (format) => `yk-color-picker.${format}.js`,
     },
     sourcemap: true,
