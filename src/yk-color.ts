@@ -4,7 +4,13 @@ import { YKColorParser } from "./yk-color-parser";
  * Color
  */
 export class YKColor {
-  constructor(h, s, v, a) {
+  a: number
+  hsv: {h: number, s: number, v: number}
+  rgb: {r: number, g: number, b: number}
+  hsl: {h: number, s: number, l: number}
+  hex: string
+
+  constructor(h: number, s: number, v: number, a: number) {
     this.a = a;
     this.hsv = { h, s, v };
     this.rgb = this.toRGB();
@@ -19,7 +25,7 @@ export class YKColor {
     s /= 100;
     v /= 100;
 
-    var r, g, b, i, f, p, q, t;
+    let r = 0, g = 0, b = 0, i, f, p, q, t;
     i = Math.floor(h * 6);
     f = h * 6 - i;
     p = v * (1 - s);

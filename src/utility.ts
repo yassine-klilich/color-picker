@@ -1,8 +1,12 @@
-export function hexPad2(value) {
+export function hexPad2(value: number) {
   return value.toString(16).padStart(2, "0");
 }
 
-export function createElement(tag, classList, attributes) {
+export function createElement(
+  tag: string,
+  classList: string[],
+  attributes?: any
+) {
   const el = document.createElement(tag);
   if (classList != null) {
     el.classList.add(...classList);
@@ -17,7 +21,11 @@ export function createElement(tag, classList, attributes) {
   return el;
 }
 
-export function attachEvent(element, eventName, eventHandler) {
+export function attachEvent(
+  element: HTMLElement | Window | Document,
+  eventName: string,
+  eventHandler: any
+) {
   element.addEventListener(eventName, eventHandler);
 }
 

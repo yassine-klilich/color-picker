@@ -31,7 +31,7 @@
     <div id="container-2"></div>
 
     <script type="module">
-      import YKColorPicker from "@yk-color-picker";
+      import YKColorPicker, { YKColorPickerPosition } from "@yk-color-picker";
 
       const colorPicker = new YKColorPicker({
         target: document.getElementById("colorBox"),
@@ -62,7 +62,7 @@
         onContainerChange: function (instance, prevContainer) {
           console.log("on container change", instance, prevContainer);
         },
-        position: YKColorPicker.BOTTOM,
+        position: YKColorPickerPosition.BOTTOM,
         color: "brown",
         theme: "dark",
         closeOnScroll: false,
