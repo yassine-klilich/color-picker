@@ -2,14 +2,6 @@
 
 YKColorPicker is a lightweight and flexible color picker library designed with a strong focus on user experience (UX), including full keyboard interaction support. It provides a seamless way to integrate a customizable color picker into your project, offering various color models such as RGB, HSV, HSL, and HEX.
 
-## Installation
-
-To install YKColorPicker in your project, you can use npm:
-
-```bash
-npm install yk-color-picker
-```
-
 ## Usage
 
 ### Basic Setup
