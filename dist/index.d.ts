@@ -4,7 +4,7 @@ declare interface __YKColorPickerOptions extends Required<YKColorPickerOptions> 
 /**
  * Color Picker
  */
-declare class YKColorPicker {
+export declare class YKColorPicker {
     static DEFAULT_OPTIONS: __YKColorPickerOptions;
     private _isOpen;
     private _options;
@@ -131,7 +131,6 @@ declare class YKColorPicker {
     private static _add;
     private static _sub;
 }
-export default YKColorPicker;
 
 export declare enum YKColorPickerMode {
     RGB = "rgb",

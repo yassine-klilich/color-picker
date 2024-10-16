@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>YKColorPicker</title>
 
+    <link rel="stylesheet" href="../dist/iife2020/style.css" />
+
     <style>
       .color-box {
         position: relative;
@@ -30,10 +32,10 @@
     <div id="container"></div>
     <div id="container-2"></div>
 
-    <script type="module">
-      import { YKColorPicker, YKColorPickerPosition } from "yk-color-picker";
+    <script src="../dist/iife2020/yk-color-picker.js"></script>
 
-      const colorPicker = new YKColorPicker({
+    <script>
+      const colorPicker = new YK.YKColorPicker({
         target: document.getElementById("colorBox"),
         // container: "container",
         onInit: function (instance) {
@@ -62,7 +64,7 @@
         onContainerChange: function (instance, prevContainer) {
           console.log("on container change", instance, prevContainer);
         },
-        position: YKColorPickerPosition.BOTTOM,
+        position: YK.YKColorPickerPosition.BOTTOM,
         color: "brown",
         theme: "dark",
         closeOnScroll: false,

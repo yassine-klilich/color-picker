@@ -21,7 +21,11 @@ export const YKColorParser = {
       let rgb: string | undefined = this.getNamedColor(color.toLowerCase());
       if (rgb != undefined) {
         const _rgb = rgb.split(" ");
-        const { h, s, v } = YKColorParser.RGBtoHSV(parseInt(_rgb[0]), parseInt(_rgb[1]), parseInt(_rgb[2]));
+        const { h, s, v } = YKColorParser.RGBtoHSV(
+          parseInt(_rgb[0]),
+          parseInt(_rgb[1]),
+          parseInt(_rgb[2])
+        );
         return { h, s, v, a: 1 };
       }
     } else {
@@ -178,10 +182,12 @@ export const YKColorParser = {
   },
 
   RGBAtoHEX: function (r: number, g: number, b: number, a: number) {
-    return `#${hexPad2(Math.round(r))}${hexPad2(Math.round(g))}${hexPad2(Math.round(b))}${a == 1 ? "" : hexPad2(Math.round(a * 255))}`
+    return `#${hexPad2(Math.round(r))}${hexPad2(Math.round(g))}${hexPad2(
+      Math.round(b)
+    )}${a == 1 ? "" : hexPad2(Math.round(a * 255))}`;
   },
 
-  getNamedColor: function(color: string): string | undefined {
+  getNamedColor: function (color: string): string | undefined {
     return {
       aliceblue: "240 248 255",
       antiquewhite: "250 235 215",
@@ -330,7 +336,6 @@ export const YKColorParser = {
       whitesmoke: "245 245 245",
       yellow: "255 255 0",
       yellowgreen: "154 205 50",
-    }[color]
-    
-  }
+    }[color];
+  },
 };

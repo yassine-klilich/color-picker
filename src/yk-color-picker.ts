@@ -77,7 +77,7 @@ interface __YKColorPickerOptions extends Required<YKColorPickerOptions> {}
 /**
  * Color Picker
  */
-export default class YKColorPicker {
+export class YKColorPicker {
   static DEFAULT_OPTIONS: __YKColorPickerOptions = {
     target: undefined,
     container: undefined,
@@ -1646,9 +1646,7 @@ export default class YKColorPicker {
       }, 600);
     } catch (err) {
       document.body.removeChild(input);
-      throw new Error("YKColorPicker:: Failed to copy color.", {
-        cause: err,
-      });
+      throw new Error("YKColorPicker:: Failed to copy color.\n" + err);
     }
   }
 
